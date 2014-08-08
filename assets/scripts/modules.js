@@ -5,21 +5,8 @@
 var MODULES=[
   "-util",
   "-animation",
-
-  "-p2",
-
-  "input",
-
 //  "get",
-
-  "world",
-
-  "quad",
-  
-  "ui",
-
-  "canvas",
-
+//  "canvas",
 //  "load"
 ];
 
@@ -27,7 +14,7 @@ var MODULES=[
 var VERSION=[0,0,0];
 
 // are you using a main loop? (you must call update() afterward disable/reenable)
-var UPDATE=true;
+var UPDATE=false;
 
 // the framerate is updated this often (seconds)
 var FRAME_DELAY=1;
@@ -261,7 +248,5 @@ function update() {
 }
 
 function delta() {
-  if(prop.time.frame.delta)
-    return prop.time.frame.delta;
-  return 0.0001;
+  return prop.time.frame.delta;
 }
