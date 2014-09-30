@@ -1,5 +1,5 @@
 
-function input_init() {
+function input_init_pre() {
   prop.input={};
 
   prop.input.button={
@@ -25,7 +25,7 @@ function input_init() {
 function input_done() {
   $(window).keydown(function(e) {
     prop.input.keys[e.which]=true;
-    input_keydown(e);
+    input_keydown(e.which);
   });
 
   $(window).keyup(function(e) {
@@ -39,8 +39,19 @@ function input_keydown(keycode) {
   // called with the users' key-repeat settings
 }
 
-function input_update() {
-  if(prop.input.keys[prop.input.keysym.shift]) {
-    // okay, shift key is currently held down
+function input_update_pre() {
+  if(prop.input.keys[prop.input.keysym.left]) {
+    prop.ship.player.controls[0] = -1;
+  } else if(prop.input.keys[prop.input.keysym.right]) {
+    prop.ship.player.controls[0] = 1;
+  } else {
+    prop.ship.player.controls[0] = 0;
+  }
+  if(prop.input.keys[prop.input.keysym.up]) {
+    prop.ship.player.controls[1] = 1;
+  } else if(prop.input.keys[prop.input.keysym.down]) {
+    prop.ship.player.controls[1] = -1;
+  } else {
+    prop.ship.player.controls[1] = 0;
   }
 }

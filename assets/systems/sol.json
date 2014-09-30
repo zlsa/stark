@@ -1,0 +1,27 @@
+{
+  "title": "Sol",
+
+  "star": {
+    "radius":     100,
+    "mass":       59800
+  },
+
+  "planets": {
+    "earth": {
+      "distance":   300,
+      "radius":     100,
+      "offset":     90,
+      "mass":       59800,
+      "period":     120,
+      "atmosphere": {
+        "thickness": 100,
+        "density":   1,
+        "colors": [
+          [0.0, "#def"],
+          [0.3, "#8df"]
+        ]
+      }
+    }
+  }
+
+}

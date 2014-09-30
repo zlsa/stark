@@ -61,7 +61,6 @@ var Content=function(options) {
   };
 
   this.dl_done=function(data) {
-    async_loaded("get");
     var that=get_queue_current(); // we better be in a queue
     if(!that) {
       log("OHSHITSHITSHIT!",LOG_FATAL);
@@ -73,10 +72,10 @@ var Content=function(options) {
       that.callback.call(that.that,"ok",data,that.payload);
     load_item_done();
     get_queue_check();
+    async_loaded("get");
   };
 
   this.dl_fail=function(d,error) {
-    async_loaded("get");
     var that=get_queue_current(); // we better be in a queue
     if(!that) {
       log("OHSHITSHITSHIT!",LOG_FATAL);
@@ -90,6 +89,7 @@ var Content=function(options) {
       that.status="fail";
       get_queue_check();
       load_item_done();
+      async_loaded("get");
     } else {
       setTimeout(function() {
         that.get(); // try again
@@ -118,7 +118,7 @@ var Content=function(options) {
   get_queue_add(this);
 };
 
-function get_pre() {
+function get_init_pre() {
   prop.get={};
   prop.get.queue=[];
 

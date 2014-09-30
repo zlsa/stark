@@ -5,16 +5,29 @@
 var MODULES=[
   "-util",
   "-animation",
-//  "get",
-//  "canvas",
-//  "load"
+  "get",
+  "assets",
+
+  "game",
+
+  "planet",
+  "system",
+
+  "ship",
+
+  "ui",
+  "input",
+
+  "load",
+
+  "canvas",
 ];
 
 // saved as prop.version and prop.version_string
 var VERSION=[0,0,0];
 
 // are you using a main loop? (you must call update() afterward disable/reenable)
-var UPDATE=false;
+var UPDATE=true;
 
 // the framerate is updated this often (seconds)
 var FRAME_DELAY=1;
@@ -72,6 +85,7 @@ var log_strings={
 
 function prop_init() {
   prop={};
+  prop.complete=false;
   prop.temp="nothing here";
   prop.version=VERSION;
   prop.version_string="v"+VERSION.join(".");
@@ -230,6 +244,10 @@ function resize() {
 }
 
 function update() {
+  if(!prop.complete) {
+    call_module("*","complete");
+    prop.complete=true;
+  }
   call_module("*","update_pre");
   call_module("*","update");
   call_module("*","update_post");
@@ -243,7 +261,7 @@ function update() {
     prop.time.frame.count=0;
     prop.time.frame.start=time();
   }
-  prop.time.frame.delta=Math.min(time()-prop.time.frame.last,1/20);
+  prop.time.frame.delta=time()-prop.time.frame.last;
   prop.time.frame.last=time();
 }
 
