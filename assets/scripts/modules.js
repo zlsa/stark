@@ -266,5 +266,6 @@ function update() {
 }
 
 function delta() {
+//  return 0.016;
   return prop.time.frame.delta;
 }

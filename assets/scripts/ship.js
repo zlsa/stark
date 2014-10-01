@@ -4,8 +4,8 @@ var Ship=Fiber.extend(function() {
     init: function(options) {
       if(!options) options={};
 
-      this.position = [0, 0];
-      this.velocity = [0, 0];
+      this.position = [0, 100];
+      this.velocity = [140, 0];
       this.angle    = 0;
       this.angular_velocity = 0;
 
@@ -28,6 +28,8 @@ var Ship=Fiber.extend(function() {
       this.images = {
         
       };
+
+      this.path = [];
 
       this.content = {
         normal_image: new Content({
@@ -92,6 +94,8 @@ var Ship=Fiber.extend(function() {
       this.updateThrust();
       this.updateGravity();
       this.updatePhysics();
+
+      this.path.push([this.position[0], this.position[1]]);
     }
   };
 });

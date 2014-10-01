@@ -8,7 +8,7 @@ var Planet=Fiber.extend(function() {
       this.radius   = options.radius   || 1;
       this.offset   = options.offset   || 0;
 
-      this.period   = options.period   || 1; // seconds for a full trip
+      this.period   = options.period   || 100; // seconds for a full trip
 
       this.parent   = options.parent || null;
       this.system   = options.system || null;
@@ -25,7 +25,8 @@ var Planet=Fiber.extend(function() {
         ]
       };
 
-      this.atmosphere.colors.push([1.0, "#000"]);
+      if(this.atmosphere.colors)
+        this.atmosphere.colors.push([1.0, "#000"]);
 
       this.planets = {};
       
@@ -71,7 +72,8 @@ var Planet=Fiber.extend(function() {
     gravityAt: function(position, mass) {
       var pp        = this.getPosition(true);
 
-      var distance  = distance2d(pp, position);
+      var distance  = distance2d([0, 0], [distance2d(pp, position), this.radius]);
+//      var distance  = distance2d(pp, position);
       var pull      = (this.mass * mass) / (distance * distance);
 
       var direction = Math.atan2((position[0] - pp[0]), (position[1] - pp[1]));
@@ -109,6 +111,7 @@ var Planet=Fiber.extend(function() {
       for(var p in this.planets) {
         this.planets[p].update();
       }
+
       this.offset = (game_time() / this.period) * Math.PI;
     },
     load: function(url) {

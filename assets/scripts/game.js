@@ -72,12 +72,12 @@ function game_clear_timeout(to) {
 }
 
 function game_update_pre() {
-  prop.game.delta=Math.min(delta()*prop.game.speedup, 100);
+  prop.game.delta=Math.min(delta()*prop.game.speedup, 1);
+
   if(game_paused()) {
     prop.game.delta=0;
-  } else {
-    $("html").removeClass("paused");
   }
+
   prop.game.time+=prop.game.delta;
   for(var i=prop.game.timeouts.length-1;i>=0;i--) {
     var remove  = false;

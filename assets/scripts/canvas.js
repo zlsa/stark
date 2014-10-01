@@ -68,6 +68,7 @@ function canvas_draw_ship(cc, ship) {
   cc.restore();
 
   cc.save()
+
   cc.translate(kilometers(ship.position[0]), -kilometers(ship.position[1]));
 
   var force = system_get().gravityAt(ship.position, ship.mass);
@@ -79,6 +80,20 @@ function canvas_draw_ship(cc, ship) {
   cc.beginPath();
   cc.moveTo(0, 0);
   cc.lineTo(-force[0] * 100, force[1] * 100);
+  cc.stroke();
+
+  cc.restore();
+
+  cc.save();
+
+  cc.strokeStyle = "#f0f";
+  cc.lineWidth   = 2;
+
+  cc.beginPath();
+  cc.moveTo(kilometers(ship.path[0][0]), -kilometers(ship.path[0][1]));
+  for(var i=1;i<ship.path.length;i++) {
+    cc.lineTo(kilometers(ship.path[i][0]), -kilometers(ship.path[i][1]));
+  }
   cc.stroke();
 
   cc.restore();
@@ -103,6 +118,10 @@ function canvas_draw_planet(cc, system, planet) {
   cc.arc(0, 0, kilometers(planet.radius), 0, Math.PI*2);
   cc.fill();
   
+  for(var i in planet.planets) {
+    canvas_draw_planet(cc, system, planet.planets[i]);
+  }
+
   cc.restore();
 }
 

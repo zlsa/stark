@@ -10,7 +10,7 @@
     "earth": {
       "distance":   300,
       "radius":     100,
-      "offset":     90,
+      "offset":     0,
       "mass":       59800,
       "period":     120,
       "atmosphere": {
@@ -20,8 +20,20 @@
           [0.0, "#def"],
           [0.3, "#8df"]
         ]
+      },
+      "planets": {
+        "moon": {
+          "distance":   800,
+          "radius":     50,
+          "offset":     0,
+          "mass":       10000,
+          "period":     60,
+          "atmosphere": {
+            "thickness": 0,
+            "density":   0
+          }
+        }
       }
     }
   }
-
 }
