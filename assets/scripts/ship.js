@@ -4,7 +4,7 @@ var Ship=Fiber.extend(function() {
     init: function(options) {
       if(!options) options={};
 
-      this.position = [0, 100];
+      this.position = [0, 0];
       this.velocity = [140, 0];
       this.angle    = 0;
       this.angular_velocity = 0;
@@ -86,16 +86,55 @@ var Ship=Fiber.extend(function() {
     },
     updateGravity: function() {
       var force = system_get().gravityAt(this.position, this.mass);
-      this.velocity[0] -= force[0] / this.mass;
-      this.velocity[1] -= force[1] / this.mass;
+      this.velocity[0] -= force[0] / this.mass * delta();
+      this.velocity[1] -= force[1] / this.mass * delta();
+    },
+    updateDamping: function() {
+      var damping = system_get().dampingAt(this.position);
+
+      var velocity = system_get().velocityAt(this.position);
+
+      this.velocity[0] += velocity[0];
+      this.velocity[1] -= velocity[1];
+
+      this.velocity[0] *= 1 - (damping * delta());
+      this.velocity[1] *= 1 - (damping * delta());
+
+      this.velocity[0] -= velocity[0];
+      this.velocity[1] += velocity[1];
     },
     update: function() {
       this.updateAssist();
       this.updateThrust();
       this.updateGravity();
+      this.updateDamping();
       this.updatePhysics();
 
       this.path.push([this.position[0], this.position[1]]);
+    },
+    teleport: function(system, planet) {
+      if(!planet) {
+        planet = system;
+        system = system_get();
+      }
+      if(typeof planet == typeof "") planet = [planet];
+      var p = system;
+
+      for(var i=0;i<planet.length;i++) {
+        p = p.planets[planet[i]];
+        if(!p) return false;
+      }
+
+      var position = p.getPosition(true, 0);
+
+      this.position[0] = position[0];
+      this.position[1] = position[1] - p.radius * 3;
+
+      var velocity = p.getVelocity(true);
+
+      this.velocity[0] = velocity[0] + (p.mass * 0.00002);
+      this.velocity[1] = velocity[1];
+
     }
   };
 });
@@ -104,6 +143,10 @@ function ship_init_pre() {
   prop.ship={};
 
   prop.ship.player = new Ship();
+}
+
+function ship_complete() {
+  prop.ship.player.teleport(system_get(), ["earth"]);
 }
 
 function ship_update() {

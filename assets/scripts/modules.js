@@ -10,6 +10,7 @@ var MODULES=[
 
   "game",
 
+  "star",
   "planet",
   "system",
 

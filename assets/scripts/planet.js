@@ -6,7 +6,7 @@ var Planet=Fiber.extend(function() {
 
       this.distance = options.distance || 0;
       this.radius   = options.radius   || 1;
-      this.offset   = options.offset   || 0;
+      this.start_offset = options.offset || 0;
 
       this.period   = options.period   || 100; // seconds for a full trip
 
@@ -16,6 +16,8 @@ var Planet=Fiber.extend(function() {
       this.mass     = options.mass || 1;
 
       this.position = [0, 0];
+
+      this.offset   = this.start_offset;
 
       this.atmosphere = options.atmosphere || {
         thickness: 100,
@@ -56,18 +58,43 @@ var Planet=Fiber.extend(function() {
     parse: function(data) {
 
     },
-    getPosition: function(absolute) {
+    getPosition: function(absolute, time_offset) {
+      if(!time_offset) time_offset = 0;
       var p = [0, 0];
-      p[0] = Math.sin(this.offset) * this.distance;
-      p[1] = Math.cos(this.offset) * this.distance;
+
+      var offset = this.offset + ((time_offset / this.period) * Math.PI);
+
+      p[0] = Math.sin(offset) * this.distance;
+      p[1] = Math.cos(offset) * this.distance;
 
       if(absolute && this.parent) {
-        var pp = this.parent.getPosition(true);
+        var pp = this.parent.getPosition(true, time_offset);
         p[0] += pp[0];
         p[1] += pp[1];
       }
 
       return p;
+    },
+    getVelocity: function(absolute) {
+      var p0 = this.getPosition(absolute, 0);
+      var p1 = this.getPosition(absolute, 1);
+      return [p1[0] - p0[0], p1[1] - p0[1]];
+    },
+    dampingAt: function(position) {
+      var distance = distance2d(this.getPosition(true), position);
+      if(distance > this.radius + this.atmosphere.thickness) return 0;
+      var density = this.atmosphere.density;
+      var damping = crange(this.radius * 0.5, distance, this.radius + this.atmosphere.thickness, density, 0);
+      return damping;
+    },
+    velocityAt: function(position) { // for damping
+      var v = this.getVelocity(true);
+      var distance = distance2d(this.getPosition(true), position);
+      if(distance > this.radius + this.atmosphere.thickness) return [0, 0];
+      var damping = crange(this.radius * 0.5, distance, this.radius + this.atmosphere.thickness, 1, 0);
+      v[0] *= damping;
+      v[1] *= damping;
+      return v;
     },
     gravityAt: function(position, mass) {
       var pp        = this.getPosition(true);
@@ -76,9 +103,11 @@ var Planet=Fiber.extend(function() {
 //      var distance  = distance2d(pp, position);
       var pull      = (this.mass * mass) / (distance * distance);
 
+      pull *= crange(this.radius, distance, this.radius * 1.414, 0, 1);
+
       var direction = Math.atan2((position[0] - pp[0]), (position[1] - pp[1]));
 
-//      pull *= crange(0, distance, this.radius, 0, 1);
+//      pull *= crange(this.radius * 0.5, distance, this.radius * 1.4, 0, 1);
 
       var force     = [pull * Math.sin(direction), pull * Math.cos(direction)];
 
@@ -112,7 +141,7 @@ var Planet=Fiber.extend(function() {
         this.planets[p].update();
       }
 
-      this.offset = (game_time() / this.period) * Math.PI;
+      this.offset = (game_time() / this.period) * Math.PI + this.start_offset;
     },
     load: function(url) {
       this.content=new Content({

@@ -71,15 +71,23 @@ function canvas_draw_ship(cc, ship) {
 
   cc.translate(kilometers(ship.position[0]), -kilometers(ship.position[1]));
 
-  var force = system_get().gravityAt(ship.position, ship.mass);
-  var direction = Math.atan2(force[0], force[1]);
+  var force = system_get().gravityAt(ship.position, 1);
 
   cc.strokeStyle = "#38f";
   cc.lineWidth   = 2;
 
   cc.beginPath();
   cc.moveTo(0, 0);
-  cc.lineTo(-force[0] * 100, force[1] * 100);
+  cc.lineTo(-force[0] * 0.5, force[1] * 0.5);
+  cc.stroke();
+
+
+  cc.strokeStyle = "#f83";
+  cc.lineWidth   = 2;
+
+  cc.beginPath();
+  cc.moveTo(0, 0);
+  cc.lineTo(ship.velocity[0] * 0.5, -ship.velocity[1] * 0.5);
   cc.stroke();
 
   cc.restore();
