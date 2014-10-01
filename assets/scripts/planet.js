@@ -150,7 +150,12 @@ var Planet=Fiber.extend(function() {
     },
     renderAtmosphere: function() {
       if(!this.atmosphere || !this.atmosphere.colors || this.atmosphere.colors.length < 1) {
-        return;
+        var c = new Color(this.color);
+        c.setHsvComponentValue(c.getHsvComponentValue() * 0.7);
+        this.atmosphere.colors = [
+          [0, c.getCssValue()]
+        ];
+//        return;
       }
 
       if(this.atmosphere.colors && this.atmosphere.colors.length >= 1) {

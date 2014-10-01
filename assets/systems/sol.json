@@ -17,15 +17,7 @@
       "radius":     50,
       "offset":     270,
       "mass":       10,
-      "period":     120,
-      "atmosphere": {
-        "thickness": 30,
-        "density":   1,
-        "colors": [
-          [0.0, "#def"],
-          [0.3, "#8df"]
-        ]
-      }
+      "period":     120
     },
 
     "eve": {
@@ -94,9 +86,9 @@
       "planets": {
         "deimos": {
           "title":      "Deimos",
-          "color":      "#655",
+          "color":      "#876",
           "distance":   1000,
-          "radius":     30,
+          "radius":     20,
           "offset":     225,
           "mass":       4,
           "period":     120
@@ -120,6 +112,7 @@
         ]
       },
       "planets": {
+        
         "io": {
           "title":      "Io",
           "color":      "#89b",
@@ -127,8 +120,17 @@
           "radius":     50,
           "offset":     20,
           "mass":       10,
-          "period":     90
+          "period":     90,
+          "atmosphere": {
+            "thickness": 3,
+            "density":   2,
+            "colors": [
+              [0.0, "#cdf"],
+              [0.3, "#358"]
+            ]
+          }
         }
+
       }
     }
   }
