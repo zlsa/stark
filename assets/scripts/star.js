@@ -4,6 +4,10 @@ var Star=Fiber.extend(function() {
     init: function(options) {
       if(!options) options={};
 
+      this.title    = options.title || "";
+
+      this.color    = new Color(options.color || "#fff");
+
       this.radius   = options.radius   || 1;
 
       this.system   = options.system || null;
@@ -26,6 +30,9 @@ var Star=Fiber.extend(function() {
     parse: function(data) {
 
     },
+    getPosition: function() {
+      return [0, 0];
+    },
     dampingAt: function(position) {
       var distance = distance2d(position);
 
@@ -39,7 +46,7 @@ var Star=Fiber.extend(function() {
       var pp        = [0, 0];
 
       var distance  = distance2d([0, 0], [distance2d(pp, position), this.radius]);
-      var pull      = (this.mass * mass) / (distance * distance);
+      var pull      = (this.mass * mass * 100000) / (distance * distance);
 
 //      pull *= crange(this.radius * 0, distance, this.radius * 1.414, 0, 1);
 

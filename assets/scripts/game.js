@@ -2,22 +2,22 @@
 function game_init_pre() {
   prop.game={};
 
-  prop.game.paused=true;
-  prop.game.focused=true;
+  prop.game.paused  = true;
+  prop.game.focused = true;
 
-  prop.game.speedup=1;
+  prop.game.speedup = 1;
 
-  prop.game.time=0;
-  prop.game.delta=0;
+  prop.game.time  = 0;
+  prop.game.delta = 0;
 
   prop.game.timeouts=[];
 
   $(window).blur(function() {
-    prop.game.focused=false;
+    prop.game.focused = false;
   });
 
   $(window).focus(function() {
-    prop.game.focused=true;
+    prop.game.focused = true;
   });
 
 }
@@ -95,6 +95,7 @@ function game_update_pre() {
       i-=1;
     }
   }
+
 }
 
 function game_complete() {

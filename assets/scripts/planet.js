@@ -4,6 +4,10 @@ var Planet=Fiber.extend(function() {
     init: function(options) {
       if(!options) options={};
 
+      this.title    = options.title || "";
+
+      this.color    = new Color(options.color || "#fff");
+
       this.distance = options.distance || 0;
       this.radius   = options.radius   || 1;
       this.start_offset = options.offset || 0;
@@ -76,34 +80,52 @@ var Planet=Fiber.extend(function() {
       return p;
     },
     getVelocity: function(absolute) {
+
       var p0 = this.getPosition(absolute, 0);
       var p1 = this.getPosition(absolute, 1);
       return [p1[0] - p0[0], p1[1] - p0[1]];
+
     },
     dampingAt: function(position) {
       var distance = distance2d(this.getPosition(true), position);
-      if(distance > this.radius + this.atmosphere.thickness) return 0;
-      var density = this.atmosphere.density;
+//      if(distance > this.radius + this.atmosphere.thickness) return 0;
+
+      var density = Math.max(0.7, this.atmosphere.density);
+
       var damping = crange(this.radius * 0.5, distance, this.radius + this.atmosphere.thickness, density, 0);
+
+      for(var p in this.planets) {
+        damping += this.planets[p].dampingAt(position);
+      }
+
       return damping;
     },
     velocityAt: function(position) { // for damping
-      var v = this.getVelocity(true);
+      var velocity = this.getVelocity(true);
+
       var distance = distance2d(this.getPosition(true), position);
-      if(distance > this.radius + this.atmosphere.thickness) return [0, 0];
-      var damping = crange(this.radius * 0.5, distance, this.radius + this.atmosphere.thickness, 1, 0);
-      v[0] *= damping;
-      v[1] *= damping;
-      return v;
+
+      var damping = crange(this.radius + this.atmosphere.thickness, distance, (this.radius + this.atmosphere.thickness) * 2, 1, 0);
+
+      velocity[0] *= damping;
+      velocity[1] *= damping;
+
+      for(var p in this.planets) {
+        var v = this.planets[p].velocityAt(position);
+        velocity[0] += v[0];
+        velocity[1] += v[1];
+      }
+
+      return velocity;
     },
     gravityAt: function(position, mass) {
       var pp        = this.getPosition(true);
 
       var distance  = distance2d([0, 0], [distance2d(pp, position), this.radius]);
 //      var distance  = distance2d(pp, position);
-      var pull      = (this.mass * mass) / (distance * distance);
+      var pull      = (this.mass * mass * 100000) / (distance * distance);
 
-      pull *= crange(this.radius, distance, this.radius * 1.414, 0, 1);
+      pull *= crange(this.radius, distance, this.radius * 1.414, 0.05, 1);
 
       var direction = Math.atan2((position[0] - pp[0]), (position[1] - pp[1]));
 

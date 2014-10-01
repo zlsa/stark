@@ -2,17 +2,40 @@
   "title": "Sol",
 
   "star": {
+    "title":      "Sol",
+    "color":      "#fed",
     "radius":     100,
-    "mass":       5980000000
+    "mass":       1200
   },
 
   "planets": {
+
+    "mercury": {
+      "title":      "Mercury",
+      "color":      "#754",
+      "distance":   12000,
+      "radius":     50,
+      "offset":     270,
+      "mass":       10,
+      "period":     120,
+      "atmosphere": {
+        "thickness": 30,
+        "density":   1,
+        "colors": [
+          [0.0, "#def"],
+          [0.3, "#8df"]
+        ]
+      }
+    },
+
     "earth": {
+      "title":      "Earth",
+      "color":      "#38f",
       "distance":   30000,
       "radius":     150,
-      "offset":     90,
-      "mass":       5980000,
-      "period":     1200,
+      "offset":     135,
+      "mass":       59,
+      "period":     800,
       "atmosphere": {
         "thickness": 30,
         "density":   1,
@@ -23,14 +46,86 @@
       },
       "planets": {
         "moon": {
+          "title":      "Moon",
+          "color":      "#999",
           "distance":   1500,
           "radius":     50,
           "offset":     0,
-          "mass":       700000,
+          "mass":       8,
           "period":     240,
           "atmosphere": {
             "thickness": 10,
-            "density":   2000000
+            "density":   0.8
+          }
+        }
+      }
+    },
+
+    "mars": {
+      "title":      "Mars",
+      "color":      "#f53",
+      "distance":   45000,
+      "radius":     120,
+      "offset":     10,
+      "mass":       50,
+      "period":     1200,
+      "atmosphere": {
+        "thickness": 30,
+        "density":   0.8,
+        "colors": [
+          [0.0, "#def"],
+          [0.3, "#8df"]
+        ]
+      },
+      "planets": {
+        "deimos": {
+          "title":      "Deimos",
+          "color":      "#655",
+          "distance":   1000,
+          "radius":     30,
+          "offset":     225,
+          "mass":       4,
+          "period":     120,
+          "atmosphere": {
+            "thickness": 10,
+            "density":   0.8
+          }
+        }
+      }
+    },
+
+    "jul": {
+      "title":      "Jul",
+      "color":      "#3f5",
+      "distance":   65000,
+      "radius":     350,
+      "offset":     90,
+      "mass":       200,
+      "period":     2000,
+      "atmosphere": {
+        "thickness": 100,
+        "density":   2,
+        "colors": [
+          [0.0, "#def"],
+          [0.3, "#8df"]
+        ]
+      },
+      "planets": {
+        "io": {
+          "title":      "Io",
+          "color":      "#89b",
+          "distance":   2000,
+          "radius":     50,
+          "offset":     20,
+          "mass":       10,
+          "period":     90,
+          "atmosphere": {
+            "thickness": 100,
+            "density":   1,
+            "colors": [
+              [0.0, "#def"],
+              [0.3, "#8df"]
+            ]
           }
         }
       }

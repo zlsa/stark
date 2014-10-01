@@ -67,34 +67,36 @@ function canvas_draw_ship(cc, ship) {
 
   cc.restore();
 
-  cc.save()
+  // cc.save()
 
-  cc.translate(kilometers(ship.position[0]), -kilometers(ship.position[1]));
+  // cc.translate(kilometers(ship.position[0]), -kilometers(ship.position[1]));
 
-  var force = system_get().gravityAt(ship.position, 1);
+  // var force = system_get().gravityAt(ship.position, 1);
 
-  cc.strokeStyle = "#38f";
-  cc.lineWidth   = 2;
+  // cc.strokeStyle = "#38f";
+  // cc.lineWidth   = 2;
 
-  cc.beginPath();
-  cc.moveTo(0, 0);
-  cc.lineTo(-force[0] * 0.5, force[1] * 0.5);
-  cc.stroke();
+  // cc.beginPath();
+  // cc.moveTo(0, 0);
+  // cc.lineTo(-force[0] * 0.5, force[1] * 0.5);
+  // cc.stroke();
 
 
-  cc.strokeStyle = "#f83";
-  cc.lineWidth   = 2;
+  // cc.strokeStyle = "#f83";
+  // cc.lineWidth   = 2;
 
-  cc.beginPath();
-  cc.moveTo(0, 0);
-  cc.lineTo(ship.velocity[0] * 0.5, -ship.velocity[1] * 0.5);
-  cc.stroke();
+  // cc.beginPath();
+  // cc.moveTo(0, 0);
+  // cc.lineTo(ship.velocity[0] * 0.5, -ship.velocity[1] * 0.5);
+  // cc.stroke();
 
-  cc.restore();
+  // cc.restore();
+
+  return;
 
   cc.save();
 
-  cc.strokeStyle = "#f0f";
+  cc.strokeStyle = "#ff0";
   cc.lineWidth   = 2;
 
   cc.beginPath();
@@ -114,29 +116,104 @@ function canvas_draw_ships(cc) {
 // SYSTEM
 
 function canvas_draw_planet(cc, system, planet) {
-  cc.save();
-  
-  var p = planet.getPosition();
+  var p = planet.getPosition(true);
 
-  cc.translate(kilometers(p[0]), -kilometers(p[1]));
-  
-  cc.fillStyle = "#999";
+  if(canvas_is_visible([kilometers(p[0]), -kilometers(p[1])], planet.radius * 2)) {
+    cc.save();
+    
+    cc.translate(kilometers(p[0]), -kilometers(p[1]));
+    
+    cc.fillStyle = planet.color.getCssValue();
 
-  cc.beginPath();
-  cc.arc(0, 0, kilometers(planet.radius), 0, Math.PI*2);
-  cc.fill();
-  
+    cc.beginPath();
+    cc.arc(0, 0, kilometers(planet.radius), 0, Math.PI*2);
+    cc.fill();
+
+    // cc.strokeStyle = "#f83";
+    // cc.lineWidth   = 2;
+
+    // var velocity = planet.getVelocity();
+
+    // cc.beginPath();
+    // cc.moveTo(0, 0);
+    // cc.lineTo(velocity[0] * 0.5, -velocity[1] * 0.5);
+    // cc.stroke();
+    
+    cc.restore();
+  } else {
+  }
+
   for(var i in planet.planets) {
     canvas_draw_planet(cc, system, planet.planets[i]);
   }
 
-  cc.restore();
+}
+
+function canvas_draw_pointer(cc, system, planet) {
+  var p = planet.getPosition(true);
+
+  //  if(!canvas_is_visible([kilometers(p[0]), -kilometers(p[1])], planet.radius * 2)) {
+  if(true) {
+    var direction = Math.atan2(-p[0] - prop.ui.pan[0], p[1] - prop.ui.pan[1]);
+
+    var l = Math.min(prop.canvas.size.width, prop.canvas.size.height) / 2 - 20;
+
+    var m = Math.max(prop.canvas.size.width, prop.canvas.size.height) / 2 + 20;
+    
+    cc.save();
+
+    cc.strokeStyle = planet.color.getCssValue();
+    cc.fillStyle   = planet.color.getCssValue();
+    cc.lineWidth   = crange(1, planet.mass, 1200, 1, 12);
+
+    var distance = distance2d([-p[0], p[1]], prop.ui.pan);
+
+    var len = scrange(l * 0.8, distance, m * 1.2, 0, 30);
+    cc.globalAlpha *= scrange(l * 0.8, distance, m * 1.2, 0, 1);
+
+    var force = distance2d(system_get().gravityAt(prop.ui.pan, 1));
+
+    var rp = planet.getPosition();
+    var distance_from_parent = distance2d(rp);
+
+    var max_draw = crange(0, planet.mass, 1200, 50000, 350000);
+    max_draw *= crange(0, force, 500, 1.8, 0.5);
+
+    if(distance_from_parent > 1) {
+      max_draw *= crange(1000, distance_from_parent, 10000, 0.1, 1);
+    }
+
+    cc.globalAlpha *= scrange(0, distance, max_draw, 1, 0.01);
+
+    cc.beginPath();
+    cc.moveTo(-Math.sin(direction) * (l - len), -Math.cos(direction) * (l - len));
+    cc.lineTo(-Math.sin(direction) * (l -   0), -Math.cos(direction) * (l -   0));
+    cc.stroke();
+
+    cc.font = "bold 12px 'Roboto Condensed', sans-serif";
+    cc.textAlign = "center";
+    cc.textBaseline = "middle";
+
+    var dist = 30;
+
+    cc.fillText(planet.title, -Math.sin(direction) * (l - len - dist), -Math.cos(direction) * (l - len - dist));
+
+    cc.font = "bold 10px 'Roboto Condensed', sans-serif";
+    cc.fillText(to_distance(distance), -Math.sin(direction) * (l - len - dist), -Math.cos(direction) * (l - len - dist) - 12);
+
+    cc.restore();
+  }
+
+  for(var i in planet.planets) {
+    canvas_draw_pointer(cc, system, planet.planets[i]);
+  }
+
 }
 
 function canvas_draw_system(cc) {
   var system = system_get();
 
-  cc.fillStyle = "#fff";
+  cc.fillStyle = system.star.color.getCssValue();
 
   cc.beginPath();
   cc.arc(0, 0, 100, 0, Math.PI*2);
@@ -146,6 +223,28 @@ function canvas_draw_system(cc) {
     canvas_draw_planet(cc, system, system.planets[i]);
   }
 
+}
+
+function canvas_draw_hud(cc) {
+  var system = system_get();
+
+  for(var i in system.planets) {
+    canvas_draw_pointer(cc, system, system.planets[i]);
+  }
+
+  canvas_draw_pointer(cc, system, system.star);
+
+}
+
+function canvas_is_visible(position, size) {
+  var width  = prop.canvas.size.width + size * 2;
+  var height = prop.canvas.size.height + size * 2;
+  
+  position[0] += prop.ui.pan[0];
+  position[1] += prop.ui.pan[1];
+  if(position[0] < -width  / 2 || position[0] > width  / 2) return false;
+  if(position[1] < -height / 2 || position[1] > height / 2) return false;
+  return true;
 }
 
 function canvas_update_post() {
@@ -166,4 +265,11 @@ function canvas_update_post() {
   canvas_draw_ships(cc);
 
   cc.restore();
+
+  cc.save();
+
+  cc.translate(prop.canvas.size.width/2, prop.canvas.size.height/2);
+  canvas_draw_hud(cc);
+  cc.restore();
+
 }

@@ -26,6 +26,16 @@ window.AudioContext = window.AudioContext||window.webkitAudioContext;
     };
 }());
 
+function isHex(c) {
+    if("0123456789abcdef".indexOf(c.toLowerCase()) > -1)
+        return true;
+    return false;
+}
+
+function isNumber(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n) || n == ".";
+}
+
 var sin_cache={};
 
 function sin(v) {
@@ -108,8 +118,12 @@ function crange(il,i,ih,ol,oh) {
   return clamp(ol,trange(il,i,ih,ol,oh),oh);
 }
 
-function srange(il,i,ih) {
-  //    return Math.cos();
+function srange(il,i,ih,ol,oh) {
+  return trange(-1,Math.sin(trange(il,i,ih,-Math.PI/2,Math.PI/2)),1,ol,oh);
+}
+
+function scrange(il,i,ih,ol,oh) {
+  return srange(-1,Math.sin(crange(il,i,ih,-Math.PI/2,Math.PI/2)),1,ol,oh);
 }
 
 function distance2d(a,b) {
@@ -137,4 +151,24 @@ function mod(x,y) {
   if(x < 0)
     x=(y-x)-2;
   return x;
+}
+
+var AU = 30000;
+
+function to_distance(d) {
+  function r(d, p) {
+    if(p < 0) {
+      p = -p;
+      d /= p;
+      return Math.round(d) * p;
+    }
+    return d.toFixed(p);
+  };
+  if(d < 50) {
+    return r(d / 1000, 2) + "m";
+  } else if(d > AU * 0.3) {
+    return r(d / AU, 2) + "au";
+  } else {
+    return r(d, -1) + "km";
+  }
 }

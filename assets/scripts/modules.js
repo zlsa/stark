@@ -5,6 +5,8 @@
 var MODULES=[
   "-util",
   "-animation",
+  "-color",
+
   "get",
   "assets",
 

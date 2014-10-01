@@ -17,7 +17,7 @@ var Ship=Fiber.extend(function() {
 
       this.controls = [0, 0];
       this.power    = {
-        thrust: 70,
+        thrust: 130,
         angle:  4.0
       };
 
@@ -63,7 +63,7 @@ var Ship=Fiber.extend(function() {
     },
     updateThrust: function() {
       this.controls[0] = clamp(-3, this.controls[0], 3);
-      this.controls[1] = clamp(-1, this.controls[1], 1);
+      this.controls[1] = clamp( 0, this.controls[1], 1);
 
       var thrust = this.power.thrust * this.controls[1];
       this.force[0] = Math.sin(this.angle) * thrust;
@@ -72,35 +72,37 @@ var Ship=Fiber.extend(function() {
       this.angular_force = this.power.angle * this.controls[0];
     },
     updatePhysics: function() {
-      this.velocity[0] += (this.force[0] / this.mass) * delta();
-      this.velocity[1] += (this.force[1] / this.mass) * delta();
+      this.velocity[0] += (this.force[0] / this.mass) * game_delta();
+      this.velocity[1] += (this.force[1] / this.mass) * game_delta();
 
-      this.angular_velocity += (this.angular_force / this.angular_mass) * delta();
+      this.angular_velocity += (this.angular_force / this.angular_mass) * game_delta();
 
-      this.position[0] += this.velocity[0] * delta();
-      this.position[1] += this.velocity[1] * delta();
+      this.position[0] += this.velocity[0] * game_delta();
+      this.position[1] += this.velocity[1] * game_delta();
 
-      this.angle       += this.angular_velocity * delta();
+      this.angle       += this.angular_velocity * game_delta();
 
       if(Math.abs(this.angular_velocity) < 0.01) this.angular_velocity = 0;
     },
     updateGravity: function() {
       var force = system_get().gravityAt(this.position, this.mass);
-      this.velocity[0] -= force[0] / this.mass * delta();
-      this.velocity[1] -= force[1] / this.mass * delta();
+      this.velocity[0] -= force[0] / this.mass * game_delta();
+      this.velocity[1] -= force[1] / this.mass * game_delta();
     },
     updateDamping: function() {
       var damping = system_get().dampingAt(this.position);
 
       var velocity = system_get().velocityAt(this.position);
 
-      this.velocity[0] += velocity[0];
+      this.velocity[0] -= velocity[0];
       this.velocity[1] -= velocity[1];
 
-      this.velocity[0] *= 1 - (damping * delta());
-      this.velocity[1] *= 1 - (damping * delta());
+//      this.velocity[0] *= 1 - (damping);
+//      this.velocity[1] *= 1 - (damping);
+      this.velocity[0] *= 1 - (damping * game_delta());
+      this.velocity[1] *= 1 - (damping * game_delta());
 
-      this.velocity[0] -= velocity[0];
+      this.velocity[0] += velocity[0];
       this.velocity[1] += velocity[1];
     },
     update: function() {
@@ -120,6 +122,14 @@ var Ship=Fiber.extend(function() {
       if(typeof planet == typeof "") planet = [planet];
       var p = system;
 
+      if(!planet) {
+        this.position[0] = 0;
+        this.position[1] = 0;
+        this.velocity[0] = 0;
+        this.velocity[1] = 0;
+        return;
+      }
+
       for(var i=0;i<planet.length;i++) {
         p = p.planets[planet[i]];
         if(!p) return false;
@@ -128,11 +138,11 @@ var Ship=Fiber.extend(function() {
       var position = p.getPosition(true, 0);
 
       this.position[0] = position[0];
-      this.position[1] = position[1] - p.radius * 3;
+      this.position[1] = position[1];
 
       var velocity = p.getVelocity(true);
 
-      this.velocity[0] = velocity[0] + (p.mass * 0.00002);
+      this.velocity[0] = velocity[0];
       this.velocity[1] = velocity[1];
 
     }
