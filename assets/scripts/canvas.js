@@ -129,6 +129,11 @@ function canvas_draw_planet(cc, system, planet) {
     cc.arc(0, 0, kilometers(planet.radius), 0, Math.PI*2);
     cc.fill();
 
+    if(planet.canvas.atmosphere) {
+      var size = Math.ceil((planet.radius + planet.atmosphere.thickness));
+      cc.drawImage(planet.canvas.atmosphere.canvas, -size, -size);
+    }
+
     // cc.strokeStyle = "#f83";
     // cc.lineWidth   = 2;
 
@@ -157,14 +162,32 @@ function canvas_draw_pointer(cc, system, planet) {
     var direction = Math.atan2(-p[0] - prop.ui.pan[0], p[1] - prop.ui.pan[1]);
 
     var l = Math.min(prop.canvas.size.width, prop.canvas.size.height) / 2 - 20;
-
     var m = Math.max(prop.canvas.size.width, prop.canvas.size.height) / 2 + 20;
     
+    var dist = 30;
+
     cc.save();
+
+    cc.fillStyle   = "#000";
+    cc.strokeStyle = "#000";
+    cc.lineWidth   = crange(1, planet.mass, 1200, 1, 12);
+
+    cc.textAlign = "center";
+    cc.textBaseline = "middle";
+
+    cc.beginPath();
+    cc.moveTo(-Math.sin(direction) * (l - len), -Math.cos(direction) * (l - len));
+    cc.lineTo(-Math.sin(direction) * (l -   0), -Math.cos(direction) * (l -   0));
+    cc.stroke();
+
+    cc.font = "bold 12px 'Roboto Condensed', sans-serif";
+    cc.fillText(planet.title, -Math.sin(direction) * (l - len - dist), -Math.cos(direction) * (l - len - dist));
+
+    cc.font = "bold 10px 'Roboto Condensed', sans-serif";
+    cc.fillText(to_distance(distance), -Math.sin(direction) * (l - len - dist), -Math.cos(direction) * (l - len - dist) - 12);
 
     cc.strokeStyle = planet.color.getCssValue();
     cc.fillStyle   = planet.color.getCssValue();
-    cc.lineWidth   = crange(1, planet.mass, 1200, 1, 12);
 
     var distance = distance2d([-p[0], p[1]], prop.ui.pan);
 
@@ -191,11 +214,6 @@ function canvas_draw_pointer(cc, system, planet) {
     cc.stroke();
 
     cc.font = "bold 12px 'Roboto Condensed', sans-serif";
-    cc.textAlign = "center";
-    cc.textBaseline = "middle";
-
-    var dist = 30;
-
     cc.fillText(planet.title, -Math.sin(direction) * (l - len - dist), -Math.cos(direction) * (l - len - dist));
 
     cc.font = "bold 10px 'Roboto Condensed', sans-serif";
@@ -216,7 +234,7 @@ function canvas_draw_system(cc) {
   cc.fillStyle = system.star.color.getCssValue();
 
   cc.beginPath();
-  cc.arc(0, 0, 100, 0, Math.PI*2);
+  cc.arc(0, 0, kilometers(system.star.radius), 0, Math.PI*2);
   cc.fill();
   
   for(var i in system.planets) {

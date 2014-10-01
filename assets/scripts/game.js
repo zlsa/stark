@@ -17,7 +17,7 @@ function game_init_pre() {
   });
 
   $(window).focus(function() {
-    prop.game.focused = true;
+
   });
 
 }

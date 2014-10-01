@@ -265,7 +265,11 @@ function update() {
     prop.time.frame.start=time();
   }
   prop.time.frame.delta=time()-prop.time.frame.last;
+  if(!prop.game.focused) {
+    prop.time.frame.delta = 0;
+  }
   prop.time.frame.last=time();
+  prop.game.focused = true;
 }
 
 function delta() {

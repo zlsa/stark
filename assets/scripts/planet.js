@@ -24,15 +24,12 @@ var Planet=Fiber.extend(function() {
       this.offset   = this.start_offset;
 
       this.atmosphere = options.atmosphere || {
-        thickness: 100,
-        density:   1,
+        thickness: 0,
+        density:   0,
         colors: [
-          [0.0, "#38f"]
+
         ]
       };
-
-      if(this.atmosphere.colors)
-        this.atmosphere.colors.push([1.0, "#000"]);
 
       this.planets = {};
       
@@ -122,7 +119,6 @@ var Planet=Fiber.extend(function() {
       var pp        = this.getPosition(true);
 
       var distance  = distance2d([0, 0], [distance2d(pp, position), this.radius]);
-//      var distance  = distance2d(pp, position);
       var pull      = (this.mass * mass * 100000) / (distance * distance);
 
       pull *= crange(this.radius, distance, this.radius * 1.414, 0.05, 1);
@@ -152,11 +148,44 @@ var Planet=Fiber.extend(function() {
 
       this.canvas.planet = cc;
     },
+    renderAtmosphere: function() {
+      if(!this.atmosphere || !this.atmosphere.colors || this.atmosphere.colors.length < 1) {
+        return;
+      }
+
+      if(this.atmosphere.colors && this.atmosphere.colors.length >= 1) {
+        this.atmosphere.colors.push([1.0, this.atmosphere.colors[this.atmosphere.colors.length-1][1]]);
+      }
+
+      var size   = Math.ceil(kilometers(this.radius + this.atmosphere.thickness) * 2);
+      var center = size/2;
+      var cc     = canvas_new(size, size);
+      
+      var radius = kilometers(this.radius) / center;
+
+      cc.fillStyle = cc.createRadialGradient(center, center, 0, center, center, center);
+
+      cc.fillStyle.addColorStop(radius * 0.2, new Color(this.atmosphere.colors[0][1]).setOpacity(0).getCssValue());
+      cc.fillStyle.addColorStop(radius * 0.6, new Color(this.atmosphere.colors[0][1]).setOpacity(0.4).getCssValue());
+
+      for(var i=0;i<this.atmosphere.colors.length;i++) {
+        var color = this.atmosphere.colors[i];
+        var opacity = crange(0, color[0], 1, 1, 0);
+        var position = crange(0, color[0], 1, radius, 1);
+        cc.fillStyle.addColorStop(position, new Color(color[1]).setOpacity(opacity).getCssValue());
+      }
+
+      cc.arc(center, center, center, 0, Math.PI * 2);
+      cc.fill();
+
+      this.canvas.atmosphere = cc;
+    },
     render: function() {
       this.renderPlanet();
+      this.renderAtmosphere();
     },
     complete: function() {
-      this.renderPlanet();
+      this.render();
     },
     update: function() {
       for(var p in this.planets) {

@@ -20,6 +20,7 @@ var Color=function(value) {
   };
   this.setOpacity=function(opacity) {
     this.opacity=opacity;
+    return this;
   };
   this.setHexValue=function(value) {
     if(value.length < 3)
@@ -41,7 +42,7 @@ var Color=function(value) {
     } else {
       return(false);
     }
-    return;
+    return this;
   };
   this.parseNumbers=function(value) {
     var numbers=value.split(",");

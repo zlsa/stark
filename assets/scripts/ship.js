@@ -17,12 +17,13 @@ var Ship=Fiber.extend(function() {
 
       this.controls = [0, 0];
       this.power    = {
-        thrust: 130,
+        thrust: 180,
         angle:  4.0
       };
 
       this.assist = {
-        angle: true
+        angle:   true,
+        gravity: true
       };
 
       this.images = {
@@ -59,6 +60,11 @@ var Ship=Fiber.extend(function() {
         if(Math.abs(this.controls[0]) < 0.01) {
           this.controls[0] = -this.angular_velocity * 10;
         }
+      }
+      if(this.assist.gravity) {
+        var force = system_get().gravityAt(this.position, this.mass);
+        var angle = angle_difference(-this.angle, Math.atan2(-force[0], force[1]));
+        this.controls[0] = (angle - this.angular_velocity) * 50;
       }
     },
     updateThrust: function() {

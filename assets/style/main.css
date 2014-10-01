@@ -8,6 +8,29 @@ html,body {
 }
 
 html {
-  background-color: #111;
-  font-family: sans-serif;
+  background-color: #222;
+  font-size: 14px;
+  font-family: "Roboto Condensed", sans-serif;
+}
+
+#debug {
+  position: absolute;
+  z-index: 1000;
+  top: 0;
+  right: 0;
+  padding: 5px 20px;
+}
+
+#debug.hidden {
+  display: none;
+}
+
+#debug-command {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+
+  padding: 5px 10px;
 }

@@ -172,3 +172,21 @@ function to_distance(d) {
     return r(d, -1) + "km";
   }
 }
+
+function angle_difference(a, b) {
+  a = degrees(a);
+  b = degrees(b);
+  var invert=false;
+  if(b > a) {
+    invert=true;
+    var temp=a;
+    a=b;
+    b=temp;
+  }
+  var difference=mod(a-b, 360);
+  if(difference > 180) difference -= 360;
+  if(invert) difference *= -1;
+  difference = radians(difference);
+  return difference;
+}
+

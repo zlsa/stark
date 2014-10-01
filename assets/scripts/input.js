@@ -12,20 +12,25 @@ function input_init_pre() {
   prop.input.keys={};
 
   prop.input.keysym={
-    shift:16,
-    control:17,
-    x:88,
-    left:37,
-    up:38,
-    right:39,
-    down:40,
+    tab:     9,
+    shift:   16,
+    control: 17,
+    space:   32,
+    x:       88,
+    left:    37,
+    up:      38,
+    right:   39,
+    down:    40,
+    enter:   13,
+    escape:  27,
   };
 }
 
 function input_done() {
   $(window).keydown(function(e) {
     prop.input.keys[e.which]=true;
-    input_keydown(e.which);
+    if(input_keydown(e.which))
+      return false;
   });
 
   $(window).keyup(function(e) {
@@ -33,9 +38,50 @@ function input_done() {
     console.log(e.which);
   });
 
+  $("#debug-command").keydown(function(e) {
+    if(e.which == prop.input.keysym.enter) {
+      input_command_run($(this).val());
+    }
+  });
+
+}
+
+function input_command_run(value) {
+  var cmd  = value.substr(0, value.indexOf(" "));
+  var data = value.substr(value.indexOf(" ") + 1);
+
+  if(value.indexOf(" ") < 0) {
+    cmd = value;
+    data = "";
+  }
+
+  console.log(cmd, data);
+
+  if(cmd == "teleport") {
+    var planet = data.split(" ");
+    if(!data || planet.length == 0) {
+      prop.ship.player.teleport();
+    } else {
+      prop.ship.player.teleport(planet);
+    }
+  }
+
+  $("#debug").addClass("hidden");
+  $("#debug-command").val("");
+  $("#debug-command").blur();
 }
 
 function input_keydown(keycode) {
+  if(keycode == prop.input.keysym.tab) {
+    $("#debug").toggleClass("hidden");
+    if(!$("#debug").hasClass("hidden")) {
+      $("#debug-command").focus();
+    } else {
+      $("#debug-command").blur();
+    }
+    return true;
+  }
+  return false;
   // called with the users' key-repeat settings
 }
 
@@ -49,9 +95,12 @@ function input_update_pre() {
   }
   if(prop.input.keys[prop.input.keysym.up]) {
     prop.ship.player.controls[1] = 1;
-  } else if(prop.input.keys[prop.input.keysym.down]) {
-    prop.ship.player.controls[1] = -1;
   } else {
     prop.ship.player.controls[1] = 0;
+  }
+  if(prop.input.keys[prop.input.keysym.down]) {
+    prop.ship.player.assist.gravity = true;
+  } else {
+    prop.ship.player.assist.gravity = false;
   }
 }

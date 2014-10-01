@@ -38,21 +38,20 @@ var Star=Fiber.extend(function() {
 
       if(distance > this.radius) return 0;
 
-      var density = 1000;
-      var damping = crange(this.radius, distance, this.radius * this.falloff, density, 0);
+      var density = 50;
+      var damping = crange(this.radius, distance, this.radius * 5, density, 0);
+
       return damping;
     },
     gravityAt: function(position, mass) {
       var pp        = [0, 0];
 
-      var distance  = distance2d([0, 0], [distance2d(pp, position), this.radius]);
+      var distance  = distance2d([distance2d(pp, position), this.radius]);
       var pull      = (this.mass * mass * 100000) / (distance * distance);
 
-//      pull *= crange(this.radius * 0, distance, this.radius * 1.414, 0, 1);
+      pull *= crange(this.radius * 2, distance, this.radius * 10, 0.05, 1);
 
       var direction = Math.atan2((position[0] - pp[0]), (position[1] - pp[1]));
-
-//      pull *= crange(0, distance, this.radius, 0, 1);
 
       var force     = [pull * Math.sin(direction), pull * Math.cos(direction)];
 
