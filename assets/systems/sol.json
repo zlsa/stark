@@ -28,6 +28,24 @@
       }
     },
 
+    "venus": {
+      "title":      "Venus",
+      "color":      "#c2c",
+      "distance":   21000,
+      "radius":     130,
+      "offset":     180,
+      "mass":       65,
+      "period":     450,
+      "atmosphere": {
+        "thickness": 30,
+        "density":   1.5,
+        "colors": [
+          [0.0, "#def"],
+          [0.3, "#8df"]
+        ]
+      }
+    },
+
     "earth": {
       "title":      "Earth",
       "color":      "#38f",
