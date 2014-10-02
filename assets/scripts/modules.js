@@ -84,6 +84,23 @@ var log_strings={
   4:"FATAL",
 };
 
+var storage = {
+  backend: localStorage,
+  prefix: "stark-",
+  prefixify: function(name) {
+    return this.prefix + name;
+  },
+  get: function(name, def) {
+    name = this.prefixify(name);
+    if(name in this.backend) return JSON.parse(this.backend.getItem(name));
+    return def;
+  },
+  set: function(name, val) {
+    name = this.prefixify(name);
+    this.backend.setItem(name, JSON.stringify(val));
+  }
+};
+
 // PROP
 
 function prop_init() {

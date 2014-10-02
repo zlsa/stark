@@ -4,24 +4,24 @@ var Ship=Fiber.extend(function() {
     init: function(options) {
       if(!options) options={};
 
-      this.position = [0, 0];
-      this.velocity = [140, 0];
-      this.angle    = 0;
-      this.angular_velocity = 0;
+      this.position = options.position || [0, 0];
+      this.velocity = options.velocity || [140, 0];
+      this.angle    = options.angle || 0;
+      this.angular_velocity = options.angular_velocity || 0;
 
-      this.mass     = 1;
-      this.angular_mass = 1;
+      this.mass         = options.mass || 1;
+      this.angular_mass = options.angular_mass || 1;
 
       this.force    = [0, 0];
       this.angular_force = 0;
 
       this.controls = [0, 0];
-      this.power    = {
+      this.power    = options.power || {
         thrust: 180,
-        angle:  12.0
+        angle:  4.0
       };
 
-      this.assist = {
+      this.assist = options.assist || {
         angle:   true,
         gravity: true
       };
@@ -39,7 +39,7 @@ var Ship=Fiber.extend(function() {
           that: this,
           callback: function(status, data) {
             if(status == "ok") {
-              this.images.normal=data;
+              this.images.normal = data;
             }
           }
         }),
@@ -49,7 +49,7 @@ var Ship=Fiber.extend(function() {
           that: this,
           callback: function(status, data) {
             if(status == "ok") {
-              this.images.engine=data;
+              this.images.engine = data;
             }
           }
         })
@@ -58,7 +58,7 @@ var Ship=Fiber.extend(function() {
     updateAssist: function() {
       if(this.assist.angle) {
         if(Math.abs(this.controls[0]) < 0.01) {
-          this.controls[0] = -this.angular_velocity * 5;
+          this.controls[0] = -this.angular_velocity * 10;
         }
       }
       if(this.assist.gravity) {
@@ -151,20 +151,45 @@ var Ship=Fiber.extend(function() {
       this.velocity[0] = velocity[0];
       this.velocity[1] = velocity[1];
 
+    },
+
+    near: function() {
+
+    },
+
+    save: function() {
+      log("ship save", LOG_DEBUG);
+
+      var data = {};
+
+      data.position = this.position;
+      data.velocity = this.velocity;
+
+      data.angle    = this.angle;
+      data.angular_velocity = this.angular_velocity;
+      
+      data.mass     = this.mass;
+      data.angular_mass = this.angular_mass;
+      
+      data.power    = this.power;
+      
+      data.assist   = this.assist;
+
+      return data;
+
     }
+      
   };
 });
 
 function ship_init_pre() {
   prop.ship={};
-
-  prop.ship.player = new Ship();
 }
 
 function ship_complete() {
-  prop.ship.player.teleport(system_get(), ["earth"]);
+
 }
 
 function ship_update() {
-  prop.ship.player.update();
+
 }

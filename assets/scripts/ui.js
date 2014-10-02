@@ -15,6 +15,6 @@ function kilometers(km) {
 }
 
 function ui_update_post() {
-  prop.ui.pan[0] = -kilometers(prop.ship.player.position[0]);
-  prop.ui.pan[1] =  kilometers(prop.ship.player.position[1]);
+  prop.ui.pan[0] = -kilometers(prop.game.ships.player.position[0]);
+  prop.ui.pan[1] =  kilometers(prop.game.ships.player.position[1]);
 }

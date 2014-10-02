@@ -2,6 +2,12 @@
 function input_init_pre() {
   prop.input={};
 
+  prop.input.controls = [0, 0];
+
+  prop.input.assist = {
+    gravity: false
+  };
+
   prop.input.button={
     none:0,
     left:1,
@@ -60,10 +66,14 @@ function input_command_run(value) {
   if(cmd == "teleport") {
     var planet = data.split(" ");
     if(!data || planet.length == 0) {
-      prop.ship.player.teleport();
+      prop.game.ships.player.teleport();
     } else {
-      prop.ship.player.teleport(planet);
+      prop.game.ships.player.teleport(planet);
     }
+  } else if(cmd == "save") {
+    storage.set("savegame", prop.game.save());
+  } else if(cmd == "restore") {
+    prop.game.restore(storage.get("savegame"));
   }
 
   $("#debug").addClass("hidden");
@@ -87,20 +97,20 @@ function input_keydown(keycode) {
 
 function input_update_pre() {
   if(prop.input.keys[prop.input.keysym.left]) {
-    prop.ship.player.controls[0] = -1;
+    prop.input.controls[0] = -1;
   } else if(prop.input.keys[prop.input.keysym.right]) {
-    prop.ship.player.controls[0] = 1;
+    prop.input.controls[0] = 1;
   } else {
-    prop.ship.player.controls[0] = 0;
+    prop.input.controls[0] = 0;
   }
   if(prop.input.keys[prop.input.keysym.up]) {
-    prop.ship.player.controls[1] = 1;
+    prop.input.controls[1] = 1;
   } else {
-    prop.ship.player.controls[1] = 0;
+    prop.input.controls[1] = 0;
   }
   if(prop.input.keys[prop.input.keysym.down]) {
-    prop.ship.player.assist.gravity = true;
+    prop.input.assist.gravity = true;
   } else {
-    prop.ship.player.assist.gravity = false;
+    prop.input.assist.gravity = false;
   }
 }

@@ -1,5 +1,6 @@
 
 var Content=function(options) {
+
   this.status="queue";
   this.url="";
   this.callback=null;
@@ -114,12 +115,20 @@ var Content=function(options) {
     },0);
   };
 
-  load_item_add();
-  get_queue_add(this);
+  if(this.url in prop.get.got && prop.get.got[this.url].status == "done") {
+    this.callback.call(this.that, "ok", prop.get.got[this.url].data, prop.get.got[this.url].payload);
+  } else {
+    load_item_add();
+    get_queue_add(this);
+
+    prop.get.got[this.url] = this;
+  }
 };
 
 function get_init_pre() {
   prop.get={};
+  prop.get.got={};
+
   prop.get.queue=[];
 
   prop.get.retry={};

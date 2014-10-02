@@ -38,7 +38,7 @@ var Star=Fiber.extend(function() {
 
       if(distance > this.radius) return 0;
 
-      var density = 50;
+      var density = 5;
       var damping = crange(this.radius, distance, this.radius * 5, density, 0);
 
       return damping;
@@ -85,6 +85,22 @@ var Star=Fiber.extend(function() {
           }
         }
       });
+    },
+
+    save: function() {
+      log("star save", LOG_DEBUG);
+
+      var data = {};
+
+      data.title  = this.title;
+
+      data.color  = this.color.getSaveableValue();
+
+      data.radius = this.radius;
+
+      data.mass   = this.mass;
+
+      return data;
     }
   };
 });

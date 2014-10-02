@@ -262,6 +262,9 @@ var Color=function(value) {
   this.getInternalValue=function() {
     return ":"+[this.r,this.g,this.b,this.opacity].join(":");
   };
+  this.getSaveableValue=function() {
+    return this.getInternalValue();
+  };
   this.getRgbValue=function() {
     return "rgb("+[parseInt(this.r),parseInt(this.g),parseInt(this.b)].join(",")+")";
   };

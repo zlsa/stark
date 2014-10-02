@@ -8,10 +8,11 @@ var Planet=Fiber.extend(function() {
 
       this.color    = new Color(options.color || "#fff");
       this.image    = null;
+      this.image_url = options.image || null;
 
       this.distance = options.distance || 0;
       this.radius   = options.radius   || 1;
-      this.start_offset = options.offset || 0;
+      this.start_offset = options.offset || options.start_offset || 0;
 
       this.period   = options.period   || 100; // seconds for a full trip
 
@@ -36,7 +37,7 @@ var Planet=Fiber.extend(function() {
       };
 
       this.planets = {};
-      
+
       this.canvas = {
         planet: null,
         atmosphere: null
@@ -48,9 +49,9 @@ var Planet=Fiber.extend(function() {
       
       this.content = {};
 
-      if(options.image) {
+      if(this.image_url) {
         this.content.image = new Content({
-          url: "assets/images/planets/" + options.image,
+          url: "assets/images/planets/" + this.image_url,
           type: "image",
           that: this,
           callback: function(status, data) {
@@ -294,13 +295,12 @@ var Planet=Fiber.extend(function() {
     render: function() {
       this.renderPlanet();
       this.renderAtmosphere();
-    },
-    complete: function() {
-      this.render();
+
       for(var p in this.planets) {
-        this.planets[p].complete();
+        this.planets[p].render();
       }
     },
+    
     update: function() {
       for(var p in this.planets) {
         this.planets[p].update();
@@ -312,6 +312,7 @@ var Planet=Fiber.extend(function() {
         this.offset = (game_time() / this.period) * Math.PI + Math.abs(this.start_offset);
       }
     },
+    
     load: function(url) {
       this.content=new Content({
         type: "json",
@@ -323,6 +324,38 @@ var Planet=Fiber.extend(function() {
           }
         }
       });
+    },
+
+    save: function() {
+      log("planet save", LOG_DEBUG);
+
+      var data = {};
+      
+      data.title = this.title;
+      data.color = this.color.getSaveableValue();
+
+      data.image_url = this.image_url;
+
+      data.distance     = this.distance;
+      data.radius       = this.radius;
+      data.start_offset = this.start_offset;
+      
+      data.period       = this.period;
+
+      data.mass         = this.mass;
+
+      data.type         = this.type;
+      data.craters      = this.craters;
+
+      data.atmosphere   = this.atmosphere;
+
+      data.planets      = {};
+
+      for(var i in this.planets) {
+        data.planets[i] = this.planets[i].save();
+      }
+
+      return data;
     }
   };
 });
