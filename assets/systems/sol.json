@@ -12,7 +12,9 @@
 
     "mercury": {
       "title":      "Mercury",
-      "color":      "#754",
+      "color":      "#a87",
+      "type":       "rocky",
+      "craters":    1,
       "distance":   12000,
       "radius":     50,
       "offset":     270,
@@ -23,6 +25,7 @@
     "eve": {
       "title":      "Eve",
       "color":      "#c2c",
+      "type":       "gas",
       "distance":   21000,
       "radius":     130,
       "offset":     180,
@@ -35,6 +38,19 @@
           [0.0, "#c8c"],
           [0.3, "#c2c"]
         ]
+      },
+      "planets": {
+        "foo": {
+          "title":      "Foo",
+          "color":      "#89c",
+          "type":       "rocky",
+          "craters":    0.4,
+          "distance":   2500,
+          "radius":     50,
+          "offset":     90,
+          "mass":       12,
+          "period":     200
+        }
       }
     },
 
@@ -52,13 +68,14 @@
         "density":   1,
         "colors": [
           [0.0, "#def"],
-          [0.2, "#8df"]
+          [0.3, "#8df"]
         ]
       },
       "planets": {
         "moon": {
           "title":      "Moon",
           "color":      "#999",
+          "craters":    1,
           "distance":   1500,
           "radius":     50,
           "offset":     0,
@@ -78,7 +95,7 @@
       "mass":       30,
       "period":     1200,
       "atmosphere": {
-        "thickness": 5,
+        "thickness": 2,
         "density":   0.6,
         "colors": [
           [0.0, "#f85"],
@@ -89,6 +106,8 @@
         "pota": {
           "title":      "Pota",
           "color":      "#887",
+          "type":       "rocky",
+          "craters":    1,
           "distance":   400,
           "radius":     20,
           "offset":    -45,
@@ -98,6 +117,8 @@
         "deimos": {
           "title":      "Deimos",
           "color":      "#8ca",
+          "type":       "rocky",
+          "craters":    1,
           "distance":   1000,
           "radius":     35,
           "offset":     225,
@@ -110,6 +131,7 @@
     "jool": {
       "title":      "Jool",
       "color":      "#3f5",
+      "type":       "gas",
       "distance":   65000,
       "radius":     350,
       "offset":     90,
@@ -127,6 +149,7 @@
         "io": {
           "title":      "Io",
           "color":      "#89b",
+          "type":       "gas",
           "distance":   2000,
           "radius":     50,
           "offset":     20,
@@ -141,7 +164,6 @@
             ]
           }
         }
-
       }
     }
   }

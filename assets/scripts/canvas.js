@@ -129,13 +129,15 @@ function canvas_draw_planet(cc, system, planet) {
 //    cc.arc(0, 0, kilometers(planet.radius), 0, Math.PI*2);
 //    cc.fill();
 
+//    cc.rotate(game_time() * 0.001);
+
     if(planet.canvas.planet) {
-      var size = Math.ceil(planet.radius);
+      var size = Math.ceil(planet.radius) + 4;
       cc.drawImage(planet.canvas.planet.canvas, -size, -size);
     }
 
     if(planet.canvas.atmosphere) {
-      var size = Math.ceil((planet.radius + planet.atmosphere.thickness));
+      var size = Math.ceil((planet.radius + planet.atmosphere.thickness)) + 2;
       cc.drawImage(planet.canvas.atmosphere.canvas, -size, -size);
     }
 
@@ -187,7 +189,7 @@ function canvas_draw_pointer(cc, system, planet) {
       max_draw *= crange(1000, distance_from_parent, 10000, 0.03, 1);
     }
 
-    var distance_visibility = crange(1000, distance, 10000, 1, crange(500, distance_from_parent, 10000, 0, 1));
+    var distance_visibility = 1; //crange(1000, distance, 10000, 1, crange(500, distance_from_parent, 10000, 0, 1));
 
     cc.save();
     

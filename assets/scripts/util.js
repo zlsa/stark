@@ -69,6 +69,10 @@ function randint(l,h) {
   return(Math.floor(Math.random()*(h-l+1))+l);
 }
 
+function random(l,h) {
+  return(Math.random()*(h-l)+l);
+}
+
 function elements(obj) {
   var n=0;
   for(var i in obj)
@@ -188,5 +192,17 @@ function angle_difference(a, b) {
   if(invert) difference *= -1;
   difference = radians(difference);
   return difference;
+}
+
+function sr(seed, slowdown) {
+  if(!slowdown) slowdown = 1;
+  var t = time() * slowdown;
+  return Math.sin(t + seed) * 0.2 + Math.sin((t + seed) * 2 + 2898) * 0.2 + Math.sin((t + seed - 198498) * 0.5) * 0.2;
+}
+
+function srt(seed, t, slowdown) {
+  if(!slowdown) slowdown = 1;
+  t *= slowdown;
+  return Math.sin(t + seed) * 0.2 + Math.sin((t + seed) * 1.53 + 2898) * 0.2 + Math.sin((t + seed - 198498) * 0.82) * 0.2 + Math.sin((t + seed - 2982) * 0.1) * 0.3;
 }
 

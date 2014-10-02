@@ -162,7 +162,7 @@ function ship_init_pre() {
 }
 
 function ship_complete() {
-  prop.ship.player.teleport(system_get(), ["earth"]);
+  prop.ship.player.teleport(system_get(), ["mercury"]);
 }
 
 function ship_update() {
