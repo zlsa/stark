@@ -2,10 +2,11 @@
   "name": "Sol",
 
   "star": {
-    "name":       "Sol",
-    "color":      "#fed",
-    "radius":     600,
-    "mass":       1200
+    "name":        "Sol",
+    "color":       "#fed",
+    "radius":      600,
+    "mass":        1200,
+    "temperature": "4000"
   },
 
   "planets": [
@@ -14,7 +15,9 @@
       "name":       "Mercury",
       "color":      "#a87",
       "type":       "rocky",
-      "craters":    1,
+      "environment": {
+        "craters":    1
+      },
       "distance":   12000,
       "radius":     50,
       "offset":     270,
@@ -78,7 +81,9 @@
         {
           "name":      "Moon",
           "color":      "#999",
-          "craters":    1,
+          "environment": {
+            "craters":    1
+          },
           "distance":   1500,
           "radius":     50,
           "offset":     0,
@@ -112,7 +117,9 @@
           "name":      "Pota",
           "color":      "#887",
           "type":       "rocky",
-          "craters":    3,
+          "environment": {
+            "craters":    1
+          },
           "distance":   400,
           "radius":     25,
           "offset":    -45,
@@ -124,7 +131,9 @@
           "name":      "Deimos",
           "color":      "#8ca",
           "type":       "rocky",
-          "craters":    1,
+          "environment": {
+            "craters":    1
+          },
           "distance":   1000,
           "radius":     35,
           "offset":     225,
@@ -157,6 +166,9 @@
           "name":      "Io",
           "color":      "#89b",
           "type":       "rocky",
+          "environment": {
+            "craters":    0
+          },
           "distance":   2000,
           "radius":     50,
           "offset":     20,
@@ -179,7 +191,9 @@
       "name":      "Pluto",
       "color":      "#aaa",
       "type":       "rocky",
-      "craters":    0.3,
+      "environment": {
+        "craters":    0.3
+      },
       "distance":   120000,
       "radius":     30,
       "offset":     45,

@@ -11,7 +11,7 @@ var Content=function(options) {
   this.payload=null;
 
   if(options) {
-    if("url" in options) this.url=options.url;
+    if("url" in options) this.url=options.url + "?" + time();
     if("callback" in options) this.callback=options.callback;
     if("type" in options) this.type=options.type;
     if("that" in options) this.that=options.that;

@@ -19,6 +19,7 @@ function canvas_init() {
 }
 
 function canvas_render_star() {
+  return;
   var size = 8;
   prop.canvas.star = canvas_new(size, size);
 
@@ -330,6 +331,7 @@ function canvas_draw_ship_pointer(cc, ship) {
 }
 
 function canvas_draw_starfield(cc) {
+  return;
   var system = system_get();
 
   for(var i=0;i<system.starfield.length;i++) {

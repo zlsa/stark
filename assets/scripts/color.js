@@ -22,6 +22,37 @@ var Color=function(value) {
     this.opacity=opacity;
     return this;
   };
+  this.setColorTemperatureValue=function(temp) {
+    temp /= 100;
+
+    if(temp < 66) {
+      this.r = 255;
+    } else {
+      this.r = temp - 60;
+      this.r = 329.698727446 * Math.pow(this.r, -0.1332047592)
+    }      
+    this.r = clamp(0, this.r, 255);
+
+    if(temp < 66) {
+      this.g = temp;
+      this.g = 99.4708025861 * Math.log(this.g) - 161.1195681661
+    } else {
+      this.g = temp - 60;
+      this.g = 288.1221695283 * Math.pow(this.g, -0.0755148492)
+    }      
+    this.g = clamp(0, this.g, 255);
+
+    if(temp >= 66) {
+      this.b = 255;
+    } else if(temp <= 19) {
+      this.b = 0;
+    } else {
+      this.b = temp - 10;
+      this.b = 138.5177312231 * Math.log(this.b) - 305.0447927307;
+    }
+    this.b = clamp(0, this.b, 255);
+
+  },
   this.setHexValue=function(value) {
     if(value.length < 3)
       return(false);

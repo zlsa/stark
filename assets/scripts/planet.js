@@ -4,31 +4,33 @@ var Planet=Fiber.extend(function() {
     init: function(options) {
       if(!options) options={};
 
-      this.name     = options.name || "";
+      this.name      = "";
 
-      this.color    = new Color(options.color || "#fff");
-      this.image    = null;
-      this.image_url = options.image || options.image_url || null;
+      this.color     = new Color("#fff");
+      this.image     = null;
+      this.image_url = null;
 
-      this.distance = options.distance || 0;
-      this.radius   = options.radius   || 1;
-      this.start_offset = radians(options.offset) || options.start_offset || 0;
+      this.distance     = 1;
+      this.radius       = 1;
+      this.start_offset = 0;
+      this.period       = 100;
 
-      this.period   = options.period   || 100; // seconds for a full trip
+      this.parent   = null;
+      this.system   = null;
 
-      this.parent   = options.parent || null;
-      this.system   = options.system || null;
-
-      this.mass     = options.mass || 1;
+      this.mass     = 1;
 
       this.position = [0, 0];
 
-      this.offset   = Math.abs(this.start_offset);
+      this.offset   = 0;
 
-      this.type     = options.type || "rocky";
-      this.craters  = options.craters || 0;
+      this.type     = "rocky";
 
-      this.atmosphere = options.atmosphere || {
+      this.environment = {
+        craters: 0,
+      };
+
+      this.atmosphere = {
         thickness: 2,
         density:   0.5,
         colors: [
@@ -45,7 +47,74 @@ var Planet=Fiber.extend(function() {
       
       this.content = {};
 
-      if(this.image_url) {
+      this.parse(options);
+
+    },
+    parse: function(data) {
+      if(data.parent) {
+        this.parent = data.parent;
+      }
+
+      if(data.system) {
+        this.system = data.system;
+      }
+
+      this.name = data.name || this.name;
+      
+      if(data.color) {
+        this.color = new Color(data.color);
+      }
+
+      if(data.distance) {
+        this.distance = data.distance;
+      }
+
+      if(data.radius) {
+        this.radius = data.radius;
+      }
+
+      if(data.offset) {
+        this.start_offset = radians(data.offset);
+        this.offset       = this.start_offset;
+      }
+
+      if(data.period) {
+        this.period = data.period;
+      }
+
+      if(data.mass) {
+        this.mass = data.mass;
+      }
+
+      if(data.type) {
+        this.type = data.type;
+      }
+
+      if(data.environment) {
+        this.environment = data.environment;
+        if(!this.environment.craters) {
+          this.environment.craters = 0;
+        }
+      }
+
+      if(data.atmosphere) {
+        this.atmosphere = data.atmosphere;
+        if(!this.atmosphere.thickness) {
+          this.atmosphere.thickness = 2;
+        }
+
+        if(!this.atmosphere.density) {
+          this.atmosphere.density = 0;
+        }
+
+        if(!this.atmosphere.colors) {
+          this.atmosphere.colors = [];
+        }
+      }
+
+      if(data.image || data.image_url) {
+        this.image_url = data.image || data.image_url;
+
         this.content.image = new Content({
           url: "assets/images/planets/" + this.image_url,
           type: "image",
@@ -56,9 +125,9 @@ var Planet=Fiber.extend(function() {
         });
       }
 
-      if(options.planets) {
-        for(var i=0;i<options.planets.length;i++) {
-          var p = options.planets[i];
+      if(data.planets) {
+        for(var i=0;i<data.planets.length;i++) {
+          var p = data.planets[i];
           p.parent = this;
           p.system = this.system;
           this.planets[i] = new Planet(p);
@@ -203,7 +272,7 @@ var Planet=Fiber.extend(function() {
         var y = random(0, size);
 
         var change = random(0.7, 1.1);
-        var crater = (random(0, 3)) < this.craters && change < 1;
+        var crater = (random(0, 3)) < this.environment.craters && change < 1;
         
         var feature_size = random(kilometers(4) * s, kilometers(30) * s);
 
@@ -366,14 +435,14 @@ var Planet=Fiber.extend(function() {
 
       data.distance     = this.distance;
       data.radius       = this.radius;
-      data.start_offset = this.start_offset;
+      data.offset       = degrees(this.start_offset);
       
       data.period       = this.period;
 
       data.mass         = this.mass;
 
       data.type         = this.type;
-      data.craters      = this.craters;
+      data.environment  = this.environment;
 
       data.atmosphere   = this.atmosphere;
 
