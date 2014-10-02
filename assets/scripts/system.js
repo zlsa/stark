@@ -79,6 +79,11 @@ var System=Fiber.extend(function() {
         }
       });
     },
+    complete: function() {
+      for(var p in this.planets) {
+        this.planets[p].complete();
+      }
+    },
     update: function() {
       for(var p in this.planets) {
         this.planets[p].update();
@@ -114,6 +119,10 @@ function system_add(system) {
 
 function system_get() {
   return prop.system.systems["sol"];
+}
+
+function system_complete() {
+  system_get().complete();
 }
 
 function system_update() {

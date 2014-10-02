@@ -125,9 +125,14 @@ function canvas_draw_planet(cc, system, planet) {
     
     cc.fillStyle = planet.color.getCssValue();
 
-    cc.beginPath();
-    cc.arc(0, 0, kilometers(planet.radius), 0, Math.PI*2);
-    cc.fill();
+//    cc.beginPath();
+//    cc.arc(0, 0, kilometers(planet.radius), 0, Math.PI*2);
+//    cc.fill();
+
+    if(planet.canvas.planet) {
+      var size = Math.ceil(planet.radius);
+      cc.drawImage(planet.canvas.planet.canvas, -size, -size);
+    }
 
     if(planet.canvas.atmosphere) {
       var size = Math.ceil((planet.radius + planet.atmosphere.thickness));
@@ -166,33 +171,9 @@ function canvas_draw_pointer(cc, system, planet) {
     
     var dist = 30;
 
-    cc.save();
-
-    cc.fillStyle   = "#000";
-    cc.strokeStyle = "#000";
-    cc.lineWidth   = crange(1, planet.mass, 1200, 1, 12);
-
-    cc.textAlign = "center";
-    cc.textBaseline = "middle";
-
-    cc.beginPath();
-    cc.moveTo(-Math.sin(direction) * (l - len), -Math.cos(direction) * (l - len));
-    cc.lineTo(-Math.sin(direction) * (l -   0), -Math.cos(direction) * (l -   0));
-    cc.stroke();
-
-    cc.font = "bold 12px 'Roboto Condensed', sans-serif";
-    cc.fillText(planet.title, -Math.sin(direction) * (l - len - dist), -Math.cos(direction) * (l - len - dist));
-
-    cc.font = "bold 10px 'Roboto Condensed', sans-serif";
-    cc.fillText(to_distance(distance), -Math.sin(direction) * (l - len - dist), -Math.cos(direction) * (l - len - dist) - 12);
-
-    cc.strokeStyle = planet.color.getCssValue();
-    cc.fillStyle   = planet.color.getCssValue();
-
     var distance = distance2d([-p[0], p[1]], prop.ui.pan);
 
     var len = scrange(l * 0.8, distance, m * 1.2, 0, 30);
-    cc.globalAlpha *= scrange(l * 0.8, distance, m * 1.2, 0, 1);
 
     var force = distance2d(system_get().gravityAt(prop.ui.pan, 1));
 
@@ -200,13 +181,56 @@ function canvas_draw_pointer(cc, system, planet) {
     var distance_from_parent = distance2d(rp);
 
     var max_draw = crange(0, planet.mass, 1200, 50000, 350000);
-    max_draw *= crange(0, force, 500, 1.8, 0.5);
+    max_draw *= crange(0, force, 500, 1.8, 0.3);
 
     if(distance_from_parent > 1) {
-      max_draw *= crange(1000, distance_from_parent, 10000, 0.1, 1);
+      max_draw *= crange(1000, distance_from_parent, 10000, 0.03, 1);
     }
 
+    var distance_visibility = crange(1000, distance, 10000, 1, crange(500, distance_from_parent, 10000, 0, 1));
+
+    cc.save();
+    
+    cc.textAlign = "center";
+    cc.textBaseline = "middle";
+
+    cc.globalAlpha *= scrange(l * 0.8, distance, m * 1.2, 0, 1);
+
+    // dark outline
+
+    cc.save();
+
+    cc.globalAlpha *= scrange(0.9, distance, max_draw, 1, 0.01);
+
+    cc.strokeStyle = "rgba(32, 32, 32, 1.0)";
+    cc.lineJoin    = "round";
+    var border = 1;
+    cc.lineWidth   = crange(1, planet.mass, 1200, 1.5, 12) + border * 2;
+
+    cc.beginPath();
+    cc.moveTo(-Math.sin(direction) * (l - len - border), -Math.cos(direction) * (l - len - border));
+    cc.lineTo(-Math.sin(direction) * (l -   0 + border), -Math.cos(direction) * (l -   0 + border));
+    cc.stroke();
+
+    cc.lineWidth = border * 2;
+
+    cc.font = "bold 12px Roboto Condensed";
+    cc.strokeText(planet.title, -Math.sin(direction) * (l - len - dist), -Math.cos(direction) * (l - len - dist));
+
+    cc.globalAlpha *= distance_visibility;
+
+    cc.font = "bold 10px Roboto Condensed";
+    cc.strokeText(to_distance(distance), -Math.sin(direction) * (l - len - dist), -Math.cos(direction) * (l - len - dist) - 12);
+    
+    cc.restore();
+
+    // color text
+
     cc.globalAlpha *= scrange(0, distance, max_draw, 1, 0.01);
+
+    cc.lineWidth   = crange(1, planet.mass, 1200, 1.5, 12);
+    cc.strokeStyle = planet.color.getCssValue();
+    cc.fillStyle   = planet.color.getCssValue();
 
     cc.beginPath();
     cc.moveTo(-Math.sin(direction) * (l - len), -Math.cos(direction) * (l - len));
@@ -215,6 +239,8 @@ function canvas_draw_pointer(cc, system, planet) {
 
     cc.font = "bold 12px 'Roboto Condensed', sans-serif";
     cc.fillText(planet.title, -Math.sin(direction) * (l - len - dist), -Math.cos(direction) * (l - len - dist));
+
+    cc.globalAlpha *= distance_visibility;
 
     cc.font = "bold 10px 'Roboto Condensed', sans-serif";
     cc.fillText(to_distance(distance), -Math.sin(direction) * (l - len - dist), -Math.cos(direction) * (l - len - dist) - 12);

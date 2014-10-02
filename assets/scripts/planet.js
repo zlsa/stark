@@ -7,6 +7,7 @@ var Planet=Fiber.extend(function() {
       this.title    = options.title || "";
 
       this.color    = new Color(options.color || "#fff");
+      this.image    = null;
 
       this.distance = options.distance || 0;
       this.radius   = options.radius   || 1;
@@ -21,11 +22,11 @@ var Planet=Fiber.extend(function() {
 
       this.position = [0, 0];
 
-      this.offset   = this.start_offset;
+      this.offset   = Math.abs(this.start_offset);
 
       this.atmosphere = options.atmosphere || {
         thickness: 0,
-        density:   0,
+        density:   0.5,
         colors: [
 
         ]
@@ -40,11 +41,21 @@ var Planet=Fiber.extend(function() {
       
       if(options.url) {
         this.load(options.url);
-      } else {
-
       }
+      
+      this.content = {};
 
-      this.render();
+      if(options.image) {
+        this.content.image = new Content({
+          url: "assets/images/planets/" + options.image,
+          type: "image",
+          that: this,
+          callback: function(status, data) {
+            this.image = data;
+            console.log("image!");
+          }
+        });
+      }
 
       if(options.planets) {
         for(var i in options.planets) {
@@ -87,9 +98,10 @@ var Planet=Fiber.extend(function() {
       var distance = distance2d(this.getPosition(true), position);
 //      if(distance > this.radius + this.atmosphere.thickness) return 0;
 
-      var density = Math.max(0.7, this.atmosphere.density);
+      var density = Math.max(0.5, this.atmosphere.density);
 
       var damping = crange(this.radius * 0.5, distance, this.radius + this.atmosphere.thickness, density, 0);
+      damping *= crange(20, this.radius, 100, 10, 1);
 
       for(var p in this.planets) {
         damping += this.planets[p].dampingAt(position);
@@ -142,9 +154,13 @@ var Planet=Fiber.extend(function() {
       var center = size/2;
       var cc     = canvas_new(size, size);
 
-      cc.arc(center, center, center, 0, Math.PI/2);
-      cc.fillStyle="#3f8";
-      cc.fill();
+      if(!this.image) {
+        cc.arc(center, center, center, 0, Math.PI * 2);
+        cc.fillStyle = this.color.getCssValue();
+        cc.fill();
+      } else {
+        cc.drawImage(this.image, 0, 0, size, size);
+      }
 
       this.canvas.planet = cc;
     },
@@ -170,8 +186,8 @@ var Planet=Fiber.extend(function() {
 
       cc.fillStyle = cc.createRadialGradient(center, center, 0, center, center, center);
 
-      cc.fillStyle.addColorStop(radius * 0.2, new Color(this.atmosphere.colors[0][1]).setOpacity(0).getCssValue());
-      cc.fillStyle.addColorStop(radius * 0.6, new Color(this.atmosphere.colors[0][1]).setOpacity(0.4).getCssValue());
+      cc.fillStyle.addColorStop(radius * 0,     new Color(this.atmosphere.colors[0][1]).setOpacity(0).getCssValue());
+      cc.fillStyle.addColorStop(radius * 0.95, new Color(this.atmosphere.colors[0][1]).setOpacity(0.1).getCssValue());
 
       for(var i=0;i<this.atmosphere.colors.length;i++) {
         var color = this.atmosphere.colors[i];
@@ -191,13 +207,20 @@ var Planet=Fiber.extend(function() {
     },
     complete: function() {
       this.render();
+      for(var p in this.planets) {
+        this.planets[p].complete();
+      }
     },
     update: function() {
       for(var p in this.planets) {
         this.planets[p].update();
       }
 
-      this.offset = (game_time() / this.period) * Math.PI + this.start_offset;
+      if(this.start_offset < 0) {
+        this.offset = -(game_time() / this.period) * Math.PI + Math.abs(this.start_offset);
+      } else {
+        this.offset = (game_time() / this.period) * Math.PI + Math.abs(this.start_offset);
+      }
     },
     load: function(url) {
       this.content=new Content({

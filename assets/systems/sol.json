@@ -41,17 +41,18 @@
     "earth": {
       "title":      "Earth",
       "color":      "#38f",
+      "image":      "earth.png",
       "distance":   30000,
       "radius":     150,
       "offset":     135,
       "mass":       59,
       "period":     800,
       "atmosphere": {
-        "thickness": 8,
+        "thickness": 6,
         "density":   1,
         "colors": [
           [0.0, "#def"],
-          [0.3, "#8df"]
+          [0.2, "#8df"]
         ]
       },
       "planets": {
@@ -70,13 +71,14 @@
     "mars": {
       "title":      "Mars",
       "color":      "#f53",
+      "image":      "mars.png",
       "distance":   45000,
       "radius":     120,
       "offset":     10,
-      "mass":       50,
+      "mass":       30,
       "period":     1200,
       "atmosphere": {
-        "thickness": 10,
+        "thickness": 5,
         "density":   0.6,
         "colors": [
           [0.0, "#f85"],
@@ -84,13 +86,22 @@
         ]
       },
       "planets": {
+        "pota": {
+          "title":      "Pota",
+          "color":      "#887",
+          "distance":   400,
+          "radius":     20,
+          "offset":    -45,
+          "mass":       2.2,
+          "period":     90
+        },
         "deimos": {
           "title":      "Deimos",
-          "color":      "#876",
+          "color":      "#8ca",
           "distance":   1000,
-          "radius":     20,
+          "radius":     35,
           "offset":     225,
-          "mass":       4,
+          "mass":       7,
           "period":     120
         }
       }

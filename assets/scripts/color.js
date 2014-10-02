@@ -268,7 +268,7 @@ var Color=function(value) {
   this.getRgbaValue=function() {
     return "rgba("+
       [parseInt(this.r),parseInt(this.g),parseInt(this.b),
-       parseFloat(this.opacity).toPrecision(4)].join(",")+")";
+       parseFloat(this.opacity).toFixed(2)].join(",")+")";
   };
   this.getCssValue=function() {
     return(this.getRgbaValue());
