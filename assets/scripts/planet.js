@@ -108,7 +108,7 @@ var Planet=Fiber.extend(function() {
       var radius   = Math.max(this.radius, 60);
 
       var damping = crange(radius * 0.5, distance, radius + this.atmosphere.thickness, density, 0);
-      damping *= crange(20, this.radius, 100, 10, 1);
+      damping *= crange(60, radius, 100, 3, 1);
 
       for(var i=0;i<this.planets.length;i++) {
         damping += this.planets[i].dampingAt(position);
