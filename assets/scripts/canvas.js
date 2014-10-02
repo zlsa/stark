@@ -245,9 +245,6 @@ function canvas_draw_planet_pointer(cc, system, planet) {
       max_distance  *= crange(1500, distance_to_parent, 12000, 0.1, 1);
     }
 
-    var force        = distance2d(system_get().gravityAt(prop.game.ships.player.position, 1));
-    max_distance    *= scrange(0, force, 30, 1, 0.4);
-
     var fade = crange(0, distance_to_viewport, max_distance, 1, 0);
     fade    *= crange(small_ring * 0.8, distance_to_viewport, large_ring * 1.2, 0, 1);
 
@@ -290,9 +287,6 @@ function canvas_draw_ship_pointer(cc, ship) {
 
     max_distance    *= crange(0, ship.model.mass, 10, 0.5, 3);
     
-    var force        = distance2d(system_get().gravityAt(prop.game.ships.player.position, 1));
-    max_distance    *= scrange(0, force, 30, 1, 0.4);
-
     var ship_force   = distance2d(system_get().gravityAt(p, 1));
     max_distance    *= crange(5, ship_force, 30, 1, 0);
 
