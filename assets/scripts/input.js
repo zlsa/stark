@@ -67,6 +67,8 @@ function input_command_run(value) {
     } else {
       prop.game.ships.player.teleport(planet);
     }
+  } else if(cmd == "speedup") {
+    prop.game.speedup = parseFloat(data);
   } else if(cmd == "save") {
     storage.set("savegame", prop.game.save());
   } else if(cmd == "restore") {

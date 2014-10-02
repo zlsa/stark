@@ -14,7 +14,7 @@
       "name":       "Mercury",
       "color":      "#a87",
       "type":       "rocky",
-      "craters":    1,
+      "craters":    2,
       "distance":   12000,
       "radius":     50,
       "offset":     270,
@@ -107,18 +107,6 @@
         ]
       },
       "planets": [
-
-        {
-          "name":      "Pota",
-          "color":      "#887",
-          "type":       "rocky",
-          "craters":    1,
-          "distance":   400,
-          "radius":     20,
-          "offset":    -45,
-          "mass":       2.2,
-          "period":     90
-        },
 
         {
           "name":      "Deimos",

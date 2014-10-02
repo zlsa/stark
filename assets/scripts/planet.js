@@ -29,7 +29,7 @@ var Planet=Fiber.extend(function() {
       this.craters  = options.craters || 0;
 
       this.atmosphere = options.atmosphere || {
-        thickness: 0,
+        thickness: 0.5,
         density:   0.5,
         colors: [
 
@@ -103,9 +103,11 @@ var Planet=Fiber.extend(function() {
       var distance = distance2d(this.getPosition(true), position);
 //      if(distance > this.radius + this.atmosphere.thickness) return 0;
 
-      var density = Math.max(0.5, this.atmosphere.density);
+      var density = Math.max(1, this.atmosphere.density);
 
-      var damping = crange(this.radius * 0.5, distance, this.radius + this.atmosphere.thickness, density, 0);
+      var radius   = Math.max(this.radius, 60);
+
+      var damping = crange(radius * 0.5, distance, radius + this.atmosphere.thickness, density, 0);
       damping *= crange(20, this.radius, 100, 10, 1);
 
       for(var i=0;i<this.planets.length;i++) {
@@ -119,7 +121,9 @@ var Planet=Fiber.extend(function() {
 
       var distance = distance2d(this.getPosition(true), position);
 
-      var damping = crange(this.radius + this.atmosphere.thickness, distance, (this.radius + this.atmosphere.thickness) * 2, 1, 0);
+      var radius   = Math.max(this.radius, 60);
+
+      var damping = crange(radius + this.atmosphere.thickness, distance, (radius + this.atmosphere.thickness) * 2, 1, 0);
 
       velocity[0] *= damping;
       velocity[1] *= damping;

@@ -143,7 +143,7 @@ function canvas_draw_planet(cc, system, planet) {
     }
 
     if(planet.canvas.atmosphere) {
-      var size = Math.ceil((planet.radius + planet.atmosphere.thickness)) + 2;
+      var size = Math.ceil((planet.radius + planet.atmosphere.thickness)) + 4;
       cc.drawImage(planet.canvas.atmosphere.canvas, -size, -size);
     }
 
