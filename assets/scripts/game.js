@@ -1,4 +1,19 @@
 
+var Timeout = Fiber.extend(function() {
+  return {
+    init: function(options) {
+      
+      this.callback = options.callback;
+      this.delay    = options.delay;
+
+      this.start    = time();
+    },
+    update: function() {
+
+    },
+  };
+});
+
 var Game = Fiber.extend(function() {
   return {
     init: function() {
@@ -21,10 +36,10 @@ var Game = Fiber.extend(function() {
 
       this.ships.auto = [];
 
-      this.ships.auto.push(new Ship({
-        type:  "auto",
-        model: "x220"
-      }));
+      // this.ships.auto.push(new Ship({
+      //   type:  "auto",
+      //   model: "x220"
+      // }));
 
       this.ships.player = new Ship({
         model: "x220"
@@ -201,19 +216,7 @@ function game_speedup() {
 }
 
 function game_timeout(func, delay, that, data) {
-  var to = [func, game_time()+delay, data, delay, false, that];
-  prop.game.timeouts.push(to);
-  return to;
-}
-
-function game_interval(func, delay, that, data) {
-  var to = [func, game_time()+delay, data, delay, true, that];
-  prop.game.timeouts.push(to);
-  return to;
-}
-
-function game_clear_timeout(to) {
-  prop.game.timeouts.splice(prop.game.timeouts.indexOf(to), 1);
+  prop.game.timeout(arguments);
 }
 
 function game_update_pre() {

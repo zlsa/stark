@@ -165,7 +165,7 @@ function mod(a, n) {
     return ((a%n)+n)%n;
 };
 
-var AU = 30000;
+var AU = 60000;
 
 function to_distance(d) {
   function r(d, p) {

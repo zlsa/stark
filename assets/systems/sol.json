@@ -3,7 +3,7 @@
 
   "star": {
     "name":        "Sol",
-    "radius":      600,
+    "radius":      1200,
     "mass":        1200,
     "temperature": "5800"
   },
@@ -17,7 +17,7 @@
       "environment": {
         "craters":    1
       },
-      "distance":   12000,
+      "distance":   20000,
       "radius":     50,
       "offset":     270,
       "mass":       10,
@@ -28,7 +28,7 @@
       "name":       "Eve",
       "color":      "#c2c",
       "type":       "gas",
-      "distance":   21000,
+      "distance":   36000,
       "radius":     130,
       "offset":     180,
       "mass":       65,
@@ -62,7 +62,7 @@
       "name":       "Earth",
       "color":      "#38f",
       "image":      "earth.png",
-      "distance":   30000,
+      "distance":   60000,
       "radius":     150,
       "offset":     135,
       "mass":       59,
@@ -83,7 +83,7 @@
           "environment": {
             "craters":    1
           },
-          "distance":   1500,
+          "distance":   2500,
           "radius":     50,
           "offset":     0,
           "mass":       8,
@@ -97,7 +97,7 @@
       "name":      "Mars",
       "color":      "#f53",
       "image":      "mars.png",
-      "distance":   45000,
+      "distance":   95200,
       "radius":     120,
       "offset":     10,
       "mass":       30,
@@ -133,7 +133,7 @@
           "environment": {
             "craters":    1
           },
-          "distance":   1000,
+          "distance":   2500,
           "radius":     35,
           "offset":     225,
           "mass":       7,
@@ -147,7 +147,7 @@
       "name":      "Jool",
       "color":      "#3f5",
       "type":       "gas",
-      "distance":   65000,
+      "distance":   160000,
       "radius":     350,
       "offset":     90,
       "mass":       200,
@@ -193,7 +193,7 @@
       "environment": {
         "craters":    0.3
       },
-      "distance":   120000,
+      "distance":   180000,
       "radius":     30,
       "offset":     45,
       "mass":       5,

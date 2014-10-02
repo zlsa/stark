@@ -10,6 +10,27 @@
     "angle":  6
   },
 
+  "fuel": {
+    "impulse": {
+      "type":       "xenon",
+      "capacity":   30,
+      "efficiency": 0.4,
+      "max_rate":   {
+        "output":   0.1,
+        "input":    1
+      }
+    },
+    "jump": {
+      "type":       "hydrogen",
+      "capacity":   50,
+      "efficiency": 0.5,
+      "max_rate":   {
+        "output":   0.05,
+        "input":    2
+      }
+    }
+  },
+
   "images": {
     "normal": "assets/ships/x220/normal.png",
     "engine": "assets/ships/x220/engine.png"

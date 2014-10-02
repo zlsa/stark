@@ -2,6 +2,8 @@
 function canvas_init_pre() {
   prop.canvas={};
 
+  prop.canvas.font    = "'Exo 2'";
+
   prop.canvas.enabled = true;
 
   prop.canvas.contexts={};
@@ -61,13 +63,7 @@ function canvas_clear(cc) {
   cc.clearRect(0, 0, prop.canvas.size[0], prop.canvas.size[1]);
 }
 
-/* DRAW */
-
-/* BACKGROUND */
-
-function canvas_draw_background(cc) {
-
-}
+/************ SHIP *************/
 
 function canvas_draw_ship(cc, ship) {
   cc.save();
@@ -88,26 +84,9 @@ function canvas_draw_ship(cc, ship) {
 
   cc.restore();
 
-  if(false) { // path
-
-    cc.save();
-
-    cc.strokeStyle = "#ff0";
-    cc.lineWidth   = 2;
-
-    cc.beginPath();
-
-    cc.moveTo(kilometers(ship.path[0][0]), -kilometers(ship.path[0][1]));
-
-    for(var i=1;i<ship.path.length;i++) {
-      cc.lineTo(kilometers(ship.path[i][0]), -kilometers(ship.path[i][1]));
-    }
-
-    cc.stroke();
-
-    cc.restore();
-  }
 }
+
+/************ SHIPS *************/
 
 function canvas_draw_ships(cc) {
   for(var i=0;i<prop.game.ships.auto.length;i++) {
@@ -116,7 +95,7 @@ function canvas_draw_ships(cc) {
   canvas_draw_ship(cc, prop.game.ships.player);
 }
 
-// SYSTEM
+/************ PLANET *************/
 
 function canvas_draw_planet(cc, system, planet) {
   var p = planet.getPosition(true);
@@ -168,6 +147,8 @@ function canvas_draw_planet(cc, system, planet) {
 
 }
 
+/************ POINTERS *************/
+
 function canvas_draw_pointer(cc, options) {
 
   var radius = (options.radius || Math.min(prop.canvas.size[0], prop.canvas.size[1]) / 2);
@@ -205,10 +186,10 @@ function canvas_draw_pointer(cc, options) {
 
   cc.lineWidth = border * 2;
 
-  cc.font = "bold 12px Roboto Condensed";
+  cc.font = "bold 12px " + prop.canvas.font;
   cc.strokeText(options.label, ta[0], ta[1] + primary_offset);
 
-  cc.font = "bold 10px Roboto Condensed";
+  cc.font = "bold 10px " + prop.canvas.font;
   cc.strokeText(options.secondary_label, ta[0], ta[1] + secondary_offset);
   
   cc.restore();
@@ -223,10 +204,10 @@ function canvas_draw_pointer(cc, options) {
   cc.lineTo(-Math.sin(options.direction) * (radius -              0), -Math.cos(options.direction) * (radius -              0));
   cc.stroke();
 
-  cc.font = "bold 12px Roboto Condensed";
+  cc.font = "bold 12px " + prop.canvas.font;
   cc.fillText(options.label, ta[0], ta[1] + primary_offset);
 
-  cc.font = "bold 10px Roboto Condensed";
+  cc.font = "bold 10px " + prop.canvas.font;
   cc.fillText(options.secondary_label, ta[0], ta[1] + secondary_offset);
   
   cc.restore();
@@ -258,7 +239,7 @@ function canvas_draw_planet_pointer(cc, system, planet) {
 
     var length = scrange(small_ring * 0.8, distance_to_viewport, large_ring * 1.2, 0, 20);
 
-    var max_distance = crange(10, planet.mass, 1200, 100000, 1200000);
+    var max_distance = crange(10, planet.mass, 1200, 300000, 2000000);
 
     if(distance_to_parent > 0) {
       max_distance  *= crange(1500, distance_to_parent, 12000, 0.1, 1);
@@ -339,6 +320,108 @@ function canvas_draw_ship_pointer(cc, ship) {
 
 }
 
+/* FUEL */
+
+function canvas_draw_ring_gauge(cc, options) {
+
+  var amount     = options.amount || 1;
+  var thickness  = options.thickness || 3;
+  var radius     = options.radius || 30;
+  var fade       = options.fade  || 1;
+  var spill      = options.spill || 5;
+  var stops      = options.stops || false;
+  var stop_width = options.stop_width || 1;
+  var max        = radians(options.max || 360);
+  var start      = radians(options.start) || (Math.PI - (max * 0.5));
+
+  cc.lineWidth = thickness;
+  cc.lineEnd   = "butt";
+
+  cc.save();
+
+  cc.beginPath();
+  cc.rotate(-Math.PI * 0.5 + start);
+  cc.arc(0, 0, radius - thickness * 0.5 - 2, 0, amount * max);
+  cc.stroke();
+
+  cc.lineWidth = 1;
+  cc.beginPath();
+  cc.arc(0, 0, radius - 0.5, 0, max);
+  cc.stroke();
+  
+  cc.restore();
+
+  if(stops) {
+    cc.save();
+
+    cc.lineWidth = stop_width;
+
+    var stop_min = radius - thickness - spill - 2;
+    var stop_max = radius + 0         + spill;
+
+    cc.rotate(-Math.PI + start);
+
+    cc.beginPath();
+    cc.moveTo(0, stop_min);
+    cc.lineTo(0, stop_max);
+
+    cc.rotate(max);
+
+    cc.moveTo(0, stop_min);
+    cc.lineTo(0, stop_max);
+
+    cc.stroke();
+
+    cc.restore();
+  }
+
+  if(options.label) {
+    cc.textAlign    = "center";
+    cc.textBaseline = "middle";
+
+    cc.font = "bold 14px " + prop.canvas.font;
+    cc.fillText(options.label, 0, 0);
+  }
+}
+
+function canvas_draw_fuel_hud(cc, ship, type) {
+  var padding = [40, 20];
+  var radius = 40;
+
+  if(type == "jump") padding[0] += radius * 2 + 20;
+
+  cc.save();
+  cc.translate(-prop.canvas.size[0] / 2 + padding[0] + radius, prop.canvas.size[1] / 2 - padding[1] - radius);
+
+  cc.fillStyle   = "#ddd";
+  cc.strokeStyle = "#ddd";
+
+  var thickness = 6;
+
+  var label = null;
+
+  var fuel_type = ship.model.fuel[type].type;
+
+  label = prop.ship.fuels[fuel_type].element;
+
+  canvas_draw_ring_gauge(cc, {
+    radius:     radius,
+    thickness:  thickness,
+    stops:      true,
+    stop_width: 3,
+    spill:      3,
+
+    label:      label,
+    
+    amount:     ship.fuel[type].getFraction(),
+    max:        315
+  });
+
+  cc.restore();
+}
+
+/************ STARFIELD **************/
+
 function canvas_draw_starfield(cc) {
   return;
   var system = system_get();
@@ -361,6 +444,8 @@ function canvas_draw_starfield(cc) {
   }
 
 }
+
+/************ MAIN ELEMENTS **************/
 
 function canvas_draw_system(cc) {
   var system = system_get();
@@ -390,7 +475,12 @@ function canvas_draw_hud(cc) {
 
   canvas_draw_planet_pointer(cc, system, system.star);
 
+  canvas_draw_fuel_hud(cc, prop.game.ships.player, "impulse");
+  canvas_draw_fuel_hud(cc, prop.game.ships.player, "jump");
+
 }
+
+/************ HELPER *************/
 
 function canvas_is_visible(position, size) { // position in km
   var width  = prop.canvas.size[0] + kilometers(size) * 2;
@@ -405,14 +495,14 @@ function canvas_is_visible(position, size) { // position in km
   return true;
 }
 
+/************ UPDATE *************/
+
 function canvas_update_post() {
   if(!prop.canvas.enabled) return;
   var cc=canvas_get("main");
 
   cc.save();
-
   canvas_clear(cc);
-  canvas_draw_background(cc);
   cc.restore();
 
   cc.save();

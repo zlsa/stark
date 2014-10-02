@@ -3,7 +3,99 @@ var Expendable = Fiber.extend(function() {
   return {
     init: function(options) {
       if(!options) options={};
+      
+      this.amount     = 0;
+      this.capacity   = 0;
 
+      this.can_hold   = {};
+
+      this.weight     = 0;
+
+      this.flow       = 0;
+
+      this.parse(options);
+    },
+    parse: function(data) {
+      if(data.amount) {
+        this.amount = data.amount;
+      }
+
+      if(data.capacity) {
+        this.capacity = data.capacity;
+      }
+
+      if(data.can_hold) {
+        this.can_hold = data.can_hold;
+      }
+
+      if(data.weight) {
+        this.weight = data.weight;
+      }
+
+    },
+    fill: function() {
+      this.amount = this.capacity;
+    },
+    set: function(fraction) {
+      this.amount = this.capacity * fraction;
+    },
+    getAmount: function() {
+      return this.amount;
+    },
+    getFraction: function() {
+      return this.amount / this.capacity;
+    },
+    getWeight: function() {
+      return this.amount * this.weight;
+    },
+    updateFlow: function() {
+      this.amount += this.flow * game_delta();
+
+      this.amount = clamp(0, this.amount, this.capacity);
+    },
+    update: function() {
+      this.updateFlow();
+    }
+  };
+});
+
+var FuelTank = Expendable.extend(function(base) {
+  return {
+    init: function(options) {
+      if(!options) options={};
+
+      base.init.call(this, options);
+
+      this.max_rate = {
+        output: 0,
+        input:  0
+      };
+
+      this.rate = {
+        output: 0,
+        input:  0
+      };
+
+    },
+    parse: function(data) {
+      base.parse.call(this, data);
+
+      if(data.type) {
+        this.type = data.type;
+      }
+
+    },
+    isEmpty: function() {
+      return (this.getAmount() < 0.01);
+    },
+    updateFuel: function() {
+      this.rate.output = clamp(0, this.rate.output, this.max_rate.output);
+      this.rate.input  = clamp(0, this.rate.input,  this.max_rate.input);
+      this.flow = -this.rate.output + this.rate.input;
+    },
+    update: function() {
+      this.updateFuel();
+      base.update.call(this);
     }
   };
 });
@@ -18,7 +110,28 @@ var ShipModel = Fiber.extend(function() {
       this.name         = "";
       this.manufacturer = "";
       this.name         = "";
-      
+
+      this.fuel         = {
+        impulse: {
+          type:       "xenon",
+          capacity:   30,
+          efficiency: 0,
+          max_rate:   {
+            output:   1,
+            input:    1
+          }
+        },
+        jump: {
+          type:       "hydrogen",
+          capacity:   50,
+          efficiency: 0,
+          max_rate:   {
+            output:   1,
+            input:    1
+          }
+        }
+      };
+
       this.mass         = 1;
       this.angular_mass = 1;
 
@@ -41,19 +154,6 @@ var ShipModel = Fiber.extend(function() {
 
     },
 
-    load: function(url) {
-      this.content.ship = new Content({
-        url:  url,
-        type: "json",
-        that: this,
-        callback: function(status, data) {
-          if(status == "ok") {
-            this.parse(data);
-          }
-        }
-      });
-    },
-
     parse: function(data) {
       this.id           = data.id           || this.id;
 
@@ -66,6 +166,19 @@ var ShipModel = Fiber.extend(function() {
       if(data.power) {
         if(data.power.thrust) this.power.thrust = data.power.thrust;
         if(data.power.angle)  this.power.angle  = data.power.angle;
+      }
+
+      if(data.fuel) {
+        var types = ["impulse", "jump"];
+        for(var i=0;i<types.length;i++) {
+          var type = types[i];
+          if(data.fuel[type]) {
+            if(data.fuel[type].type)       this.fuel[type].type       = data.fuel[type].type;
+            if(data.fuel[type].capacity)   this.fuel[type].capacity   = data.fuel[type].capacity;
+            if(data.fuel[type].efficiency) this.fuel[type].efficiency = data.fuel[type].efficiency;
+            if(data.fuel[type].max_rate)   this.fuel[type].max_rate   = data.fuel[type].max_rate;
+          }
+        }
       }
 
       if(data.images) {
@@ -88,37 +201,65 @@ var ShipModel = Fiber.extend(function() {
 
       }
 
-    }
+    },
+
+    load: function(url) {
+      this.content.ship = new Content({
+        url:  url,
+        type: "json",
+        that: this,
+        callback: function(status, data) {
+          if(status == "ok") {
+            this.parse(data);
+          }
+        }
+      });
+    },
+
   };
 });
+
+/******************************************/
 
 var Ship = Fiber.extend(function() {
   return {
     init: function(options) {
       if(!options) options={};
 
+      // 'player' or 'auto'
+      this.type     = "player";
+
+      // ... basic stuff
       this.position = [0, 0];
       this.velocity = [140, 0];
       this.angle    = 0;
       this.angular_velocity = 0;
 
+      // ... here too
       this.force    = [0, 0];
       this.angular_force = 0;
 
+      // autopilot controls these
       this.controls = [0, 0];
 
-      this.mass     = 0;
+      // automatically updated every frame
+      this.mass         = 0;
+      this.angular_mass = 0;
 
-      this.type     = "player";
-
+      // updated every frame
+      this.fuel         = {
+        impulse: new FuelTank(),
+        jump:    new FuelTank()
+      };
+      
+      // the model
       this.model    = new ShipModel();
 
+      // assist
       this.assist = options.assist || {
         angle:   true,
         gravity: true
       };
-
-      this.path = [];
 
       this.parse(options);
     },
@@ -146,10 +287,30 @@ var Ship = Fiber.extend(function() {
 
       if(data.model) {
         this.model = prop.ship.models[data.model];
+
+        var types = ["impulse", "jump"];
+        for(var i=0;i<types.length;i++) {
+          var type = types[i];
+          this.fuel[type].max_rate = this.model.fuel[type].max_rate;
+          this.fuel[type].weight   = prop.ship.fuels[this.model.fuel[type].type].weight;
+          this.fuel[type].capacity = this.model.fuel[type].capacity;
+
+          this.fuel[type].fill();
+
+          if(data.fuel && data.fuel[type])
+            this.fuel[type].set(data.fuel[type].amount || 1);
+        }
+
       }
 
     },
 
+    updateFuel: function() {
+      this.fuel.impulse.rate.output = crange(0, this.controls[1], 1, 0, this.model.fuel.impulse.efficiency);
+      prop.foo = this.fuel.impulse;
+
+      this.fuel.impulse.update();
+    },
     updateMass: function() {
       this.mass = this.model.mass;
       this.angular_mass = this.model.angular_mass;
@@ -217,6 +378,7 @@ var Ship = Fiber.extend(function() {
       this.velocity[1] += velocity[1];
     },
     update: function() {
+      this.updateFuel();
       this.updateMass();
 
       if(this.type == "auto") {
@@ -228,8 +390,6 @@ var Ship = Fiber.extend(function() {
       this.updateGravity();
       this.updateDamping();
       this.updatePhysics();
-
-      this.path.push([this.position[0], this.position[1]]);
     },
     teleport: function(system, planet) {
       if(!planet) {
@@ -288,6 +448,15 @@ var Ship = Fiber.extend(function() {
       
       data.assist   = this.assist;
 
+      data.fuel     = {
+        impulse: {
+          amount: this.fuel.impulse.getFraction()
+        },
+        jump: {
+          amount: this.fuel.jump.getFraction()
+        }
+      };
+
       return data;
 
     }
@@ -301,6 +470,17 @@ function ship_init_pre() {
   prop.ship.models = {};
 
   prop.ship.root = "assets/ships/";
+
+  prop.ship.fuels = {
+    "xenon": {
+      weight:  0.05,
+      element: "Xe"
+    },
+    "hydrogen": {
+      weight: 0.015,
+      element: "H"
+    }
+  };
 }
 
 function ship_init() {
