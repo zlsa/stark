@@ -26,6 +26,18 @@ window.AudioContext = window.AudioContext||window.webkitAudioContext;
     };
 }());
 
+function flatten(a) {
+  var out = [];
+  for(var i=0;i<a.length;i++) {
+    if(typeof a[i] == typeof []) {
+      out.push.apply(out, flatten(a[i]));
+    } else {
+      out.push(a[i]);
+    }
+  }
+  return out;
+}
+
 function isHex(c) {
     if("0123456789abcdef".indexOf(c.toLowerCase()) > -1)
         return true;

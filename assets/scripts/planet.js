@@ -299,9 +299,15 @@ var Planet=Fiber.extend(function() {
     },
     render: function() {
       console.log("rendering planet " + this.name);
+      
+      var start = time();
 
       this.renderPlanet();
       this.renderAtmosphere();
+
+      var elapsed = time() - start;
+
+      console.log("took " + elapsed.toFixed(4) + " seconds to render " + this.name);
     },
     
     update: function() {

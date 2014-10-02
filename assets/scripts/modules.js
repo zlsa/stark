@@ -24,6 +24,7 @@ var MODULES=[
   "load",
 
   "canvas",
+//  "gl",
 ];
 
 // saved as prop.version and prop.version_string

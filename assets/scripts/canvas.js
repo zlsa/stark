@@ -2,14 +2,18 @@
 function canvas_init_pre() {
   prop.canvas={};
 
+  prop.canvas.enabled = true;
+
   prop.canvas.contexts={};
 
   // resize canvas to fit window?
   prop.canvas.resize=true;
+
   prop.canvas.size={ // all canvases are the same size
     height:480,
     width:640
   };
+
 }
 
 function canvas_init() {
@@ -22,8 +26,8 @@ function canvas_new(width, height) {
 
 function canvas_resize() {
   if(prop.canvas.resize) {
-    prop.canvas.size.width=$(window).width();
-    prop.canvas.size.height=$(window).height();
+    prop.canvas.size.width  = $(window).width();
+    prop.canvas.size.height = $(window).height();
   }
   for(var i in prop.canvas.contexts) {
     prop.canvas.contexts[i].canvas.height=prop.canvas.size.height;
@@ -299,6 +303,7 @@ function canvas_is_visible(position, size) { // position in km
 }
 
 function canvas_update_post() {
+  if(!prop.canvas.enabled) return;
   var cc=canvas_get("main");
 
   cc.save();
