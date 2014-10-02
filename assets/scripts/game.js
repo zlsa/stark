@@ -57,6 +57,7 @@ var Game = Fiber.extend(function() {
     complete: function() {
       this.system = prop.system.systems[0];
       this.system.render();
+      this.system.generateStarfield();
 
       for(var i=0;i<this.ships.auto.length;i++) {
         this.ships.auto[i].teleport(this.system, ["earth"]);

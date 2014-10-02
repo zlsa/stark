@@ -10,11 +10,26 @@ function canvas_init_pre() {
   prop.canvas.resize=true;
 
   prop.canvas.size = [0, 0]
-    
 }
 
 function canvas_init() {
   canvas_add("main");
+  
+  canvas_render_star();
+}
+
+function canvas_render_star() {
+  var size = 8;
+  prop.canvas.star = canvas_new(size, size);
+
+  prop.canvas.star.fillStyle = prop.canvas.star.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+  prop.canvas.star.fillStyle.addColorStop(0, "#fff");
+  prop.canvas.star.fillStyle.addColorStop(0.5, "#fff");
+  prop.canvas.star.fillStyle.addColorStop(1, "rgba(255, 255, 255, 0)");
+  
+  prop.canvas.star.fillRect(0, 0, size, size);
+
+  prop.canvas.star_size = size;
 }
 
 function canvas_new(width, height) {
@@ -175,7 +190,7 @@ function canvas_draw_pointer(cc, options) {
 
   var border     = options.outline || 1;
 
-  cc.strokeStyle = "rgba(32, 32, 32, 1.0)";
+  cc.strokeStyle = "rgba(0, 0, 0, 1.0)";
   cc.lineJoin    = "round";
   cc.lineWidth   = options.width + border * 2;
 
@@ -314,15 +329,37 @@ function canvas_draw_ship_pointer(cc, ship) {
 
 }
 
+function canvas_draw_starfield(cc) {
+  var system = system_get();
+
+  for(var i=0;i<system.starfield.length;i++) {
+    var star = system.starfield[i];
+
+    var depth = crange(0, star[1], 1, 0.5, 0.1);
+
+    var pos = [
+      mod(star[0][0] + (prop.ui.pan[0] * depth), prop.canvas.size[0]),
+      mod(star[0][1] + (prop.ui.pan[1] * depth), prop.canvas.size[1])
+    ];
+
+//    cc.arc(pos[0], pos[1], crange(0, star[1], 1, 2, 0.5), 0, Math.PI*2);
+//    cc.rect(pos[0], pos[1], crange(0, star[1], 1, 2, 0.5), crange(0, star[1], 1, 2, 0.5));
+    var s    = prop.canvas.star_size;
+    var size = crange(0, star[1], 1, s, 1);
+    cc.drawImage(prop.canvas.star.canvas, pos[0] - s, pos[1] - s, size, size);
+  }
+
+}
+
 function canvas_draw_system(cc) {
   var system = system_get();
 
   cc.fillStyle = system.star.color.getCssValue();
-
+  
   cc.beginPath();
   cc.arc(0, 0, kilometers(system.star.radius), 0, Math.PI*2);
   cc.fill();
-  
+
   for(var i=0;i<system.planets.length;i++) {
     canvas_draw_planet(cc, system, system.planets[i]);
   }
@@ -369,7 +406,10 @@ function canvas_update_post() {
 
   cc.save();
 
-  cc.translate(prop.canvas.size[0]/2, prop.canvas.size[1]/2);
+  canvas_draw_starfield(cc);
+
+  cc.translate(prop.canvas.size[0] / 2, prop.canvas.size[1] / 2);
+
   cc.translate(prop.ui.pan[0], prop.ui.pan[1]);
 
   canvas_draw_system(cc);
@@ -379,7 +419,7 @@ function canvas_update_post() {
 
   cc.save();
 
-  cc.translate(prop.canvas.size[0]/2, prop.canvas.size[1]/2);
+  cc.translate(prop.canvas.size[0] / 2, prop.canvas.size[1] / 2);
   canvas_draw_hud(cc);
   cc.restore();
 

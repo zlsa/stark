@@ -16,6 +16,32 @@ var System=Fiber.extend(function() {
         this.parse(options);
       }
 
+      this.starfield = [];
+
+    },
+    generateStarfield: function() {
+      var density = 120; // px per star
+
+      var number = (prop.canvas.size[0] * prop.canvas.size[1]) / density / density;
+
+      console.log(number);
+
+      var rng = new Math.seedrandom("starfield");
+
+      this.starfield = [];
+
+      for(var i=0;i<number;i++) {
+        var position = [
+          rng() * prop.canvas.size[0],
+          rng() * prop.canvas.size[1],
+        ];
+        var depth = rng();
+        this.starfield.push([position, depth]);
+      }
+
+    },
+    resize: function() {
+      this.generateStarfield();
     },
     getChild: function(name) {
       name = name.toLowerCase();
