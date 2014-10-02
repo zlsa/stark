@@ -71,18 +71,20 @@ var RELEASE=false;
 var async_modules={};
 var async_done_callback=null;
 
-var LOG_DEBUG=0;
-var LOG_INFO=1;
-var LOG_WARNING=2;
-var LOG_ERROR=3;
-var LOG_FATAL=4;
+var LOG_FLOOD   = 0;
+var LOG_DEBUG   = 1;
+var LOG_INFO    = 2;
+var LOG_WARNING = 3;
+var LOG_ERROR   = 4;
+var LOG_FATAL   = 5;
 
 var log_strings={
-  0:"DEBUG",
-  1:"INFO ",
-  2:"WARN ",
-  3:"ERROR",
-  4:"FATAL",
+  0: "FLOOD",
+  1: "DEBUG",
+  2: "INFO ",
+  3: "WARN ",
+  4: "ERROR",
+  5: "FATAL",
 };
 
 var storage = {

@@ -160,88 +160,100 @@ var Planet=Fiber.extend(function() {
 
       return force;
     },
+
+    renderGasPlanet: function(cc, size, scale) {
+      var center = size/2;
+
+      var radius = kilometers(this.radius * scale) * 10;
+      cc.fillStyle = cc.createRadialGradient(center, -radius, radius, center, -radius, radius + kilometers(this.radius * 2 * scale));
+
+      var s = crange(10, this.radius, 1000, 3, 0.05) * 0.03;
+
+      for(var i=0;i<kilometers(this.radius * 2 * scale);i+=3) {
+        var c = new Color(this.color);
+        c.setHsvComponentValue(c.getHsvComponentValue() * crange(-1, srt(5098, i * s), 1, 0.8, 1.1));
+        cc.fillStyle.addColorStop(i / kilometers(this.radius * scale) / 2, c.getCssValue());
+      }
+
+      cc.arc(center, center, kilometers(this.radius * scale), 0, Math.PI * 2);
+      cc.fill();
+    },
+    renderRockyPlanet: function(cc, size, scale) {
+      var center = size/2;
+
+      var s = crange(10, this.radius, 1000, 0.4, 3) * scale;
+
+      var height = 1;
+
+      cc.save();
+
+      cc.arc(center, center, kilometers(this.radius * scale) + 0.5, 0, Math.PI * 2);
+      cc.fillStyle = this.color.getCssValue();
+      cc.fill();
+
+      cc.clip();
+
+      var tilesize = 10;
+
+      var feature_number = this.radius * this.radius * 0.025 * random(0.7, 1.3);
+
+      for(var i=0;i<feature_number;i++) {
+        var c = new Color(this.color);
+        var x = random(0, size);
+        var y = random(0, size);
+
+        var change = random(0.7, 1.1);
+        var crater = (random(0, 3)) < this.craters && change < 1;
+        
+        var feature_size = random(kilometers(4) * s, kilometers(30) * s);
+
+        if(crater) feature_size *= 1.2;
+
+        c.setHsvComponentValue(c.getHsvComponentValue() * change);
+
+        if(crater) {
+          cc.fillStyle = cc.createRadialGradient(x, y + feature_size * 0.5, 0, x, y, feature_size * 2);
+        } else {
+          cc.fillStyle = cc.createRadialGradient(x, y, 0, x, y, feature_size * 2);
+        }
+
+        if(crater) {
+          cc.fillStyle.addColorStop(0,   c.setOpacity(0).getCssValue());
+          cc.fillStyle.addColorStop(0.7, c.setOpacity(1).getCssValue());
+          cc.fillStyle.addColorStop(1,   c.setOpacity(0).getCssValue());
+        } else {
+          cc.fillStyle.addColorStop(0, c.getCssValue());
+          cc.fillStyle.addColorStop(1, c.setOpacity(0).getCssValue());
+        }
+
+        cc.fillRect(x - feature_size * 2, y - feature_size * 2, feature_size * 4, feature_size * 4);
+
+      }
+
+      cc.restore();
+
+      cc.arc(center, center, kilometers(this.radius * scale) + 1, 0, Math.PI * 2);
+      cc.fillStyle = cc.createRadialGradient(center, center, 0, center, center, center);
+      cc.fillStyle.addColorStop(0.0, "rgba(0, 0, 0, 0.10)");
+      cc.fillStyle.addColorStop(0.5, "rgba(0, 0, 0, 0.32)");
+      cc.fillStyle.addColorStop(0.9, "rgba(0, 0, 0, 0.65)");
+      cc.fillStyle.addColorStop(1.0, "rgba(0, 0, 0, 0.75)");
+
+      cc.fill();
+    },
     renderPlanet: function() {
-      var size   = Math.ceil(this.radius * 2) + 4;
+      var scale  = 2;
+      var size   = Math.ceil(kilometers(this.radius * 2 * scale)) + 4;
       var center = size/2;
       var cc     = canvas_new(size, size);
 
       if(!this.image) {
         cc.save();
+
         if(this.type == "gas") {
-          var radius = this.radius * 10;
-          cc.fillStyle = cc.createRadialGradient(center, -radius, radius, center, -radius, radius + this.radius * 2);
-
-          var s = crange(10, this.radius, 1000, 3, 0.05) * 0.08;
-
-          for(var i=0;i<this.radius * 2;i+=3) {
-            var c = new Color(this.color);
-            c.setHsvComponentValue(c.getHsvComponentValue() * crange(-1, srt(5098, i * s), 1, 0.8, 1.1));
-            cc.fillStyle.addColorStop(i / this.radius / 2, c.getCssValue());
-          }
-
-          cc.arc(center, center, kilometers(this.radius), 0, Math.PI * 2);
-          cc.fill();
+          this.renderGasPlanet(cc, size, scale);
         } else if(this.type == "rocky") {
-          var s = crange(10, this.radius, 1000, 0.4, 3);
-
-          var height = 1;
-
-          cc.save();
-
-          cc.arc(center, center, kilometers(this.radius) + 0.5, 0, Math.PI * 2);
-          cc.fillStyle = this.color.getCssValue();
-          cc.fill();
-
-          cc.clip();
-
-          var tilesize = 10;
-
-          var feature_number = this.radius * this.radius * 0.025 * random(0.7, 1.3);
-
-          for(var i=0;i<feature_number;i++) {
-            var c = new Color(this.color);
-            var x = random(0, size);
-            var y = random(0, size);
-
-            var change = random(0.7, 1.1);
-            var crater = (random(0, 3)) < this.craters && change < 1;
-            
-            var feature_size = random(kilometers(4) * s, kilometers(30) * s);
-
-            if(crater) feature_size *= 1.2;
-
-            c.setHsvComponentValue(c.getHsvComponentValue() * change);
-
-            if(crater) {
-              cc.fillStyle = cc.createRadialGradient(x, y + feature_size * 0.5, 0, x, y, feature_size * 2);
-            } else {
-              cc.fillStyle = cc.createRadialGradient(x, y, 0, x, y, feature_size * 2);
-            }
-
-            if(crater) {
-              cc.fillStyle.addColorStop(0,   c.setOpacity(0).getCssValue());
-              cc.fillStyle.addColorStop(0.7, c.setOpacity(1).getCssValue());
-              cc.fillStyle.addColorStop(1,   c.setOpacity(0).getCssValue());
-            } else {
-              cc.fillStyle.addColorStop(0, c.getCssValue());
-              cc.fillStyle.addColorStop(1, c.setOpacity(0).getCssValue());
-            }
-
-            cc.fillRect(x - feature_size * 2, y - feature_size * 2, feature_size * 4, feature_size * 4);
-
-          }
-
-          cc.restore();
-
-          cc.arc(center, center, kilometers(this.radius) + 1, 0, Math.PI * 2);
-          cc.fillStyle = cc.createRadialGradient(center, center, 0, center, center, center);
-          cc.fillStyle.addColorStop(0.0, "rgba(0, 0, 0, 0.10)");
-          cc.fillStyle.addColorStop(0.5, "rgba(0, 0, 0, 0.32)");
-          cc.fillStyle.addColorStop(0.9, "rgba(0, 0, 0, 0.65)");
-          cc.fillStyle.addColorStop(1.0, "rgba(0, 0, 0, 0.75)");
-
-          cc.fill();
-
+          this.renderRockyPlanet(cc, size, scale);
         } else {
           cc.arc(center, center, kilometers(this.radius), 0, Math.PI * 2);
           cc.fillStyle = this.color.getCssValue();
@@ -249,7 +261,7 @@ var Planet=Fiber.extend(function() {
         }
         cc.restore();
       } else {
-        cc.drawImage(this.image, 0, 0, kilometers(this.radius * 2), kilometers(this.radius * 2));
+        cc.drawImage(this.image, 1, 1, kilometers(this.radius * 2 * scale), kilometers(this.radius * 2 * scale));
       }
 
       this.canvas.planet = cc;
@@ -343,7 +355,7 @@ var Planet=Fiber.extend(function() {
     },
 
     save: function() {
-      log("planet save", LOG_DEBUG);
+      log("planet save", LOG_FLOOD);
 
       var data = {};
       

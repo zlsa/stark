@@ -1,0 +1,17 @@
+{
+  "name":         "X220",
+  "manufacturer": "Xon Aerospace",
+
+  "mass":         0.2,
+  "angular_mass": 0.5,
+
+  "power": {
+    "thrust": 8,
+    "angle":  6
+  },
+
+  "images": {
+    "normal": "assets/ships/x220/normal.png",
+    "engine": "assets/ships/x220/engine.png"
+  }
+}

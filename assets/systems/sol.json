@@ -2,7 +2,7 @@
   "name": "Sol",
 
   "star": {
-    "name":      "Sol",
+    "name":       "Sol",
     "color":      "#fed",
     "radius":     600,
     "mass":       1200
@@ -49,7 +49,7 @@
           "distance":   2500,
           "radius":     50,
           "offset":     90,
-          "mass":       12,
+          "mass":       16,
           "period":     200
         }
 

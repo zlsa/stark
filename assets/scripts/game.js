@@ -18,10 +18,24 @@ var Game = Fiber.extend(function() {
       this.system = null;
 
       this.ships = {};
-      this.ships.player = new Ship();
+
+      this.ships.auto = [];
+
+      this.ships.auto.push(new Ship({
+        type:  "auto",
+        model: "x220"
+      }));
+
+      this.ships.player = new Ship({
+        model: "x220"
+      });
 
       Math.seedrandom("stark");
       
+      $(window).blur(function() {
+        prop.game.focused = false;
+      });
+
     },
     isPaused: function() {
       return !this.focused || this.paused;
@@ -44,6 +58,9 @@ var Game = Fiber.extend(function() {
       this.system = prop.system.systems[0];
       this.system.render();
 
+      for(var i=0;i<this.ships.auto.length;i++) {
+        this.ships.auto[i].teleport(this.system, ["earth"]);
+      }
       this.ships.player.teleport(this.system, ["earth"]);
 
       this.paused = false;
@@ -75,9 +92,15 @@ var Game = Fiber.extend(function() {
       }
 
       this.system.update();
+
       this.ships.player.controls = prop.input.controls;
       this.ships.player.assist.gravity = prop.input.assist.gravity;
+
       this.ships.player.update();
+
+      for(var i=0;i<this.ships.auto.length;i++) {
+        this.ships.auto[i].update();
+      }
 
     },
 
@@ -105,6 +128,12 @@ var Game = Fiber.extend(function() {
 
       data.ships.player = this.ships.player.save();
 
+      data.ships.auto   = [];
+
+      for(var i=0;i<this.ships.auto.length;i++) {
+        data.ships.auto.push(this.ships.auto[i].save());
+      }
+
       return data;
     },
 
@@ -130,25 +159,16 @@ var Game = Fiber.extend(function() {
 
       this.ships.player = new Ship(data.ships.player);
 
+      this.ships.auto = [];
+      for(var i=0;i<data.ships.auto.length;i++) {
+        this.ships.auto.push(new Ship(data.ships.auto[i]));
+      }
+
     },
     
 
   };
 });
-
-function game_init_pre() {
-
-  prop.game = new Game();
-
-  $(window).blur(function() {
-    prop.game.focused = false;
-  });
-
-  $(window).focus(function() {
-
-  });
-
-}
 
 function game_pause() {
   prop.game.pause();
@@ -200,5 +220,7 @@ function game_update_pre() {
 }
 
 function game_complete() {
+  prop.game = new Game();
   prop.game.complete();
 }
+
