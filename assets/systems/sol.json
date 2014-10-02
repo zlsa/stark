@@ -112,12 +112,12 @@
           "name":      "Pota",
           "color":      "#887",
           "type":       "rocky",
-          "craters":    1,
+          "craters":    3,
           "distance":   400,
-          "radius":     30,
+          "radius":     25,
           "offset":    -45,
-          "mass":       10,
-          "period":     90
+          "mass":       7,
+          "period":     100
         },
 
         {

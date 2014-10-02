@@ -101,9 +101,9 @@ var System=Fiber.extend(function() {
     },
 
     render: function() {
-      for(var p in this.planets) {
-        this.planets[p].render();
-      }
+//      for(var p in this.planets) {
+//        this.planets[p].render();
+//      }
     },
 
     update: function() {

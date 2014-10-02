@@ -124,7 +124,7 @@ function canvas_draw_planet(cc, system, planet) {
     }
   }
 
-  if(canvas_is_visible([kilometers(p[0]), -kilometers(p[1])], planet.radius * 2)) {
+  if(canvas_is_visible([p[0], -p[1]], planet.radius * 2)) {
     cc.save();
     
     cc.translate(kilometers(p[0]), -kilometers(p[1]));
@@ -285,9 +285,11 @@ function canvas_draw_hud(cc) {
 
 }
 
-function canvas_is_visible(position, size) {
-  var width  = prop.canvas.size.width + size * 2;
-  var height = prop.canvas.size.height + size * 2;
+function canvas_is_visible(position, size) { // position in km
+  var width  = prop.canvas.size.width  + kilometers(size) * 2;
+  var height = prop.canvas.size.height + kilometers(size) * 2;
+
+  position = [kilometers(position[0]), kilometers(position[1])];
   
   position[0] += prop.ui.pan[0];
   position[1] += prop.ui.pan[1];

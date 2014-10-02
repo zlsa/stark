@@ -12,7 +12,7 @@ var Planet=Fiber.extend(function() {
 
       this.distance = options.distance || 0;
       this.radius   = options.radius   || 1;
-      this.start_offset = options.offset || options.start_offset || 0;
+      this.start_offset = radians(options.offset) || options.start_offset || 0;
 
       this.period   = options.period   || 100; // seconds for a full trip
 
@@ -29,7 +29,7 @@ var Planet=Fiber.extend(function() {
       this.craters  = options.craters || 0;
 
       this.atmosphere = options.atmosphere || {
-        thickness: 0.5,
+        thickness: 2,
         density:   0.5,
         colors: [
 
@@ -108,7 +108,7 @@ var Planet=Fiber.extend(function() {
       var radius   = Math.max(this.radius, 60);
 
       var damping = crange(radius * 0.5, distance, radius + this.atmosphere.thickness, density, 0);
-      damping *= crange(60, radius, 100, 3, 1);
+      damping *= crange(60, radius, 100, 0.8, 1);
 
       for(var i=0;i<this.planets.length;i++) {
         damping += this.planets[i].dampingAt(position);
@@ -139,9 +139,9 @@ var Planet=Fiber.extend(function() {
     gravityAt: function(position, mass) {
       var pp        = this.getPosition(true);
 
-      var radius    = Math.max(this.radius, 60);
+      var radius    = Math.max(this.radius, 40);
 
-      var distance  = distance2d([0, 0], [distance2d(pp, position), this.radius]);
+      var distance  = distance2d([0, 0], [distance2d(pp, position), radius]);
       var pull      = (this.mass * mass * 100000) / (distance * distance);
 
       pull *= crange(radius, distance, radius * 1.414, 0.05, 1);
@@ -298,24 +298,29 @@ var Planet=Fiber.extend(function() {
       this.canvas.atmosphere = cc;
     },
     render: function() {
+      console.log("rendering planet " + this.name);
+
       this.renderPlanet();
       this.renderAtmosphere();
-
-      for(var i=0;i<this.planets.length;i++) {
-        this.planets[i].render();
-      }
     },
     
     update: function() {
-      for(var i=0;i<this.planets.length;i++) {
-        this.planets[i].update();
-      }
 
       if(this.start_offset < 0) {
         this.offset = -(game_time() / this.period) * Math.PI + Math.abs(this.start_offset);
       } else {
         this.offset = (game_time() / this.period) * Math.PI + Math.abs(this.start_offset);
       }
+
+      var pos = this.getPosition(true);
+      if(canvas_is_visible([pos[0], -pos[1]], this.radius * 2) && !this.canvas.planet) {
+        this.render();
+      }
+
+      for(var i=0;i<this.planets.length;i++) {
+        this.planets[i].update();
+      }
+
     },
     
     load: function(url) {
