@@ -1,17 +1,17 @@
 {
-  "title": "Sol",
+  "name": "Sol",
 
   "star": {
-    "title":      "Sol",
+    "name":      "Sol",
     "color":      "#fed",
     "radius":     600,
     "mass":       1200
   },
 
-  "planets": {
+  "planets": [
 
-    "mercury": {
-      "title":      "Mercury",
+    {
+      "name":       "Mercury",
       "color":      "#a87",
       "type":       "rocky",
       "craters":    1,
@@ -22,8 +22,8 @@
       "period":     120
     },
 
-    "eve": {
-      "title":      "Eve",
+    {
+      "name":       "Eve",
       "color":      "#c2c",
       "type":       "gas",
       "distance":   21000,
@@ -39,9 +39,10 @@
           [0.3, "#c2c"]
         ]
       },
-      "planets": {
-        "foo": {
-          "title":      "Foo",
+      "planets": [
+
+        {
+          "name":      "Foo",
           "color":      "#89c",
           "type":       "rocky",
           "craters":    0.4,
@@ -51,11 +52,12 @@
           "mass":       12,
           "period":     200
         }
-      }
+
+      ]
     },
 
-    "earth": {
-      "title":      "Earth",
+    {
+      "name":       "Earth",
       "color":      "#38f",
       "image":      "earth.png",
       "distance":   30000,
@@ -71,9 +73,10 @@
           [0.3, "#8df"]
         ]
       },
-      "planets": {
-        "moon": {
-          "title":      "Moon",
+
+      "planets": [
+        {
+          "name":      "Moon",
           "color":      "#999",
           "craters":    1,
           "distance":   1500,
@@ -82,11 +85,12 @@
           "mass":       8,
           "period":     240
         }
-      }
+
+      ]
     },
 
-    "mars": {
-      "title":      "Mars",
+    {
+      "name":      "Mars",
       "color":      "#f53",
       "image":      "mars.png",
       "distance":   45000,
@@ -102,9 +106,10 @@
           [0.3, "#f53"]
         ]
       },
-      "planets": {
-        "pota": {
-          "title":      "Pota",
+      "planets": [
+
+        {
+          "name":      "Pota",
           "color":      "#887",
           "type":       "rocky",
           "craters":    1,
@@ -114,8 +119,9 @@
           "mass":       2.2,
           "period":     90
         },
-        "deimos": {
-          "title":      "Deimos",
+
+        {
+          "name":      "Deimos",
           "color":      "#8ca",
           "type":       "rocky",
           "craters":    1,
@@ -125,11 +131,12 @@
           "mass":       7,
           "period":     120
         }
-      }
+
+      ]
     },
 
-    "jool": {
-      "title":      "Jool",
+    {
+      "name":      "Jool",
       "color":      "#3f5",
       "type":       "gas",
       "distance":   65000,
@@ -144,10 +151,10 @@
           [0.0, "#3f5"]
         ]
       },
-      "planets": {
+      "planets": [
         
-        "io": {
-          "title":      "Io",
+        {
+          "name":      "Io",
           "color":      "#89b",
           "type":       "rocky",
           "distance":   2000,
@@ -164,11 +171,12 @@
             ]
           }
         }
-      }
+        
+      ]
     },
 
-    "pluto": {
-      "title":      "Pluto",
+    {
+      "name":      "Pluto",
       "color":      "#aaa",
       "type":       "rocky",
       "craters":    0.3,
@@ -178,5 +186,5 @@
       "mass":       5,
       "period":     2400
     }
-  }
+  ]
 }

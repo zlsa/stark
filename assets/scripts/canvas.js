@@ -118,8 +118,10 @@ function canvas_draw_ships(cc) {
 function canvas_draw_planet(cc, system, planet) {
   var p = planet.getPosition(true);
 
-  for(var i in planet.planets) {
-    canvas_draw_planet(cc, system, planet.planets[i]);
+  if(planet.planets) {
+    for(var i=0;i<planet.planets.length;i++) {
+      canvas_draw_planet(cc, system, planet.planets[i]);
+    }
   }
 
   if(canvas_is_visible([kilometers(p[0]), -kilometers(p[1])], planet.radius * 2)) {
@@ -164,8 +166,10 @@ function canvas_draw_planet(cc, system, planet) {
 function canvas_draw_pointer(cc, system, planet) {
   var p = planet.getPosition(true);
 
-  for(var i in planet.planets) {
-    canvas_draw_pointer(cc, system, planet.planets[i]);
+  if(planet.planets) {
+    for(var i=0;i<planet.planets.length;i++) {
+      canvas_draw_pointer(cc, system, planet.planets[i]);
+    }
   }
 
   if(true) {
@@ -220,7 +224,7 @@ function canvas_draw_pointer(cc, system, planet) {
     cc.lineWidth = border * 2;
 
     cc.font = "bold 12px Roboto Condensed";
-    cc.strokeText(planet.title, -Math.sin(direction) * (l - len - dist), -Math.cos(direction) * (l - len - dist));
+    cc.strokeText(planet.name, -Math.sin(direction) * (l - len - dist), -Math.cos(direction) * (l - len - dist));
 
     cc.globalAlpha *= distance_visibility;
 
@@ -243,7 +247,7 @@ function canvas_draw_pointer(cc, system, planet) {
     cc.stroke();
 
     cc.font = "bold 12px 'Roboto Condensed', sans-serif";
-    cc.fillText(planet.title, -Math.sin(direction) * (l - len - dist), -Math.cos(direction) * (l - len - dist));
+    cc.fillText(planet.name, -Math.sin(direction) * (l - len - dist), -Math.cos(direction) * (l - len - dist));
 
     cc.globalAlpha *= distance_visibility;
 
@@ -264,7 +268,7 @@ function canvas_draw_system(cc) {
   cc.arc(0, 0, kilometers(system.star.radius), 0, Math.PI*2);
   cc.fill();
   
-  for(var i in system.planets) {
+  for(var i=0;i<system.planets.length;i++) {
     canvas_draw_planet(cc, system, system.planets[i]);
   }
 
@@ -273,7 +277,7 @@ function canvas_draw_system(cc) {
 function canvas_draw_hud(cc) {
   var system = system_get();
 
-  for(var i in system.planets) {
+  for(var i=0;i<system.planets.length;i++) {
     canvas_draw_pointer(cc, system, system.planets[i]);
   }
 

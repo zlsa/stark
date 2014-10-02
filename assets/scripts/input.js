@@ -41,7 +41,6 @@ function input_done() {
 
   $(window).keyup(function(e) {
     prop.input.keys[e.which]=false;
-    console.log(e.which);
   });
 
   $("#debug-command").keydown(function(e) {
@@ -60,8 +59,6 @@ function input_command_run(value) {
     cmd = value;
     data = "";
   }
-
-  console.log(cmd, data);
 
   if(cmd == "teleport") {
     var planet = data.split(" ");

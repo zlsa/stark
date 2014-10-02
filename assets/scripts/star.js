@@ -4,7 +4,7 @@ var Star=Fiber.extend(function() {
     init: function(options) {
       if(!options) options={};
 
-      this.title    = options.title || "";
+      this.name     = options.name || "";
 
       this.color    = new Color(options.color || "#fff");
 
@@ -92,7 +92,7 @@ var Star=Fiber.extend(function() {
 
       var data = {};
 
-      data.title  = this.title;
+      data.name   = this.name;
 
       data.color  = this.color.getSaveableValue();
 

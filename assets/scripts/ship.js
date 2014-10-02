@@ -125,7 +125,9 @@ var Ship=Fiber.extend(function() {
         planet = system;
         system = system_get();
       }
+
       if(typeof planet == typeof "") planet = [planet];
+
       var p = system;
 
       if(!planet) {
@@ -137,8 +139,11 @@ var Ship=Fiber.extend(function() {
       }
 
       for(var i=0;i<planet.length;i++) {
-        p = p.planets[planet[i]];
-        if(!p) return false;
+        p = p.getChild(planet[i]);
+        if(!p) {
+          console.log(planet[i], p);
+          return false;
+        }
       }
 
       var position = p.getPosition(true, 0);

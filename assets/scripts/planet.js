@@ -4,11 +4,11 @@ var Planet=Fiber.extend(function() {
     init: function(options) {
       if(!options) options={};
 
-      this.title    = options.title || "";
+      this.name     = options.name || "";
 
       this.color    = new Color(options.color || "#fff");
       this.image    = null;
-      this.image_url = options.image || null;
+      this.image_url = options.image || options.image_url || null;
 
       this.distance = options.distance || 0;
       this.radius   = options.radius   || 1;
@@ -36,16 +36,12 @@ var Planet=Fiber.extend(function() {
         ]
       };
 
-      this.planets = {};
+      this.planets = [];
 
       this.canvas = {
         planet: null,
         atmosphere: null
       };
-      
-      if(options.url) {
-        this.load(options.url);
-      }
       
       this.content = {};
 
@@ -56,13 +52,12 @@ var Planet=Fiber.extend(function() {
           that: this,
           callback: function(status, data) {
             this.image = data;
-            console.log("image!");
           }
         });
       }
 
       if(options.planets) {
-        for(var i in options.planets) {
+        for(var i=0;i<options.planets.length;i++) {
           var p = options.planets[i];
           p.parent = this;
           p.system = this.system;
@@ -71,8 +66,14 @@ var Planet=Fiber.extend(function() {
       }
 
     },
-    parse: function(data) {
+    getChild: function(name) {
+      name = name.toLowerCase();
+      
+      for(var i=0;i<this.planets.length;i++) {
+        if(this.planets[i].name.toLowerCase() == name) return this.planets[i];
+      }
 
+      return null;
     },
     getPosition: function(absolute, time_offset) {
       if(!time_offset) time_offset = 0;
@@ -107,8 +108,8 @@ var Planet=Fiber.extend(function() {
       var damping = crange(this.radius * 0.5, distance, this.radius + this.atmosphere.thickness, density, 0);
       damping *= crange(20, this.radius, 100, 10, 1);
 
-      for(var p in this.planets) {
-        damping += this.planets[p].dampingAt(position);
+      for(var i=0;i<this.planets.length;i++) {
+        damping += this.planets[i].dampingAt(position);
       }
 
       return damping;
@@ -123,8 +124,8 @@ var Planet=Fiber.extend(function() {
       velocity[0] *= damping;
       velocity[1] *= damping;
 
-      for(var p in this.planets) {
-        var v = this.planets[p].velocityAt(position);
+      for(var i=0;i<this.planets.length;i++) {
+        var v = this.planets[i].velocityAt(position);
         velocity[0] += v[0];
         velocity[1] += v[1];
       }
@@ -147,8 +148,8 @@ var Planet=Fiber.extend(function() {
 
       var force     = [pull * Math.sin(direction), pull * Math.cos(direction)];
 
-      for(var p in this.planets) {
-        var f = this.planets[p].gravityAt(position, mass);
+      for(var i=0;i<this.planets.length;i++) {
+        var f = this.planets[i].gravityAt(position, mass);
         force[0] += f[0];
         force[1] += f[1];
       }
@@ -296,14 +297,14 @@ var Planet=Fiber.extend(function() {
       this.renderPlanet();
       this.renderAtmosphere();
 
-      for(var p in this.planets) {
-        this.planets[p].render();
+      for(var i=0;i<this.planets.length;i++) {
+        this.planets[i].render();
       }
     },
     
     update: function() {
-      for(var p in this.planets) {
-        this.planets[p].update();
+      for(var i=0;i<this.planets.length;i++) {
+        this.planets[i].update();
       }
 
       if(this.start_offset < 0) {
@@ -331,10 +332,10 @@ var Planet=Fiber.extend(function() {
 
       var data = {};
       
-      data.title = this.title;
+      data.name  = this.name;
       data.color = this.color.getSaveableValue();
 
-      data.image_url = this.image_url;
+      data.image_url    = this.image_url;
 
       data.distance     = this.distance;
       data.radius       = this.radius;
@@ -349,10 +350,10 @@ var Planet=Fiber.extend(function() {
 
       data.atmosphere   = this.atmosphere;
 
-      data.planets      = {};
+      data.planets      = [];
 
       for(var i in this.planets) {
-        data.planets[i] = this.planets[i].save();
+        data.planets.push(this.planets[i].save());
       }
 
       return data;

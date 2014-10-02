@@ -19,6 +19,8 @@ var Game = Fiber.extend(function() {
 
       this.ships = {};
       this.ships.player = new Ship();
+
+      Math.seedrandom("stark");
       
     },
     isPaused: function() {
@@ -39,7 +41,7 @@ var Game = Fiber.extend(function() {
     },
     
     complete: function() {
-      this.system = prop.system.systems.sol;
+      this.system = prop.system.systems[0];
       this.system.render();
 
       this.ships.player.teleport(this.system, ["earth"]);
@@ -107,6 +109,8 @@ var Game = Fiber.extend(function() {
     },
 
     restore: function(data) {
+      
+      Math.seedrandom("stark");
       
       this.paused   = data.paused;
       this.focused  = data.focused;
