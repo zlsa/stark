@@ -55,59 +55,42 @@ function canvas_draw_background(cc) {
 
 function canvas_draw_ship(cc, ship) {
   cc.save();
+
   cc.translate(kilometers(ship.position[0]), -kilometers(ship.position[1]));
   cc.rotate(ship.angle);
+
   cc.scale(0.5, 0.5);
-  var xoffset=Math.round(clamp(0, mod(ship.angle / (Math.PI*2) * 360, 360), 359))*48;
-  xoffset=0;
-  var size=96;
+
+  var size = 320;
+
+  var image = ship.model.images.normal;
+
   if(ship.controls[1] > 0.2)
-    cc.drawImage(ship.model.images.engine, xoffset, 0, size, size, -size/2, -size/2, size, size);
-  else
-    cc.drawImage(ship.model.images.normal, xoffset, 0, size, size, -size/2, -size/2, size, size);
+    image = ship.model.images.engine;
+  
+  cc.drawImage(image, 0, 0, size, size, -size / 2, -size / 2, size, size);
 
   cc.restore();
 
-  // cc.save()
+  if(false) { // path
 
-  // cc.translate(kilometers(ship.position[0]), -kilometers(ship.position[1]));
+    cc.save();
 
-  // var force = system_get().gravityAt(ship.position, 1);
+    cc.strokeStyle = "#ff0";
+    cc.lineWidth   = 2;
 
-  // cc.strokeStyle = "#38f";
-  // cc.lineWidth   = 2;
+    cc.beginPath();
 
-  // cc.beginPath();
-  // cc.moveTo(0, 0);
-  // cc.lineTo(-force[0] * 0.5, force[1] * 0.5);
-  // cc.stroke();
+    cc.moveTo(kilometers(ship.path[0][0]), -kilometers(ship.path[0][1]));
 
+    for(var i=1;i<ship.path.length;i++) {
+      cc.lineTo(kilometers(ship.path[i][0]), -kilometers(ship.path[i][1]));
+    }
 
-  // cc.strokeStyle = "#f83";
-  // cc.lineWidth   = 2;
+    cc.stroke();
 
-  // cc.beginPath();
-  // cc.moveTo(0, 0);
-  // cc.lineTo(ship.velocity[0] * 0.5, -ship.velocity[1] * 0.5);
-  // cc.stroke();
-
-  // cc.restore();
-
-  return;
-
-  cc.save();
-
-  cc.strokeStyle = "#ff0";
-  cc.lineWidth   = 2;
-
-  cc.beginPath();
-  cc.moveTo(kilometers(ship.path[0][0]), -kilometers(ship.path[0][1]));
-  for(var i=1;i<ship.path.length;i++) {
-    cc.lineTo(kilometers(ship.path[i][0]), -kilometers(ship.path[i][1]));
+    cc.restore();
   }
-  cc.stroke();
-
-  cc.restore();
 }
 
 function canvas_draw_ships(cc) {
@@ -262,8 +245,8 @@ function canvas_draw_planet_pointer(cc, system, planet) {
       max_distance  *= crange(1500, distance_to_parent, 12000, 0.1, 1);
     }
 
-    var force        = distance2d(system_get().gravityAt(pan_km, 1));
-    max_distance    *= crange(0, force, 1, 1, 0.5);
+    var force        = distance2d(system_get().gravityAt(prop.game.ships.player.position, 1));
+    max_distance    *= scrange(0, force, 30, 1, 0.4);
 
     var fade = crange(0, distance_to_viewport, max_distance, 1, 0);
     fade    *= crange(small_ring * 0.8, distance_to_viewport, large_ring * 1.2, 0, 1);
@@ -299,15 +282,19 @@ function canvas_draw_ship_pointer(cc, ship) {
     
     var distance_to_viewport = distance2d([-p[0], p[1]], pan_km);
 
+    if(distance_to_viewport < small_ring * 0.8) return;
+
     var length = scrange(small_ring * 0.8, distance_to_viewport, large_ring * 1.2, 0, 20);
 
-    var max_distance = 500000;
+    var max_distance = 30000;
 
-    var force        = distance2d(system_get().gravityAt(pan_km, 1));
-    max_distance    *= crange(0, force, 1, 1, 0.5);
+    max_distance    *= crange(0, ship.model.mass, 10, 0.5, 3);
+    
+    var force        = distance2d(system_get().gravityAt(prop.game.ships.player.position, 1));
+    max_distance    *= scrange(0, force, 30, 1, 0.4);
 
     var ship_force   = distance2d(system_get().gravityAt(p, 1));
-    max_distance    *= crange(0, force, 0.2, 1, 0);
+    max_distance    *= crange(5, ship_force, 30, 1, 0);
 
     var fade = crange(0, distance_to_viewport, max_distance, 1, 0);
     fade    *= crange(small_ring * 0.8, distance_to_viewport, large_ring * 1.2, 0, 1);

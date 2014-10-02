@@ -159,7 +159,7 @@ var Ship = Fiber.extend(function() {
 //        if(Math.abs(this.controls[0]) < 0.01) {
 //          this.controls[0] = -this.angular_velocity * 10;
 //        }
-        this.controls[0] = angle_difference(this.controls[0], this.angular_velocity * 0.4) * 10;
+        this.controls[0] = angle_difference(this.controls[0], this.angular_velocity * 0.4) * 3;
       }
       if(this.assist.gravity) {
         var force = system_get().gravityAt(this.position, this.mass);

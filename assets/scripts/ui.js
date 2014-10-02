@@ -3,7 +3,7 @@ function ui_init_pre() {
   prop.ui = {};
   prop.ui.pan = [0, 0];
 
-  prop.ui.scale = 1/1000; // meters per pixel
+  prop.ui.scale = 1/1500; // meters per pixel
 }
 
 function meters(m) {
