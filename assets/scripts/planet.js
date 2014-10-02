@@ -133,10 +133,12 @@ var Planet=Fiber.extend(function() {
     gravityAt: function(position, mass) {
       var pp        = this.getPosition(true);
 
+      var radius    = Math.max(this.radius, 60);
+
       var distance  = distance2d([0, 0], [distance2d(pp, position), this.radius]);
       var pull      = (this.mass * mass * 100000) / (distance * distance);
 
-      pull *= crange(this.radius, distance, this.radius * 1.414, 0.05, 1);
+      pull *= crange(radius, distance, radius * 1.414, 0.05, 1);
 
       var direction = Math.atan2((position[0] - pp[0]), (position[1] - pp[1]));
 
@@ -162,12 +164,15 @@ var Planet=Fiber.extend(function() {
         if(this.type == "gas") {
           var radius = this.radius * 10;
           cc.fillStyle = cc.createRadialGradient(center, -radius, radius, center, -radius, radius + this.radius * 2);
-          var s = crange(10, this.radius, 1000, 2, 0.05) * 0.08;
-          for(var i=0;i<this.radius * 2;i+=2) {
+
+          var s = crange(10, this.radius, 1000, 3, 0.05) * 0.08;
+
+          for(var i=0;i<this.radius * 2;i+=3) {
             var c = new Color(this.color);
             c.setHsvComponentValue(c.getHsvComponentValue() * crange(-1, srt(5098, i * s), 1, 0.8, 1.1));
             cc.fillStyle.addColorStop(i / this.radius / 2, c.getCssValue());
           }
+
           cc.arc(center, center, kilometers(this.radius), 0, Math.PI * 2);
           cc.fill();
         } else if(this.type == "rocky") {
