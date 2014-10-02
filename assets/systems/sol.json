@@ -3,10 +3,9 @@
 
   "star": {
     "name":        "Sol",
-    "color":       "#fed",
     "radius":      600,
     "mass":        1200,
-    "temperature": "4000"
+    "temperature": "5800"
   },
 
   "planets": [

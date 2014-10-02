@@ -179,7 +179,10 @@ function canvas_draw_pointer(cc, options) {
 
   cc.globalAlpha *= options.fade;
 
-  var dist = 20; // distance from end of line to text
+  var dist = 30; // distance from end of line to text
+
+  var primary_offset = 4;
+  var secondary_offset = -8;
 
   var ta = [
       -Math.sin(options.direction) * (radius - options.length - dist),
@@ -203,10 +206,10 @@ function canvas_draw_pointer(cc, options) {
   cc.lineWidth = border * 2;
 
   cc.font = "bold 12px Roboto Condensed";
-  cc.strokeText(options.label, ta[0], ta[1]);
+  cc.strokeText(options.label, ta[0], ta[1] + primary_offset);
 
   cc.font = "bold 10px Roboto Condensed";
-  cc.strokeText(options.secondary_label, ta[0], ta[1] - 12);
+  cc.strokeText(options.secondary_label, ta[0], ta[1] + secondary_offset);
   
   cc.restore();
 
@@ -221,10 +224,10 @@ function canvas_draw_pointer(cc, options) {
   cc.stroke();
 
   cc.font = "bold 12px Roboto Condensed";
-  cc.fillText(options.label, ta[0], ta[1]);
+  cc.fillText(options.label, ta[0], ta[1] + primary_offset);
 
   cc.font = "bold 10px Roboto Condensed";
-  cc.fillText(options.secondary_label, ta[0], ta[1] - 12);
+  cc.fillText(options.secondary_label, ta[0], ta[1] + secondary_offset);
   
   cc.restore();
 }
@@ -264,6 +267,12 @@ function canvas_draw_planet_pointer(cc, system, planet) {
     var fade = crange(0, distance_to_viewport, max_distance, 1, 0);
     fade    *= crange(small_ring * 0.8, distance_to_viewport, large_ring * 1.2, 0, 1);
 
+    var color = planet.color;
+    if(!color) {
+      color = new Color().setColorTemperatureValue(planet.temperature); // stars
+    }
+    color = color.getCssValue(),
+
     canvas_draw_pointer(cc, {
       radius:          kilometers(small_ring) + 10,
 
@@ -274,7 +283,7 @@ function canvas_draw_planet_pointer(cc, system, planet) {
       label:           planet.name,
       secondary_label: to_distance(distance_to_viewport),
 
-      color:           planet.color.getCssValue(),
+      color:           color,
       fade:            fade
     });
 
@@ -356,7 +365,7 @@ function canvas_draw_starfield(cc) {
 function canvas_draw_system(cc) {
   var system = system_get();
 
-  cc.fillStyle = system.star.color.getCssValue();
+  cc.fillStyle = new Color().setColorTemperatureValue(system.star.temperature).getCssValue();
   
   cc.beginPath();
   cc.arc(0, 0, kilometers(system.star.radius), 0, Math.PI*2);

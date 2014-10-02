@@ -4,15 +4,13 @@ var Star=Fiber.extend(function() {
     init: function(options) {
       if(!options) options={};
 
-      this.name     = options.name || "";
+      this.name        = "";
 
-      this.color    = new Color(options.color || "#fff");
+      this.system      = null;
 
-      this.radius   = options.radius   || 1;
-
-      this.system   = options.system || null;
-
-      this.mass     = options.mass || 1;
+      this.radius      = 1;
+      this.mass        = 1;
+      this.temperature = 5800;
 
       this.canvas = {
         star: null,
@@ -20,14 +18,33 @@ var Star=Fiber.extend(function() {
       
       if(options.url) {
         this.load(options.url);
-      } else {
-
       }
+
+      this.parse(options);
 
       this.render();
 
     },
     parse: function(data) {
+      if(data.name) {
+        this.name = data.name;
+      }
+
+      if(data.radius) {
+        this.radius = data.radius;
+      }
+
+      if(data.mass) {
+        this.mass = data.mass;
+      }
+
+      if(data.temperature) {
+        this.temperature = data.temperature;
+      }
+
+      if(data.system) {
+        this.system = data.system;
+      }
 
     },
     getPosition: function() {
@@ -92,13 +109,13 @@ var Star=Fiber.extend(function() {
 
       var data = {};
 
-      data.name   = this.name;
+      data.name         = this.name;
 
-      data.color  = this.color.getSaveableValue();
+      data.temperature  = this.temperature;
 
-      data.radius = this.radius;
+      data.radius       = this.radius;
 
-      data.mass   = this.mass;
+      data.mass         = this.mass;
 
       return data;
     }

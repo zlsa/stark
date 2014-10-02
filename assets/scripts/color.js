@@ -52,6 +52,7 @@ var Color=function(value) {
     }
     this.b = clamp(0, this.b, 255);
 
+    return this;
   },
   this.setHexValue=function(value) {
     if(value.length < 3)
@@ -91,6 +92,7 @@ var Color=function(value) {
     this.g=clamp(ctiny,this.g,255-ctiny);
     this.b=clamp(ctiny,this.b,255-ctiny);
     this.opacity=clamp(0,this.opacity,1);
+    return this;
   };
   this.setRgbValue=function(value) {
     if(value.length < 5)
@@ -336,6 +338,8 @@ var Color=function(value) {
       this.setHexValue("#33b5e5");
     else if(this.isHexValue(value))
       return this.setHexValue(value);
+    else if(value.substr(value.length-2, 1).toLowerCase() == "k")
+      return this.setColorTemperatureValue(value.substr(0, value.length-1));
     return null;
   };
   this.blend=function(color,amount) { // returns new color <amount> way between
