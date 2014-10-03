@@ -18,7 +18,7 @@
         "craters":    1
       },
       "distance":   20000,
-      "radius":     50,
+      "radius":     40,
       "offset":     270,
       "mass":       10,
       "period":     120
@@ -150,7 +150,7 @@
       "distance":   176230,
       "radius":     350,
       "offset":     90,
-      "mass":       200,
+      "mass":       300,
       "period":     2000,
       "atmosphere": {
         "thickness": 20,

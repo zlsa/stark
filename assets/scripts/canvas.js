@@ -182,9 +182,10 @@ function canvas_draw_planet_stats(cc, system, planet) {
 
       var rows = [];
 
-      rows.push(["name", planet.name]);
-      rows.push(["type", capitalize(planet.getType())]);
-      rows.push(["temperature", planet.getTemperature().toFixed(1) + " °C"]);
+      rows.push(["name",        planet.name]);
+      rows.push(["type",        capitalize(planet.getType())]);
+      rows.push(["class",       planet.getPClass()]);
+      rows.push(["temperature", Math.round(planet.getTemperature()) + " °C"]);
 
       for(var i=0;i<rows.length;i++) {
         rows[i][0] = rows[i][0].toUpperCase();

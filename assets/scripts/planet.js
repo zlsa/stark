@@ -195,23 +195,54 @@ var Planet=Fiber.extend(function() {
         if(this.environment.craters > 0.8) {
           type += ", with craters";
         }
-        var temperature = this.getTemperature();
-
-        if(temperature > 10 && temperature < 40 && this.atmosphere.density > 0.8 && this.atmosphere.density < 1.3) {
-          type += "; habitable";
-        }
       }
 
       return type;
     },
 
+    isHabitable: function() {
+
+    },
+    getHabitability: function() {
+      var score = 0;
+
+      score  = crange(10.0, Math.abs(20.0 - this.getTemperature()),  15.0, 1, 0);
+      score *= crange( 0.2, Math.abs( 1.0 - this.atmosphere.density), 0.4, 1, 0);
+
+      return score;
+    },
+    getPClass: function() {
+      var pclass = "";
+      var temperature = this.getTemperature();
+      var mass        = this.mass;
+
+      if(     temperature < 5 ) pclass += "cold";
+      else if(temperature < 45) pclass += "warm";
+      else                      pclass += "hot";
+
+      pclass += " ";
+
+      if(     mass < 5   ) pclass += "asteroidan";
+      else if(mass < 15  ) pclass += "mercurian";
+      else if(mass < 35  ) pclass += "subterran";
+      else if(mass < 65  ) pclass += "terran";
+      else if(mass < 90  ) pclass += "superterran";
+      else if(mass < 200 ) pclass += "neptunian";
+      else                 pclass += "jovian";
+
+      return pclass;
+    },
     getTemperature: function() {
       var distance    = distance2d(this.getPosition(true));
 
-      var temperature = (this.system.star.temperature * 100) / distance;
+      var temperature = (this.system.star.temperature * 2000) / (distance * distance * 0.0002);
 
-      temperature *= crange(0, this.atmosphere.density, 3, 1, 6);
-      temperature *= crange(3, this.atmosphere.density, 9, 1, 10);
+      temperature *= crange(0, distance, 50000, 15, 1);
+
+      temperature *= crange(0, this.atmosphere.density, 3, 0.5, 3);
+      temperature *= crange(3, this.atmosphere.density, 9, 1.0, 3);
+      
+      temperature -= crange(0, temperature, 10, 200, 0);
 
       return temperature;
     },
