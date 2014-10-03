@@ -89,6 +89,10 @@ function input_keydown(keycode) {
       $("#debug-command").blur();
     }
     return true;
+  } else if(keycode == prop.input.keysym.esc) {
+    $("#debug").addClass("hidden");
+    $("#debug-command").blur();
+    return true;
   }
   return false;
   // called with the users' key-repeat settings

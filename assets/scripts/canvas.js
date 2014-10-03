@@ -2,7 +2,7 @@
 function canvas_init_pre() {
   prop.canvas={};
 
-  prop.canvas.font    = "'Exo 2'";
+  prop.canvas.font    = "'Exo 2', sans-serif";
 
   prop.canvas.enabled = true;
 
@@ -242,7 +242,7 @@ function canvas_draw_planet_pointer(cc, system, planet) {
     var max_distance = crange(10, planet.mass, 1200, 300000, 2000000);
 
     if(distance_to_parent > 0) {
-      max_distance  *= crange(1500, distance_to_parent, 12000, 0.1, 1);
+      max_distance  *= crange(3000, distance_to_parent, 12000, 0.1, 1);
     }
 
     var fade = crange(0, distance_to_viewport, max_distance, 1, 0);
@@ -252,10 +252,13 @@ function canvas_draw_planet_pointer(cc, system, planet) {
     if(!color) {
       color = new Color().setColorTemperatureValue(planet.temperature); // stars
     }
-    color = color.getCssValue(),
+    color = color.getCssValue();
+
+    var inset = scrange(3200, distance_to_viewport, 6000, 60, 0);
+    inset    *=  crange(3000, distance_to_parent,   3500,  1, 0);
 
     canvas_draw_pointer(cc, {
-      radius:          kilometers(small_ring) + 10,
+      radius:          kilometers(small_ring) + 10 - inset,
 
       direction:       direction,
       length:          length,
@@ -303,7 +306,7 @@ function canvas_draw_ship_pointer(cc, ship) {
     if(ship.type == "auto") color = "#888";
 
     canvas_draw_pointer(cc, {
-      radius:          kilometers(small_ring) - 60,
+      radius:          kilometers(small_ring) - 120,
 
       direction:       direction,
       length:          length,
@@ -328,7 +331,7 @@ function canvas_draw_ring_gauge(cc, options) {
   var thickness  = options.thickness || 3;
   var radius     = options.radius || 30;
   var fade       = options.fade  || 1;
-  var spill      = options.spill || 5;
+  var spill      = options.spill || 0;
   var stops      = options.stops || false;
   var stop_width = options.stop_width || 1;
   var max        = radians(options.max || 360);
@@ -408,8 +411,8 @@ function canvas_draw_fuel_hud(cc, ship, type) {
     radius:     radius,
     thickness:  thickness,
     stops:      true,
-    stop_width: 3,
-    spill:      3,
+    stop_width: 1,
+    spill:      0,
 
     label:      label,
     
