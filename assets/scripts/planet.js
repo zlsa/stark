@@ -242,7 +242,7 @@ var Planet=Fiber.extend(function() {
     },
     getPopulation: function() {
       var can_support = crange(0.9, this.getESI(), 1.0, 0, 40000);
-      can_support    += crange(0.0, this.getESI(), 1.0, 0, 10);
+      can_support    += crange(0.4, this.getESI(), 1.0, 0, 10);
 
       var area = Math.PI * 4 * (this.radius * this.radius);
 
