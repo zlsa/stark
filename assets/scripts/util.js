@@ -26,6 +26,10 @@ window.AudioContext = window.AudioContext||window.webkitAudioContext;
     };
 }());
 
+function capitalize(s) {
+  return s[0].toUpperCase() + s.substr(1);
+}
+
 function flatten(a) {
   var out = [];
   for(var i=0;i<a.length;i++) {

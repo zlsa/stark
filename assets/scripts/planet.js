@@ -32,7 +32,7 @@ var Planet=Fiber.extend(function() {
 
       this.atmosphere = {
         thickness: 2,
-        density:   0.5,
+        density:   0,
         colors: [
 
         ]
@@ -135,6 +135,8 @@ var Planet=Fiber.extend(function() {
       }
 
     },
+
+    // CHILDREN
     getChild: function(name) {
       name = name.toLowerCase();
       
@@ -144,6 +146,8 @@ var Planet=Fiber.extend(function() {
 
       return null;
     },
+
+    // POSITION
     getPosition: function(absolute, time_offset) {
       if(!time_offset) time_offset = 0;
       var p = [0, 0];
@@ -168,6 +172,50 @@ var Planet=Fiber.extend(function() {
       return [p1[0] - p0[0], p1[1] - p0[1]];
 
     },
+
+    /************************ STATS ************************/
+
+    getType: function() {
+      var type = this.type;
+
+      if(this.type == "gas") {
+        if(this.mass > 80 || this.radius > 150) {
+          type += " giant";
+        } else {
+          type += " planet";
+        }
+      } else if(this.type == "rocky") {
+        if(this.atmosphere.density < 0.1) {
+          type += ", no atmosphere";
+        } else if(this.atmosphere.density > 0.8) {
+          type += " with atmosphere";
+        } else {
+          type += ", trace atmosphere";
+        }
+        if(this.environment.craters > 0.8) {
+          type += ", with craters";
+        }
+        var temperature = this.getTemperature();
+
+        if(temperature > 10 && temperature < 40 && this.atmosphere.density > 0.8 && this.atmosphere.density < 1.3) {
+          type += "; comfort zone";
+        }
+      }
+
+      return type;
+    },
+
+    getTemperature: function() {
+      var distance    = distance2d(this.getPosition(true));
+
+      var temperature = (this.system.star.temperature * 100) / distance;
+
+      temperature *= crange(0, this.atmosphere.density, 2, 1, 3);
+
+      return temperature;
+    },
+
+    // PHYSICS
     dampingAt: function(position) {
       var distance = distance2d(this.getPosition(true), position);
 //      if(distance > this.radius + this.atmosphere.thickness) return 0;
@@ -230,6 +278,7 @@ var Planet=Fiber.extend(function() {
       return force;
     },
 
+    /*************** RENDER FUNCTIONS *******************/
     renderGasPlanet: function(cc, size, scale) {
       var center = size/2;
 
@@ -391,6 +440,7 @@ var Planet=Fiber.extend(function() {
       console.log("took " + elapsed.toFixed(4) + " seconds to render " + this.name);
     },
     
+    /*************** UPDATE *******************/
     update: function() {
 
       if(this.start_offset < 0) {
@@ -410,6 +460,7 @@ var Planet=Fiber.extend(function() {
 
     },
     
+    /*************** LOAD *******************/
     load: function(url) {
       this.content=new Content({
         type: "json",

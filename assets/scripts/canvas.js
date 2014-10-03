@@ -63,6 +63,23 @@ function canvas_clear(cc) {
   cc.clearRect(0, 0, prop.canvas.size[0], prop.canvas.size[1]);
 }
 
+// UTIL
+
+function canvas_outline_text(cc, text, position, border) {
+  if(!border) border = 1;
+
+  cc.save();
+  cc.strokeStyle = "rgba(0, 0, 0, 1.0)";
+  cc.lineJoin    = "round";
+  cc.lineWidth   = border * 2;
+
+  cc.strokeText(text, position[0], position[1]);
+  cc.restore();
+
+  cc.fillText(text, position[0], position[1]);
+
+}
+
 /************ SHIP *************/
 
 function canvas_draw_ship(cc, ship) {
@@ -111,14 +128,6 @@ function canvas_draw_planet(cc, system, planet) {
     
     cc.translate(kilometers(p[0]), -kilometers(p[1]));
     
-    cc.fillStyle = planet.color.getCssValue();
-
-//    cc.beginPath();
-//    cc.arc(0, 0, kilometers(planet.radius), 0, Math.PI*2);
-//    cc.fill();
-
-//    cc.rotate(game_time() * 0.001);
-
     if(planet.canvas.planet) {
       var offset = Math.ceil(kilometers(planet.radius)) + 2;
       var size   = Math.ceil(kilometers(planet.radius * 2))
@@ -131,20 +140,69 @@ function canvas_draw_planet(cc, system, planet) {
       cc.drawImage(planet.canvas.atmosphere.canvas, -offset, -offset, size, size);
     }
 
-    // cc.strokeStyle = "#f83";
-    // cc.lineWidth   = 2;
-
-    // var velocity = planet.getVelocity();
-
-    // cc.beginPath();
-    // cc.moveTo(0, 0);
-    // cc.lineTo(velocity[0] * 0.5, -velocity[1] * 0.5);
-    // cc.stroke();
-    
     cc.restore();
   } else {
+
   }
 
+}
+
+function canvas_draw_planet_stats(cc, system, planet) {
+  var p = planet.getPosition(true);
+
+  if(planet.planets) {
+    for(var i=0;i<planet.planets.length;i++) {
+      canvas_draw_planet_stats(cc, system, planet.planets[i]);
+    }
+  }
+
+  var padding = [40, 20];
+
+  if(canvas_is_visible([p[0], -p[1]], planet.radius * 2)) {
+    var pan_km = [pixels_to_km(prop.ui.pan[0]), pixels_to_km(prop.ui.pan[1])];
+    
+    var direction = Math.atan2(-p[0] - pan_km[0], p[1] - pan_km[1]);
+    
+    var small_ring = pixels_to_km(Math.min(prop.canvas.size[0], prop.canvas.size[1]) / 2 - 20);
+    var large_ring = pixels_to_km(Math.max(prop.canvas.size[0], prop.canvas.size[1]) / 2 + 20);
+    
+    var distance_to_viewport = distance2d([-p[0], p[1]], pan_km);
+
+    var alpha = scrange(small_ring * 0.3, distance_to_viewport, large_ring * 0.7, 1, 0);
+
+    if(alpha >= 0.0001) {
+      
+      cc.save();
+
+      cc.translate(-(prop.canvas.size[0] * 0.5) + padding[0], -(prop.canvas.size[1] * 0.5) + padding[0]);
+
+      cc.globalAlpha = alpha;
+
+      cc.textAlign = "left";
+
+      var rows = [];
+
+      rows.push(planet.name);
+      rows.push(capitalize(planet.getType()));
+      rows.push(planet.getTemperature().toFixed(1) + " degrees Centigrade");
+      rows.push(planet.atmosphere.density);
+
+      cc.fillStyle = planet.color.getCssValue();
+
+      var offset = 0;
+
+      cc.font = "bold 12px " + prop.canvas.font;
+      for(var i=0;i<rows.length;i++) {
+        if(i == 1) {
+          cc.font = "12px " + prop.canvas.font;
+        }
+        canvas_outline_text(cc, rows[i], [0, (i * 16) - offset]);
+      }
+
+      cc.restore();
+
+    }
+  }
 }
 
 /************ POINTERS *************/
@@ -155,10 +213,8 @@ function canvas_draw_pointer(cc, options) {
     
   cc.save();
   
-  cc.textAlign    = "center";
-  cc.textBaseline = "middle";
-
   cc.globalAlpha *= options.fade;
+  cc.globalAlpha *= crange(0, options.length, 10, 0, 1);
 
   var dist = 30; // distance from end of line to text
 
@@ -246,7 +302,6 @@ function canvas_draw_planet_pointer(cc, system, planet) {
     }
 
     var fade = crange(0, distance_to_viewport, max_distance, 1, 0);
-    fade    *= crange(small_ring * 0.8, distance_to_viewport, large_ring * 1.2, 0, 1);
 
     var color = planet.color;
     if(!color) {
@@ -300,7 +355,6 @@ function canvas_draw_ship_pointer(cc, ship) {
     max_distance    *= crange(5, ship_force, 30, 1, 0);
 
     var fade = crange(0, distance_to_viewport, max_distance, 1, 0);
-    fade    *= crange(small_ring * 0.8, distance_to_viewport, large_ring * 1.2, 0, 1);
 
     var color = "#ccc";
     if(ship.type == "auto") color = "#888";
@@ -379,9 +433,6 @@ function canvas_draw_ring_gauge(cc, options) {
   }
 
   if(options.label) {
-    cc.textAlign    = "center";
-    cc.textBaseline = "middle";
-
     cc.font = "bold 14px " + prop.canvas.font;
     cc.fillText(options.label, 0, 0);
   }
@@ -482,6 +533,10 @@ function canvas_draw_hud(cc) {
     canvas_draw_ship_pointer(cc, prop.game.ships.auto[i]);
   }
 
+  for(var i=0;i<system.planets.length;i++) {
+    canvas_draw_planet_stats(cc, system, system.planets[i]);
+  }
+
   canvas_draw_planet_pointer(cc, system, system.star);
 
   canvas_draw_fuel_hud(cc, prop.game.ships.player, "impulse");
@@ -509,6 +564,9 @@ function canvas_is_visible(position, size) { // position in km
 function canvas_update_post() {
   if(!prop.canvas.enabled) return;
   var cc=canvas_get("main");
+
+  cc.textAlign    = "center";
+  cc.textBaseline = "middle";
 
   cc.save();
   canvas_clear(cc);

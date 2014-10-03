@@ -222,7 +222,7 @@ function game_update_pre() {
 function game_complete() {
   prop.game = new Game();
   prop.game.complete();
-  if(storage.has("savegame"))
-    prop.game.restore(storage.get("savegame"));
+//  if(storage.has("savegame"))
+//    prop.game.restore(storage.get("savegame"));
 }
 
