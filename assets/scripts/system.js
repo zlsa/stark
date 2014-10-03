@@ -19,6 +19,25 @@ var System=Fiber.extend(function() {
       this.starfield = [];
 
     },
+    closestPlanet: function(position, touching) {
+      if(!touching) touching = false;
+      var closest_planet = null;
+      var closest        = Infinity;
+      for(var i=0;i<this.planets.length;i++) {
+        var distance = distance2d(position, this.planets[i].getPosition(true));
+        if(distance < closest) {
+          if(touching && distance > this.planets[i].radius) continue;
+          closest_planet = this.planets[i];
+          closest        = distance;
+        }
+        var p = this.planets[i].closestPlanet(position, touching);
+        if(p[1] < closest) {
+          closest_planet = p[0];
+          closest        = p[1];
+        }
+      }
+      return closest_planet;
+    },
     generateStarfield: function() {
       return;
       var density = 120; // px per star

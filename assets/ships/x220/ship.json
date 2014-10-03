@@ -10,6 +10,10 @@
     "angle":  6
   },
 
+  "cargo": {
+    "capacity": 30
+  },
+
   "fuel": {
     "impulse": {
       "type":       "xenon",
@@ -24,7 +28,7 @@
       "capacity":   50,
       "max_rate":   {
         "output":   0.05,
-        "input":    2
+        "input":    0.5
       }
     }
   },

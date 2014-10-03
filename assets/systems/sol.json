@@ -145,7 +145,7 @@
 
     {
       "name":      "Jool",
-      "color":      "#3f5",
+      "color":      "#3b5",
       "type":       "gas",
       "distance":   176230,
       "radius":     350,
@@ -156,7 +156,7 @@
         "thickness": 20,
         "density":   2,
         "colors": [
-          [0.0, "#3f5"]
+          [0.0, "#3b5"]
         ]
       },
       "planets": [

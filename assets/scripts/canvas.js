@@ -209,10 +209,15 @@ function canvas_draw_planet_stats(cc, system, planet) {
 
       var rows = [];
 
-      rows.push(["name",        planet.name]);
-      rows.push(["type",        capitalize(planet.getType())]);
-      rows.push(["class",       planet.getPClass()]);
-      rows.push(["temperature", Math.round(planet.getTemperature()) + " °C"]);
+      rows.push(["name",          planet.name]);
+      rows.push(["type",          capitalize(planet.getType())]);
+      rows.push(["class",         planet.getPClass()]);
+      rows.push(["esi",           planet.getESI().toFixed(2)]);
+
+      rows.push(["xenon fuel",    planet.canRefuel("xenon")]);
+      rows.push(["hydrogen fuel", planet.canRefuel("hydrogen")]);
+      rows.push(["population",    to_number(planet.getPopulation())]);
+      rows.push(["temperature",   Math.round(planet.getTemperature()) + " °C"]);
 
       for(var i=0;i<rows.length;i++) {
         rows[i][0] = rows[i][0].toUpperCase();
@@ -243,6 +248,8 @@ function canvas_draw_planet_stats(cc, system, planet) {
         
         temp_offset = 0;
 
+        var text = rows[i][1];
+
         if(rows[i][0] != "") {
           cc.save();
           cc.textAlign = "right";
@@ -250,35 +257,31 @@ function canvas_draw_planet_stats(cc, system, planet) {
           cc.fillText(rows[i][0], xoffset - col_padding - ((1 - alpha) * 20), (i * 18) - offset);
           cc.restore();
         } else {
-          temp_offset = -cc.measureText(rows[i][1]).width / 2;
+          temp_offset = -cc.measureText(text).width / 2;
         }
 
         cc.save();
         cc.font = "bold 14px " + prop.canvas.font;
+
+        if(typeof rows[i][1] == typeof true) {
+          if(rows[i][1] == true) {
+            text = "YES";
+            cc.fillStyle = "#8f8";
+          } else {
+            text = "NO";
+            cc.fillStyle = "#f88";
+          }
+        }
+
         if(i == 0) {
-          
           canvas_box_text(cc, {
-            label:    rows[i][1],
+            label:    text,
             position: [xoffset + col_padding + temp_offset, (i * 18) - offset],
             size:     14,
             color:    planet.color
           });
-
-          if(false) {
-            cc.save();
-            var c = new Color(planet.color);
-            c.setHsvComponentSaturation(clamp(0, c.getHsvComponentSaturation(), 90));
-            c.setHsvComponentValue(clamp(128, c.getHsvComponentValue(), 255));
-            cc.fillStyle = c.getCssValue();
-            var box_padding = [2, 9];
-            cc.fillRect(xoffset + col_padding + temp_offset - box_padding[0], (i * 18) - offset - box_padding[1],
-                        cc.measureText(rows[i][1]).width + box_padding[0] * 2, box_padding[1] * 2);
-            cc.fillStyle = "#000";
-            cc.fillText(rows[i][1], xoffset + col_padding + temp_offset, (i * 18) - offset);
-            cc.restore();
-          }
         } else {
-          cc.fillText(rows[i][1], xoffset + col_padding + temp_offset, (i * 18) - offset);
+          cc.fillText(text, xoffset + col_padding + temp_offset, (i * 18) - offset);
         }
         cc.restore()
       }
@@ -536,16 +539,18 @@ function canvas_draw_fuel_hud(cc, ship, type) {
   var warning    = scrange(0.15, fraction, 0.20, 1, 0);
   var blink      = scrange(0.01, fraction, 0.02, 1, 0);
 
+  var refueling  = ship.fuel.impulse.rate.input > 0.001;
+
+  var fuel_type  = ship.model.fuel[type].type;
+  var label      = prop.cargo.fuels[fuel_type].element;
+
   var alpha      = crange(-1, Math.sin(game_time() * 11), 1, 1 - (0.8 * blink), 1);
 
   cc.globalAlpha = alpha;
 
-  cc.fillStyle   = new Color("#ddd").blend(new Color("f42"), warning).getCssValue();
-
+  cc.fillStyle   = new Color("#ddd").blend(new Color("#f42"), warning).getCssValue();
+  if(refueling) cc.fillStyle = "#ddd";
   cc.strokeStyle = cc.fillStyle;
-
-  var fuel_type  = ship.model.fuel[type].type;
-  var label      = prop.ship.fuels[fuel_type].element;
 
   canvas_draw_ring_gauge(cc, {
     radius:     radius,

@@ -15,6 +15,7 @@ var MODULES=[
   "star",
   "planet",
 
+  "cargo",
   "ship",
 
   "game",

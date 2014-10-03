@@ -173,6 +173,13 @@ var Planet=Fiber.extend(function() {
 
     },
 
+    /************************ TRADING ************************/
+
+    canRefuel: function(fuel_type) {
+      if(this.getESI() > 0.6) return true;
+      return false;
+    },
+
     /************************ STATS ************************/
 
     getType: function() {
@@ -201,13 +208,14 @@ var Planet=Fiber.extend(function() {
     },
 
     isHabitable: function() {
-
+      if(this.getPClass() == "warm terran") return true;
+      return false;
     },
-    getHabitability: function() {
+    getESI: function() {
       var score = 0;
 
-      score  = crange(10.0, Math.abs(20.0 - this.getTemperature()),  15.0, 1, 0);
-      score *= crange( 0.2, Math.abs( 1.0 - this.atmosphere.density), 0.4, 1, 0);
+      score  = crange(20.0, Math.abs(20.0 - this.getTemperature()),   300.0, 0.5, 0);
+      score += crange( 0.6, Math.abs( 1.1 - this.atmosphere.density),   2.0, 0.5, 0);
 
       return score;
     },
@@ -232,8 +240,25 @@ var Planet=Fiber.extend(function() {
 
       return pclass;
     },
+    getPopulation: function() {
+      var can_support = crange(0.9, this.getESI(), 1.0, 0, 40000);
+      can_support    += crange(0.0, this.getESI(), 1.0, 0, 10);
+
+      var area = Math.PI * 4 * (this.radius * this.radius);
+
+      var population = can_support * area;
+
+      return population;
+    },
+    getDistance: function() {
+      if(this.parent) {
+        return this.parent.getDistance();
+      } else {
+        return this.distance;
+      }
+    },
     getTemperature: function() {
-      var distance    = distance2d(this.getPosition(true));
+      var distance    = this.getDistance();
 
       var temperature = (this.system.star.temperature * 2000) / (distance * distance * 0.0002);
 
@@ -310,6 +335,25 @@ var Planet=Fiber.extend(function() {
       return force;
     },
 
+    closestPlanet: function(position, touching) {
+      if(!touching) touching = false;
+      var closest_planet = null;
+      var closest        = Infinity;
+      for(var i=0;i<this.planets.length;i++) {
+        var distance = distance2d(position, this.planets[i].getPosition(true));
+        if(distance < closest) {
+          if(touching && distance > this.planets[i].radius) continue;
+          closest_planet = this.planets[i];
+          closest        = distance;
+        }
+        var p = this.planets[i].closestPlanet(position, touching);
+        if(p[1] < closest) {
+          closest_planet = p[0];
+          closest        = p[1];
+        }
+      }
+      return [closest_planet, closest];
+    },
     /*************** RENDER FUNCTIONS *******************/
     renderGasPlanet: function(cc, size, scale) {
       var center = size/2;

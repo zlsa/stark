@@ -189,6 +189,35 @@ function to_distance(d) {
   }
 }
 
+var thousand    = 1000;
+var million     = 1000000;
+var billion     = 1000000000;
+var trillion    = 1000000000000;
+var quadrillion = 1000000000000000;
+
+function to_number(d) {
+  function r(d, p) {
+    if(p < 0) {
+      p = Math.round(p);
+      p = -p;
+      d /= p;
+      return Math.round(d) * p;
+    }
+    return d.toFixed(p);
+  };
+  if(d < 0.5 * thousand) {
+    return Math.round(d);
+  } else if(d < 0.5 * million) {
+    return r(d / thousand, 0) + " thousand";
+  } else if(d < 0.5 * billion) {
+    return r(d / million, 2) + " million";
+  } else if(d < 0.5 * trillion) {
+    return r(d / billion, 2) + " billion";
+  } else {
+    return r(d / trillion, 2) + " trillion";
+  }
+}
+
 function angle_difference(a, b) {
   a = degrees(a);
   b = degrees(b);
