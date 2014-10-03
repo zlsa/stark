@@ -2,7 +2,8 @@
 function canvas_init_pre() {
   prop.canvas={};
 
-  prop.canvas.font    = "'Exo 2', sans-serif";
+  prop.canvas.font      = "'Exo 2', sans-serif";
+  prop.canvas.mono_font = "monoOne, monospace";
 
   prop.canvas.enabled = true;
 
@@ -129,13 +130,13 @@ function canvas_draw_planet(cc, system, planet) {
     cc.translate(kilometers(p[0]), -kilometers(p[1]));
     
     if(planet.canvas.planet) {
-      var offset = Math.ceil(kilometers(planet.radius)) + 2;
+      var offset = Math.ceil(kilometers(planet.radius));
       var size   = Math.ceil(kilometers(planet.radius * 2))
       cc.drawImage(planet.canvas.planet.canvas, -offset, -offset, size, size);
     }
 
     if(planet.canvas.atmosphere) {
-      var offset = Math.ceil(kilometers(planet.radius + planet.atmosphere.thickness)) + 2;
+      var offset = Math.ceil(kilometers(planet.radius + planet.atmosphere.thickness));
       var size   = Math.ceil(kilometers((planet.radius + planet.atmosphere.thickness) * 2))
       cc.drawImage(planet.canvas.atmosphere.canvas, -offset, -offset, size, size);
     }
@@ -165,7 +166,6 @@ function canvas_draw_planet_stats(cc, system, planet) {
     
     var small_ring = pixels_to_km(Math.min(prop.canvas.size[0], prop.canvas.size[1]) / 2 - 20);
     var large_ring = pixels_to_km(Math.max(prop.canvas.size[0], prop.canvas.size[1]) / 2 + 20);
-    
     var distance_to_viewport = distance2d([-p[0], p[1]], pan_km);
 
     distance_to_viewport    *= crange(0, planet.mass, 120, 3, 0.5);
@@ -273,29 +273,35 @@ function canvas_draw_pointer(cc, options) {
       -Math.cos(options.direction) * (radius - options.length - dist)
   ];
 
+  var sd         = -Math.sin(options.direction);
+  var cd         = -Math.cos(options.direction);
+
   // OUTLINE
-  cc.save();
 
-  var border     = options.outline || 1;
+  var border     = options.outline || 0;
 
-  cc.strokeStyle = "rgba(0, 0, 0, 1.0)";
-  cc.lineJoin    = "round";
-  cc.lineWidth   = options.width + border * 2;
+  if(border != 0) {
+    cc.save();
 
-  cc.beginPath();
-  cc.moveTo(-Math.sin(options.direction) * (radius - options.length - border), -Math.cos(options.direction) * (radius - options.length - border));
-  cc.lineTo(-Math.sin(options.direction) * (radius -              0 + border), -Math.cos(options.direction) * (radius -              0 + border));
-  cc.stroke();
+    cc.strokeStyle = "rgba(0, 0, 0, 1.0)";
+    cc.lineJoin    = "round";
+    cc.lineWidth   = options.width + border * 2;
 
-  cc.lineWidth = border * 2;
+    cc.beginPath();
+    cc.moveTo(sd * (radius - options.length - border), cd * (radius - options.length - border));
+    cc.lineTo(sd * (radius -              0 + border), cd * (radius -              0 + border));
+    cc.stroke();
 
-  cc.font = "bold 12px " + prop.canvas.font;
-  cc.strokeText(options.label, ta[0], ta[1] + primary_offset);
+    cc.lineWidth = border * 2;
 
-  cc.font = "bold 10px " + prop.canvas.font;
-  cc.strokeText(options.secondary_label, ta[0], ta[1] + secondary_offset);
-  
-  cc.restore();
+    cc.font = "bold 13px " + prop.canvas.font;
+    cc.strokeText(options.label, ta[0], ta[1] + primary_offset);
+
+    cc.font = "bold 9px " + prop.canvas.mono_font;
+    cc.strokeText(options.secondary_label, ta[0], ta[1] + secondary_offset);
+    
+    cc.restore();
+  }
 
   // COLOR
   cc.fillStyle   = options.color;
@@ -303,14 +309,14 @@ function canvas_draw_pointer(cc, options) {
   cc.lineWidth   = options.width;
 
   cc.beginPath();
-  cc.moveTo(-Math.sin(options.direction) * (radius - options.length), -Math.cos(options.direction) * (radius - options.length));
-  cc.lineTo(-Math.sin(options.direction) * (radius -              0), -Math.cos(options.direction) * (radius -              0));
+  cc.moveTo(sd * (radius - options.length), cd * (radius - options.length));
+  cc.lineTo(sd * (radius -              0), cd * (radius -              0));
   cc.stroke();
 
-  cc.font = "bold 12px " + prop.canvas.font;
+  cc.font = "bold 13px " + prop.canvas.font;
   cc.fillText(options.label, ta[0], ta[1] + primary_offset);
 
-  cc.font = "bold 10px " + prop.canvas.font;
+  cc.font = "bold 9px " + prop.canvas.mono_font;
   cc.fillText(options.secondary_label, ta[0], ta[1] + secondary_offset);
   
   cc.restore();
