@@ -176,7 +176,7 @@ var Planet=Fiber.extend(function() {
     /************************ TRADING ************************/
 
     canRefuel: function(fuel_type) {
-      if(this.getESI() > 0.6) return true;
+      if(this.getPopulation() > 500000) return true;
       return false;
     },
 
@@ -339,19 +339,22 @@ var Planet=Fiber.extend(function() {
       if(!touching) touching = false;
       var closest_planet = null;
       var closest        = Infinity;
+
+      var distance = distance2d(position, this.getPosition(true));
+      if((touching && distance < this.radius) || !touching) {
+        closest_planet = this;
+        closest        = distance;
+      }
+
       for(var i=0;i<this.planets.length;i++) {
-        var distance = distance2d(position, this.planets[i].getPosition(true));
-        if(distance < closest) {
-          if(touching && distance > this.planets[i].radius) continue;
-          closest_planet = this.planets[i];
-          closest        = distance;
-        }
         var p = this.planets[i].closestPlanet(position, touching);
+
         if(p[1] < closest) {
           closest_planet = p[0];
           closest        = p[1];
         }
       }
+      
       return [closest_planet, closest];
     },
     /*************** RENDER FUNCTIONS *******************/

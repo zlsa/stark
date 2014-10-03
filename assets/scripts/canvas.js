@@ -492,6 +492,20 @@ function canvas_draw_ring_gauge(cc, options) {
   cc.beginPath();
   cc.arc(0, 0, radius - 0.5, 0, max);
   cc.stroke();
+
+  if(options.secondary) {
+    var t = mod(game_time(), 1);
+    var r = crange(0, t, 1, -10, 0);
+    var w = crange(0, t, 1, thickness, 0);
+
+    cc.globalAlpha *= scrange(0, t, 0.8, 0, 1);
+    
+    cc.lineWidth = w;
+
+    cc.beginPath();
+    cc.arc(0, 0, radius - thickness - 2 + r, 0, max);
+    cc.stroke();
+  }
   
   cc.restore();
 
@@ -549,7 +563,6 @@ function canvas_draw_fuel_hud(cc, ship, type) {
   cc.globalAlpha = alpha;
 
   cc.fillStyle   = new Color("#ddd").blend(new Color("#f42"), warning).getCssValue();
-  if(refueling) cc.fillStyle = "#ddd";
   cc.strokeStyle = cc.fillStyle;
 
   canvas_draw_ring_gauge(cc, {
@@ -558,6 +571,7 @@ function canvas_draw_fuel_hud(cc, ship, type) {
     stops:      true,
     stop_width: 1,
     spill:      0,
+    secondary:  refueling,
 
     label:      label,
     
