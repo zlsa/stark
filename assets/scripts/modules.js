@@ -24,7 +24,7 @@ var MODULES=[
   "load",
 
   "canvas",
-//  "gl",
+  //  "gl",
 ];
 
 // saved as prop.version and prop.version_string
@@ -293,6 +293,6 @@ function update() {
 }
 
 function delta() {
-//  return 0.016;
+  //  return 0.016;
   return prop.time.frame.delta;
 }

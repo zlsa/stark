@@ -11,7 +11,7 @@ var Content=function(options) {
   this.payload=null;
 
   if(options) {
-    if("url" in options) this.url=options.url + "?" + time();
+    if("url" in options) this.url=options.url;
     if("callback" in options) this.callback=options.callback;
     if("type" in options) this.type=options.type;
     if("that" in options) this.that=options.that;
@@ -21,21 +21,21 @@ var Content=function(options) {
   this.getJSON=function() {
 //    log("Getting JSON file "+this.url+"...",LOG_DEBUG);
     var that=this;
-    $.getJSON(that.url)
+    $.getJSON(that.url + "?" + time())
       .done(that.dl_done)
       .fail(that.dl_fail);
   };
 
   this.getString=function() {
 //    log("Getting plain file "+this.url+"...",LOG_DEBUG);
-    $.get(this.url)
+    $.get(this.url + "?" + time())
       .done(this.dl_done)
       .fail(this.dl_fail);
   };
 
   this.getImage=function() {
 //    log("Getting image "+this.url+"...",LOG_DEBUG);
-    this.data=new Image(this.url);
+    this.data=new Image(this.url + "?" + time());
     this.data.onload=function() {
       var that=get_queue_current(); // we better be in a queue
       if(!that) {
@@ -57,7 +57,7 @@ var Content=function(options) {
 
   this.getAudio=function() {
 //    log("Getting audio "+this.url+"...",LOG_DEBUG);
-    this.data=new Audio(this.url);
+    this.data=new Audio(this.url + "?" + time());
     this.dl_done(this.data);
   };
 
@@ -72,6 +72,7 @@ var Content=function(options) {
     if(that.callback)
       that.callback.call(that.that,"ok",data,that.payload);
     load_item_done();
+    prop.get.got[this.url] = this;
     get_queue_check();
     async_loaded("get");
   };
@@ -115,13 +116,11 @@ var Content=function(options) {
     },0);
   };
 
-  if(this.url in prop.get.got && prop.get.got[this.url].status == "done") {
+  if(this.url in prop.get.got) {
     this.callback.call(this.that, "ok", prop.get.got[this.url].data, prop.get.got[this.url].payload);
   } else {
     load_item_add();
     get_queue_add(this);
-
-    prop.get.got[this.url] = this;
   }
 };
 
