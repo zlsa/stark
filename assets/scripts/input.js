@@ -70,6 +70,9 @@ function input_command_run(value) {
   } else if(cmd == "ifuel") {
     var amount = parseFloat(data);
     prop.game.ships.player.fuel.impulse.set(amount);
+  } else if(cmd == "jfuel") {
+    var amount = parseFloat(data);
+    prop.game.ships.player.fuel.jump.set(amount);
   } else if(cmd == "speedup") {
     prop.game.speedup = parseFloat(data);
   } else if(cmd == "save") {

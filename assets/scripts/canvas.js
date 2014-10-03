@@ -398,9 +398,11 @@ function canvas_draw_fuel_hud(cc, ship, type) {
 
   var fraction   = ship.fuel[type].getFraction();
 
-  var warning    = scrange(0.19, fraction, 0.21, 1, 0);
+  var warning    = scrange(0.15, fraction, 0.20, 1, 0);
+  var blink      = scrange(0.05, fraction, 0.10, 1, 0);
 
-  var alpha      = 1 - ((Math.sin(game_time() * 7) * 0.5 + 0.5) * warning);
+  var blink_rate = scrange(0.00, fraction, 0.05, 16, 8);
+  var alpha      = crange(-1, Math.sin(game_time() * blink_rate), 1, 1 - (0.6 * blink), 1);
 
   cc.globalAlpha = alpha;
 

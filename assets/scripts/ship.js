@@ -115,7 +115,6 @@ var ShipModel = Fiber.extend(function() {
         impulse: {
           type:       "xenon",
           capacity:   30,
-          efficiency: 0,
           max_rate:   {
             output:   1,
             input:    1
@@ -124,7 +123,6 @@ var ShipModel = Fiber.extend(function() {
         jump: {
           type:       "hydrogen",
           capacity:   50,
-          efficiency: 0,
           max_rate:   {
             output:   1,
             input:    1
@@ -175,7 +173,6 @@ var ShipModel = Fiber.extend(function() {
           if(data.fuel[type]) {
             if(data.fuel[type].type)       this.fuel[type].type       = data.fuel[type].type;
             if(data.fuel[type].capacity)   this.fuel[type].capacity   = data.fuel[type].capacity;
-            if(data.fuel[type].efficiency) this.fuel[type].efficiency = data.fuel[type].efficiency;
             if(data.fuel[type].max_rate)   this.fuel[type].max_rate   = data.fuel[type].max_rate;
           }
         }
@@ -307,7 +304,7 @@ var Ship = Fiber.extend(function() {
     },
 
     updateFuel: function() {
-      var fuel_rate_out = this.controls[1] * this.model.fuel.impulse.efficiency;
+      var fuel_rate_out = this.controls[1] * this.model.fuel.impulse.max_rate.output;
       this.fuel.impulse.rate.output = fuel_rate_out;
 
       if(this.fuel.impulse.isEmpty()) this.controls[1] = 0;
@@ -420,7 +417,7 @@ var Ship = Fiber.extend(function() {
         }
       }
 
-      var position = p.getPosition(true, -0.3);
+      var position = p.getPosition(true);
 
       this.position[0] = position[0];
       this.position[1] = position[1];

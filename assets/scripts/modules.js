@@ -94,6 +94,10 @@ var storage = {
   prefixify: function(name) {
     return this.prefix + name;
   },
+  has: function(name, def) {
+    name = this.prefixify(name);
+    return (name in this.backend);
+  },
   get: function(name, def) {
     name = this.prefixify(name);
     if(name in this.backend) return JSON.parse(this.backend.getItem(name));

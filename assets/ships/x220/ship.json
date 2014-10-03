@@ -14,16 +14,14 @@
     "impulse": {
       "type":       "xenon",
       "capacity":   30,
-      "efficiency": 0.5,
       "max_rate":   {
-        "output":   1,
+        "output":   0.3,
         "input":    1
       }
     },
     "jump": {
       "type":       "hydrogen",
       "capacity":   50,
-      "efficiency": 0.5,
       "max_rate":   {
         "output":   0.05,
         "input":    2

@@ -130,8 +130,6 @@ var Game = Fiber.extend(function() {
       data.paused   = this.paused;
       data.focused  = this.focused;
 
-      data.speedup  = this.speedup;
-
       data.time     = this.time;
 
       data.timeouts = this.timeouts;
@@ -159,8 +157,6 @@ var Game = Fiber.extend(function() {
       
       this.paused   = data.paused;
       this.focused  = data.focused;
-
-      this.speedup  = data.speedup;
 
       this.time     = data.time;
 
@@ -226,5 +222,7 @@ function game_update_pre() {
 function game_complete() {
   prop.game = new Game();
   prop.game.complete();
+  if(storage.has("savegame"))
+    prop.game.restore(storage.get("savegame"));
 }
 
