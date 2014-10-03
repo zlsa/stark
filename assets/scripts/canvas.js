@@ -81,6 +81,33 @@ function canvas_outline_text(cc, text, position, border) {
 
 }
 
+function canvas_box_text(cc, options) {
+
+  var size    = options.size || 14;
+  var padding = [2, Math.ceil((size * 0.5) + 1)];
+  var label   = options.label;
+  var color   = new Color(options.color || "#fff");
+  var pos     = [Math.round(options.position[0]), Math.round(options.position[1])];
+  
+  var width   = cc.measureText(label).width;
+
+  color.setHsvComponentSaturation(clamp(0, color.getHsvComponentSaturation(), 90));
+  color.setHsvComponentValue(clamp(128, color.getHsvComponentValue(), 255));
+
+  cc.save();
+  cc.fillStyle = color.getCssValue();
+
+  var xoffset = 0;
+  if(cc.textAlign == "center") xoffset = Math.ceil(-(width * 0.5));
+  cc.fillRect(pos[0] - padding[0] + xoffset, pos[1] - padding[1], width + padding[0] * 2 + 1, padding[1] * 2);
+
+  cc.fillStyle = "#000";
+  cc.fillText(label, pos[0], pos[1]);
+
+  cc.restore();
+
+}
+
 /************ SHIP *************/
 
 function canvas_draw_ship(cc, ship) {
@@ -229,17 +256,27 @@ function canvas_draw_planet_stats(cc, system, planet) {
         cc.save();
         cc.font = "bold 14px " + prop.canvas.font;
         if(i == 0) {
-          cc.save();
-          var c = new Color(planet.color);
-          c.setHsvComponentSaturation(clamp(0, c.getHsvComponentSaturation(), 90));
-          c.setHsvComponentValue(clamp(128, c.getHsvComponentValue(), 255));
-          cc.fillStyle = c.getCssValue();
-          var box_padding = [2, 9];
-          cc.fillRect(xoffset + col_padding + temp_offset - box_padding[0], (i * 18) - offset - box_padding[1],
-                      cc.measureText(rows[i][1]).width + box_padding[0] * 2, box_padding[1] * 2);
-          cc.fillStyle = "#000";
-          cc.fillText(rows[i][1], xoffset + col_padding + temp_offset, (i * 18) - offset);
-          cc.restore();
+          
+          canvas_box_text(cc, {
+            label:    rows[i][1],
+            position: [xoffset + col_padding + temp_offset, (i * 18) - offset],
+            size:     14,
+            color:    planet.color
+          });
+
+          if(false) {
+            cc.save();
+            var c = new Color(planet.color);
+            c.setHsvComponentSaturation(clamp(0, c.getHsvComponentSaturation(), 90));
+            c.setHsvComponentValue(clamp(128, c.getHsvComponentValue(), 255));
+            cc.fillStyle = c.getCssValue();
+            var box_padding = [2, 9];
+            cc.fillRect(xoffset + col_padding + temp_offset - box_padding[0], (i * 18) - offset - box_padding[1],
+                        cc.measureText(rows[i][1]).width + box_padding[0] * 2, box_padding[1] * 2);
+            cc.fillStyle = "#000";
+            cc.fillText(rows[i][1], xoffset + col_padding + temp_offset, (i * 18) - offset);
+            cc.restore();
+          }
         } else {
           cc.fillText(rows[i][1], xoffset + col_padding + temp_offset, (i * 18) - offset);
         }
@@ -294,12 +331,6 @@ function canvas_draw_pointer(cc, options) {
 
     cc.lineWidth = border * 2;
 
-    cc.font = "bold 13px " + prop.canvas.font;
-    cc.strokeText(options.label, ta[0], ta[1] + primary_offset);
-
-    cc.font = "bold 9px " + prop.canvas.mono_font;
-    cc.strokeText(options.secondary_label, ta[0], ta[1] + secondary_offset);
-    
     cc.restore();
   }
 
@@ -503,9 +534,9 @@ function canvas_draw_fuel_hud(cc, ship, type) {
   var fraction   = ship.fuel[type].getFraction();
 
   var warning    = scrange(0.15, fraction, 0.20, 1, 0);
-  var blink      = scrange(0.05, fraction, 0.10, 1, 0);
+  var blink      = scrange(0.01, fraction, 0.02, 1, 0);
 
-  var alpha      = crange(-1, Math.sin(game_time() * 6), 1, 1 - (0.6 * blink), 1);
+  var alpha      = crange(-1, Math.sin(game_time() * 11), 1, 1 - (0.8 * blink), 1);
 
   cc.globalAlpha = alpha;
 
