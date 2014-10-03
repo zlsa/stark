@@ -156,7 +156,7 @@ function canvas_draw_planet_stats(cc, system, planet) {
     }
   }
 
-  var padding = [40, 20];
+  var padding = [40, 60];
 
   if(canvas_is_visible([p[0], -p[1]], planet.radius * 2)) {
     var pan_km = [pixels_to_km(prop.ui.pan[0]), pixels_to_km(prop.ui.pan[1])];
@@ -168,35 +168,81 @@ function canvas_draw_planet_stats(cc, system, planet) {
     
     var distance_to_viewport = distance2d([-p[0], p[1]], pan_km);
 
-    var alpha = scrange(small_ring * 0.3, distance_to_viewport, large_ring * 0.7, 1, 0);
+    distance_to_viewport    *= crange(0, planet.mass, 120, 3, 0.5);
+
+    var alpha = scrange(small_ring * 0.3, distance_to_viewport, large_ring * 0.5, 1, 0);
 
     if(alpha >= 0.0001) {
       
       cc.save();
 
-      cc.translate(-(prop.canvas.size[0] * 0.5) + padding[0], -(prop.canvas.size[1] * 0.5) + padding[0]);
+      cc.translate(-(prop.canvas.size[0] * 0.5) + padding[0] - ((1 - alpha) * 40), -(prop.canvas.size[1] * 0.5) + padding[0]);
 
       cc.globalAlpha = alpha;
 
-      cc.textAlign = "left";
-
       var rows = [];
 
-      rows.push(planet.name);
-      rows.push(capitalize(planet.getType()));
-      rows.push(planet.getTemperature().toFixed(1) + " degrees Centigrade");
-      rows.push(planet.atmosphere.density);
+      rows.push(["name", planet.name]);
+      rows.push(["type", capitalize(planet.getType())]);
+      rows.push(["temperature", planet.getTemperature().toFixed(1) + " °C"]);
 
-      cc.fillStyle = planet.color.getCssValue();
-
-      var offset = 0;
-
-      cc.font = "bold 12px " + prop.canvas.font;
       for(var i=0;i<rows.length;i++) {
-        if(i == 1) {
-          cc.font = "12px " + prop.canvas.font;
+        rows[i][0] = rows[i][0].toUpperCase();
+      }
+
+      cc.font = "14px " + prop.canvas.font;
+
+      var col_padding = 4;
+      var xoffset = 0;
+      
+      for(var i=0;i<rows.length;i++) {
+        xoffset = Math.max(cc.measureText(rows[i][0]).width, xoffset);
+      }
+
+      xoffset += 4;
+
+      var offset  = 0;
+
+      var height  = rows.length * 18;
+
+      var temp_offset = 0;
+
+      cc.textAlign = "left";
+      
+      cc.fillStyle = "#ddd";
+
+      for(var i=0;i<rows.length;i++) {
+        
+        temp_offset = 0;
+
+        if(rows[i][0] != "") {
+          cc.save();
+          cc.textAlign = "right";
+          cc.globalAlpha *= 0.8;
+          cc.fillText(rows[i][0], xoffset - col_padding - ((1 - alpha) * 20), (i * 18) - offset);
+          cc.restore();
+        } else {
+          temp_offset = -cc.measureText(rows[i][1]).width / 2;
         }
-        canvas_outline_text(cc, rows[i], [0, (i * 16) - offset]);
+
+        cc.save();
+        cc.font = "bold 14px " + prop.canvas.font;
+        if(i == 0) {
+          cc.save();
+          var c = new Color(planet.color);
+          c.setHsvComponentSaturation(clamp(0, c.getHsvComponentSaturation(), 90));
+          c.setHsvComponentValue(clamp(128, c.getHsvComponentValue(), 255));
+          cc.fillStyle = c.getCssValue();
+          var box_padding = [2, 9];
+          cc.fillRect(xoffset + col_padding + temp_offset - box_padding[0], (i * 18) - offset - box_padding[1],
+                      cc.measureText(rows[i][1]).width + box_padding[0] * 2, box_padding[1] * 2);
+          cc.fillStyle = "#000";
+          cc.fillText(rows[i][1], xoffset + col_padding + temp_offset, (i * 18) - offset);
+          cc.restore();
+        } else {
+          cc.fillText(rows[i][1], xoffset + col_padding + temp_offset, (i * 18) - offset);
+        }
+        cc.restore()
       }
 
       cc.restore();
@@ -452,8 +498,7 @@ function canvas_draw_fuel_hud(cc, ship, type) {
   var warning    = scrange(0.15, fraction, 0.20, 1, 0);
   var blink      = scrange(0.05, fraction, 0.10, 1, 0);
 
-  var blink_rate = scrange(0.00, fraction, 0.05, 16, 8);
-  var alpha      = crange(-1, Math.sin(game_time() * blink_rate), 1, 1 - (0.6 * blink), 1);
+  var alpha      = crange(-1, Math.sin(game_time() * 6), 1, 1 - (0.6 * blink), 1);
 
   cc.globalAlpha = alpha;
 

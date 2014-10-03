@@ -198,7 +198,7 @@ var Planet=Fiber.extend(function() {
         var temperature = this.getTemperature();
 
         if(temperature > 10 && temperature < 40 && this.atmosphere.density > 0.8 && this.atmosphere.density < 1.3) {
-          type += "; comfort zone";
+          type += "; habitable";
         }
       }
 
@@ -210,7 +210,8 @@ var Planet=Fiber.extend(function() {
 
       var temperature = (this.system.star.temperature * 100) / distance;
 
-      temperature *= crange(0, this.atmosphere.density, 2, 1, 3);
+      temperature *= crange(0, this.atmosphere.density, 3, 1, 6);
+      temperature *= crange(3, this.atmosphere.density, 9, 1, 10);
 
       return temperature;
     },
