@@ -77,7 +77,7 @@ function canvas_draw_ship(cc, ship) {
 
   var image = ship.model.images.normal;
 
-  if(ship.controls[1] > 0.2)
+  if(ship.thrust > 0.001)
     image = ship.model.images.engine;
   
   cc.drawImage(image, 0, 0, size, size, -size / 2, -size / 2, size, size);
@@ -327,7 +327,7 @@ function canvas_draw_ship_pointer(cc, ship) {
 
 function canvas_draw_ring_gauge(cc, options) {
 
-  var amount     = options.amount || 1;
+  var amount     = options.amount;
   var thickness  = options.thickness || 3;
   var radius     = options.radius || 30;
   var fade       = options.fade  || 1;
@@ -396,27 +396,31 @@ function canvas_draw_fuel_hud(cc, ship, type) {
   cc.save();
   cc.translate(-prop.canvas.size[0] / 2 + padding[0] + radius, prop.canvas.size[1] / 2 - padding[1] - radius);
 
-  cc.fillStyle   = "#ddd";
-  cc.strokeStyle = "#ddd";
+  var fraction   = ship.fuel[type].getFraction();
 
-  var thickness = 6;
+  var warning    = scrange(0.19, fraction, 0.21, 1, 0);
 
-  var label = null;
+  var alpha      = 1 - ((Math.sin(game_time() * 7) * 0.5 + 0.5) * warning);
 
-  var fuel_type = ship.model.fuel[type].type;
+  cc.globalAlpha = alpha;
 
-  label = prop.ship.fuels[fuel_type].element;
+  cc.fillStyle   = new Color("#ddd").blend(new Color("f42"), warning).getCssValue();
+
+  cc.strokeStyle = cc.fillStyle;
+
+  var fuel_type  = ship.model.fuel[type].type;
+  var label      = prop.ship.fuels[fuel_type].element;
 
   canvas_draw_ring_gauge(cc, {
     radius:     radius,
-    thickness:  thickness,
+    thickness:  6,
     stops:      true,
     stop_width: 1,
     spill:      0,
 
     label:      label,
     
-    amount:     ship.fuel[type].getFraction(),
+    amount:     fraction,
     max:        315
   });
 

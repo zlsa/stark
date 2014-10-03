@@ -14,9 +14,9 @@
     "impulse": {
       "type":       "xenon",
       "capacity":   30,
-      "efficiency": 0.4,
+      "efficiency": 0.5,
       "max_rate":   {
-        "output":   0.1,
+        "output":   1,
         "input":    1
       }
     },

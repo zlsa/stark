@@ -11,13 +11,13 @@ var MODULES=[
   "get",
   "assets",
 
-  "game",
-
+  "system",
   "star",
   "planet",
-  "system",
 
   "ship",
+
+  "game",
 
   "ui",
   "input",
@@ -257,6 +257,7 @@ function done() {
   call_module("*","done");
   async_wait(function() {
     prop.loaded=true;
+    prop.time.done=time();
     call_module("*","ready");
     if(UPDATE)
       requestAnimationFrame(update);

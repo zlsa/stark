@@ -67,6 +67,9 @@ function input_command_run(value) {
     } else {
       prop.game.ships.player.teleport(planet);
     }
+  } else if(cmd == "ifuel") {
+    var amount = parseFloat(data);
+    prop.game.ships.player.fuel.impulse.set(amount);
   } else if(cmd == "speedup") {
     prop.game.speedup = parseFloat(data);
   } else if(cmd == "save") {

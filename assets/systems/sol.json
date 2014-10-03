@@ -4,8 +4,8 @@
   "star": {
     "name":        "Sol",
     "radius":      1200,
-    "mass":        1200,
-    "temperature": "5800"
+    "mass":        5000,
+    "temperature": 5800
   },
 
   "planets": [
@@ -97,7 +97,7 @@
       "name":      "Mars",
       "color":      "#f53",
       "image":      "mars.png",
-      "distance":   95200,
+      "distance":   95230,
       "radius":     120,
       "offset":     10,
       "mass":       30,
@@ -119,7 +119,7 @@
           "environment": {
             "craters":    1
           },
-          "distance":   400,
+          "distance":   440,
           "radius":     25,
           "offset":    -45,
           "mass":       7,
@@ -133,7 +133,7 @@
           "environment": {
             "craters":    1
           },
-          "distance":   2500,
+          "distance":   2520,
           "radius":     35,
           "offset":     225,
           "mass":       7,
@@ -147,7 +147,7 @@
       "name":      "Jool",
       "color":      "#3f5",
       "type":       "gas",
-      "distance":   160000,
+      "distance":   176230,
       "radius":     350,
       "offset":     90,
       "mass":       200,
@@ -168,7 +168,7 @@
           "environment": {
             "craters":    0
           },
-          "distance":   2000,
+          "distance":   2450,
           "radius":     50,
           "offset":     20,
           "mass":       8,
@@ -193,7 +193,7 @@
       "environment": {
         "craters":    0.3
       },
-      "distance":   180000,
+      "distance":   225900,
       "radius":     30,
       "offset":     45,
       "mass":       5,

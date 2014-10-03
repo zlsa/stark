@@ -245,6 +245,7 @@ var Ship = Fiber.extend(function() {
       // automatically updated every frame
       this.mass         = 0;
       this.angular_mass = 0;
+      this.thrust       = 0;
 
       // updated every frame
       this.fuel         = {
@@ -298,7 +299,7 @@ var Ship = Fiber.extend(function() {
           this.fuel[type].fill();
 
           if(data.fuel && data.fuel[type])
-            this.fuel[type].set(data.fuel[type].amount || 1);
+            this.fuel[type].set(data.fuel[type].amount);
         }
 
       }
@@ -306,7 +307,11 @@ var Ship = Fiber.extend(function() {
     },
 
     updateFuel: function() {
-      this.fuel.impulse.rate.output = crange(0, this.controls[1], 1, 0, this.model.fuel.impulse.efficiency);
+      var fuel_rate_out = this.controls[1] * this.model.fuel.impulse.efficiency;
+      this.fuel.impulse.rate.output = fuel_rate_out;
+
+      if(this.fuel.impulse.isEmpty()) this.controls[1] = 0;
+
       prop.foo = this.fuel.impulse;
 
       this.fuel.impulse.update();
@@ -337,9 +342,9 @@ var Ship = Fiber.extend(function() {
       this.controls[0] = clamp(-3, this.controls[0], 3);
       this.controls[1] = clamp( 0, this.controls[1], 1);
 
-      var thrust = this.model.power.thrust * this.controls[1] * 10;
-      this.force[0] = Math.sin(this.angle) * thrust;
-      this.force[1] = Math.cos(this.angle) * thrust;
+      this.thrust = this.model.power.thrust * this.controls[1] * 10;
+      this.force[0] = Math.sin(this.angle) * this.thrust;
+      this.force[1] = Math.cos(this.angle) * this.thrust;
 
       this.angular_force = this.model.power.angle * this.controls[0];
     },
@@ -369,8 +374,6 @@ var Ship = Fiber.extend(function() {
       this.velocity[0] -= velocity[0];
       this.velocity[1] -= velocity[1];
 
-//      this.velocity[0] *= 1 - (damping);
-//      this.velocity[1] *= 1 - (damping);
       this.velocity[0] *= 1 - (damping * game_delta());
       this.velocity[1] *= 1 - (damping * game_delta());
 
@@ -417,7 +420,7 @@ var Ship = Fiber.extend(function() {
         }
       }
 
-      var position = p.getPosition(true, 0);
+      var position = p.getPosition(true, -0.3);
 
       this.position[0] = position[0];
       this.position[1] = position[1];
