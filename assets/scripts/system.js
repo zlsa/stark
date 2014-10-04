@@ -19,6 +19,57 @@ var System=Fiber.extend(function() {
       this.starfield = [];
 
     },
+
+    generate: function() {
+      Math.seedrandom(time());
+
+      this.name = "Untitled System 42";
+
+      this.star = new Star({
+        system: this
+      }).generate();
+
+      this.planets = [];
+
+      var planet_number = randint(3, 8);
+      for(var i=0;i<planet_number;i++) {
+        var planet = new Planet({
+          system: this
+        }).generate(this, i, planet_number);
+        this.planets.push(planet);
+      }
+
+      return this;
+    },
+
+    parse: function(data) {
+      console.log(data);
+
+      if(data.name) {
+        this.name = data.name;
+      }
+      
+      if(data.star) {
+        data.star.system = this;
+        this.star = new Star(data.star);
+      }
+
+      if(data.planets) {
+        for(var i=0;i<data.planets.length;i++) {
+          //        if(data.planets[i].offset) {
+          //          data.planets[i].offset = radians(data.planets[i].offset);
+          //        }
+          var p = data.planets[i];
+          p.system = this;
+          var planet = new Planet(p);
+          this.planets[i] = planet;
+        }
+      }
+
+    },
+
+    /* misc stuff */
+
     closestPlanet: function(position, touching) {
       if(!touching) touching = false;
       var closest_planet = null;
@@ -103,31 +154,6 @@ var System=Fiber.extend(function() {
       damping += this.star.dampingAt(position);
       return damping;
     },
-    parse: function(data) {
-      console.log(data);
-
-      if(data.name) {
-        this.name = data.name;
-      }
-      
-      if(data.star) {
-        data.star.system = this;
-        this.star = new Star(data.star);
-      }
-
-      if(data.planets) {
-        for(var i=0;i<data.planets.length;i++) {
-          //        if(data.planets[i].offset) {
-          //          data.planets[i].offset = radians(data.planets[i].offset);
-          //        }
-          var p = data.planets[i];
-          p.system = this;
-          var planet = new Planet(p);
-          this.planets[i] = planet;
-        }
-      }
-
-    },
     load: function(url) {
       this.content=new Content({
         type: "json",
@@ -175,13 +201,23 @@ var System=Fiber.extend(function() {
 
 function system_init_pre() {
   prop.system = {};
+
   prop.system.systems = [];
   
   prop.system.root = "assets/systems/";
 }
 
 function system_init() {
-  system_load("sol");
+//  system_load("sol");
+}
+
+function system_generate(name) {
+  if(!name) name = "Untitled System 42";
+  
+  var s = new System();
+  s.generate();
+
+  system_add(s);
 }
 
 function system_load(name, url) {
@@ -194,7 +230,10 @@ function system_load(name, url) {
 }
 
 function system_add(system) {
-  prop.system.systems.push(system);
+  if(prop.game && prop.game.system)
+    prop.game.systems.push(system);
+  else
+    prop.system.systems.push(system);
 }
 
 function system_get() {

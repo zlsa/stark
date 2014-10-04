@@ -50,6 +50,57 @@ var Planet=Fiber.extend(function() {
       this.parse(options);
 
     },
+
+    generate: function(system, number, total) {
+      this.name   = "P" + (number + 1);
+
+      this.distance = Math.max(((number * 200000 * random(0.5, 1.5)) + random(0, 5000)) / total, system.star.radius * random(10, 20));
+
+      this.radius = random(80, 200);
+
+      this.start_offset = random(0, Math.PI * 2);
+      this.offset       = this.start_offset;
+
+      this.period = this.distance * 0.03;
+
+      if(Math.random() > crange(AU, this.distance, AU*3, 0.99, 0.6)) this.radius += random(0, 200);
+      this.radius *= crange(10000, this.distance, AU*5, 0.8, 2);
+
+      this.mass  = crange(80, this.radius, 600, 10, 300) * random(0.8, 1.2);
+
+      var chance_of_gas = crange(150, this.radius, 250, 0, 1);
+
+      this.type = "rocky";
+      if(Math.random() < chance_of_gas) this.type = "gas";
+
+      var color = new Color();
+
+      color.setHsvComponentHue(Math.random() * 320);
+      color.setHsvComponentSaturation(random(64, 128) + (Math.random() > 0.8?random(0, 128):0));
+      color.setHsvComponentValue(random(128, 220));
+
+      this.color = color;
+
+      var density = Math.random() * crange(AU*0.5, Math.abs((AU * 1.5) - this.distance), AU*1.5, 1, 0.2) * 2;
+      
+      if(this.type == "gas") density = Math.max(1.2, density);
+
+      this.atmosphere = {
+        thickness: random(0.5, 2) * density,
+        density:   density,
+        colors: []
+      };
+
+      if(this.type == "gas") {
+        this.atmosphere.thickness = 10;
+      }
+      
+      if(density > 0.2)
+        this.atmosphere.colors.push([0.0, color.getCssValue()]);
+
+      return this;
+    },
+
     parse: function(data) {
       if(data.parent) {
         this.parent = data.parent;
@@ -192,9 +243,9 @@ var Planet=Fiber.extend(function() {
           type += " planet";
         }
       } else if(this.type == "rocky") {
-        if(this.atmosphere.density < 0.1) {
+        if(this.atmosphere.density < 0.05) {
           type += ", no atmosphere";
-        } else if(this.atmosphere.density > 0.8) {
+        } else if(this.atmosphere.density > 0.3) {
           type += " with atmosphere";
         } else {
           type += ", trace atmosphere";
@@ -241,6 +292,7 @@ var Planet=Fiber.extend(function() {
       return pclass;
     },
     getPopulation: function() {
+      if(this.type == "gas") return 0;
       var can_support = crange(0.9, this.getESI(), 1.0, 0, 40000);
       can_support    += crange(0.4, this.getESI(), 1.0, 0, 10);
 
@@ -277,7 +329,7 @@ var Planet=Fiber.extend(function() {
       var distance = distance2d(this.getPosition(true), position);
 //      if(distance > this.radius + this.atmosphere.thickness) return 0;
 
-      var density = Math.max(1, this.atmosphere.density);
+      var density = 1;
 
       var radius   = Math.max(this.radius, 60);
 

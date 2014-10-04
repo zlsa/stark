@@ -25,6 +25,20 @@ var Star=Fiber.extend(function() {
       this.render();
 
     },
+
+    generate: function() {
+      this.name = "Star";
+
+      this.radius = random(200, 8000);
+
+      this.mass  = crange(200, this.radius, 800, 7000, 3000);
+      this.mass += crange(800, this.radius, 8000, 0, 5000);
+
+      this.temperature = crange(200, this.radius, 8000, 8000, 3500);
+
+      return this;
+    },
+
     parse: function(data) {
       if(data.name) {
         this.name = data.name;

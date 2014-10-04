@@ -30,7 +30,9 @@ var Game = Fiber.extend(function() {
 
       this.mode = "fly";
 
-      this.system = null;
+      this.systems = prop.system.systems
+      this.systems.push(system_generate());
+      this.system  = null;
 
       this.ships = {};
 
@@ -70,14 +72,17 @@ var Game = Fiber.extend(function() {
     },
     
     complete: function() {
-      this.system = prop.system.systems[0];
+      this.system = this.systems[0];
       this.system.render();
       this.system.generateStarfield();
 
+      var first_planet = this.system.planets[0].name;
+      console.log(first_planet);
+
       for(var i=0;i<this.ships.auto.length;i++) {
-        this.ships.auto[i].teleport(this.system, ["earth"]);
+        this.ships.auto[i].teleport(this.system, first_planet);
       }
-      this.ships.player.teleport(this.system, ["earth"]);
+      this.ships.player.teleport(this.system, first_planet);
 
       this.paused = false;
     },

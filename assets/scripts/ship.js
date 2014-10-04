@@ -97,7 +97,6 @@ var ShipModel = Fiber.extend(function() {
             callback: function(status, data, payload) {
               if(status == "ok") {
                 this.images[payload] = data;
-                console.log(this.images);
               }
             }
           });
@@ -331,12 +330,13 @@ var Ship = Fiber.extend(function() {
       for(var i=0;i<planet.length;i++) {
         p = p.getChild(planet[i]);
         if(!p) {
-          console.log(planet[i], p);
           return false;
         }
       }
 
       var position = p.getPosition(true);
+
+      console.log(position, p);
 
       this.position[0] = position[0];
       this.position[1] = position[1];

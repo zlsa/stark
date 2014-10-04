@@ -173,19 +173,18 @@ var AU = 60000;
 
 function to_distance(d) {
   function r(d, p) {
-    if(p < 0) {
-      p = -p;
-      d /= p;
-      return Math.round(d) * p;
-    }
-    return d.toFixed(p);
+    var n = 0;
+    if(p == 0) n = Math.round(p);
+    else       n = d.toFixed(p);
+
+    return to_comma(n);
   };
   if(d < 50) {
-    return r(d / 1000, 2) + "m";
+    return r(d / 1000, 2) + " m";
   } else if(d > AU * 0.3) {
-    return r(d / AU, 2) + "au";
+    return r(d / AU, 2) + " au";
   } else {
-    return r(d, -1) + "km";
+    return to_comma(Math.round(d)) + " km";
   }
 }
 
@@ -194,28 +193,67 @@ var million     = 1000000;
 var billion     = 1000000000;
 var trillion    = 1000000000000;
 var quadrillion = 1000000000000000;
+var quintillion = 1000000000000000000;
+var sextillion  = 1000000000000000000000;
+var septillion  = 1000000000000000000000000;
 
-function to_number(d) {
+function to_number(d, truncate) {
   function r(d, p) {
-    if(p < 0) {
-      p = Math.round(p);
-      p = -p;
-      d /= p;
-      return Math.round(d) * p;
-    }
-    return d.toFixed(p);
+    var n = 0;
+    if(p == 0) n = Math.round(p);
+    else       n = d.toFixed(p);
+
+    return to_comma(n, truncate);
   };
-  if(d < 0.5 * thousand) {
-    return Math.round(d);
-  } else if(d < 0.5 * million) {
-    return r(d / thousand, 0) + " thousand";
-  } else if(d < 0.5 * billion) {
+  var threshold = 1.2;
+  if(d < threshold * thousand * 10) {
+    return to_comma(Math.round(d), truncate);
+  } else if(d < threshold * million) {
+    return r(d / thousand, 2) + " thousand";
+  } else if(d < threshold * billion) {
     return r(d / million, 2) + " million";
-  } else if(d < 0.5 * trillion) {
+  } else if(d < threshold * trillion) {
     return r(d / billion, 2) + " billion";
-  } else {
+  } else if(d < threshold * quadrillion) {
     return r(d / trillion, 2) + " trillion";
+  } else if(d < threshold * quintillion) {
+    return r(d / quadrillion, 2) + " quadrillion";
+  } else if(d < threshold * sextillion) {
+    return r(d / quintillion, 2) + " quintillion";
+  } else if(d < threshold * septillion) {
+    return r(d / sextillion, 2) + " sextillion";
+  } else {
+    return r(d / septillion, 2) + " septillion";
   }
+}
+
+function to_comma(number, truncate) {
+  if(!truncate) truncate = true;
+  var num = Math.abs(number);
+  var n = Math.floor(Math.round(num));
+
+  var buf = [];
+
+  var ns = n + "";
+  for(var i=ns.length;i>=3;i-=3) {
+    buf.push(ns.substr(i-3, 3));
+  }
+
+  if(i > 0) buf.push(ns.substr(0, i));
+
+  buf.reverse();
+
+  var fractional = mod(num, 1).toFixed(2) + "";
+
+  var prefix = "";
+  if(number < 0) prefix = "-";
+
+  buf = buf.join(",");
+
+  if(Math.abs(num - n) == 0 && truncate)
+    return prefix + buf;
+
+  return prefix + buf + "." + fractional.substr(fractional.indexOf(".") + 1);
 }
 
 function angle_difference(a, b) {
@@ -258,4 +296,32 @@ var Lowpass=function(mix) {
     this.value = (this.target * (1-mix)) + (this.value * mix);
   };
 };
+
+function choose_weight(l) {
+  if(l.length == 0) return;
+  if(typeof l[0] != typeof []) return choose(l);
+  // l = [[item, weight], [item, weight] ... ];
+  var weight  = 0;
+  for(var i=0;i<l.length;i++) {
+    weight += l[i][1];
+  }
+  var random = Math.random() * weight;
+  weight     = 0;
+  for(var i=0;i<l.length;i++) {
+    weight += l[i][1];
+    if(weight > random) {
+      return l[i][0];
+    }
+  }
+  console.log("OHSHIT");
+  return(null);
+}
+
+function weed_list(l, constraint) {
+  var weeded = [];
+  for(var i=0;i<l.length;i++) {
+    if(constraint(l[i])) weeded.push(l[i]);
+  }
+  return weeded;
+}
 
