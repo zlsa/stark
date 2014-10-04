@@ -247,3 +247,15 @@ function srt(seed, t, slowdown) {
   return Math.sin(t + seed) * 0.2 + Math.sin((t + seed) * 1.53 + 2898) * 0.2 + Math.sin((t + seed - 198498) * 0.82) * 0.2 + Math.sin((t + seed - 2982) * 0.1) * 0.3;
 }
 
+var Lowpass=function(mix) {
+  this.target = 0;
+  this.value = 0;
+
+  this.mix = mix;
+
+  this.tick=function() {
+    var mix=this.mix;
+    this.value = (this.target * (1-mix)) + (this.value * mix);
+  };
+};
+

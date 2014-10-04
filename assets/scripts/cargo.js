@@ -73,7 +73,12 @@ var FuelTank = Expendable.extend(function(base) {
 
       this.rate = {
         output: 0,
-        input:  0
+        input:  0,
+      };
+
+      this.lowpass = {
+        output: new Lowpass(0.9),
+        input:  new Lowpass(0.9),
       };
 
     },
@@ -92,6 +97,12 @@ var FuelTank = Expendable.extend(function(base) {
       this.rate.output = clamp(0, this.rate.output, this.max_rate.output);
       this.rate.input  = clamp(0, this.rate.input,  this.max_rate.input);
       this.flow = -this.rate.output + this.rate.input;
+
+      this.lowpass.output.target = this.rate.output;
+      this.lowpass.input.target  = this.rate.input;
+
+      this.lowpass.output.tick();
+      this.lowpass.input.tick();
     },
     update: function() {
       this.updateFuel();

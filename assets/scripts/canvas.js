@@ -498,12 +498,12 @@ function canvas_draw_ring_gauge(cc, options) {
     var r = crange(0, t, 1, -10, 0);
     var w = crange(0, t, 1, thickness, 0);
 
-    cc.globalAlpha *= scrange(0, t, 0.8, 0, 1);
+    cc.globalAlpha *= scrange(0, t, 1.0, 0, 1) * crange(0, options.secondary, 0.5, 0, 1);
     
-    cc.lineWidth = w;
+    cc.lineWidth = w * options.secondary;
 
     cc.beginPath();
-    cc.arc(0, 0, radius - thickness - 2 + r, 0, max);
+    cc.arc(0, 0, radius - thickness - 2 + r, 0, amount * max);
     cc.stroke();
   }
   
@@ -553,7 +553,7 @@ function canvas_draw_fuel_hud(cc, ship, type) {
   var warning    = scrange(0.15, fraction, 0.20, 1, 0);
   var blink      = scrange(0.01, fraction, 0.02, 1, 0);
 
-  var refueling  = ship.fuel.impulse.rate.input > 0.001;
+  var refueling  = ship.fuel[type].rate.input > 0.001;
 
   var fuel_type  = ship.model.fuel[type].type;
   var label      = prop.cargo.fuels[fuel_type].element;
@@ -571,7 +571,7 @@ function canvas_draw_fuel_hud(cc, ship, type) {
     stops:      true,
     stop_width: 1,
     spill:      0,
-    secondary:  refueling,
+    secondary:  ship.fuel[type].lowpass.input.value / ship.fuel[type].max_rate.input,
 
     label:      label,
     
