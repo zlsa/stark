@@ -6,7 +6,9 @@ var System=Fiber.extend(function() {
 
       this.name  = null;
 
-      this.star  = null;
+      this.star  = new Star({
+        system: this
+      });
 
       this.planets = [];
 
@@ -213,7 +215,7 @@ function system_init_pre() {
 }
 
 function system_init() {
-//  system_load("sol");
+  system_load("sol");
 }
 
 function system_generate(name) {

@@ -15,6 +15,11 @@ var Color=function(value) {
             equals(this.b,color.b) &&
             equals(this.opacity,color.opacity));
   };
+  this.adjustAsBackground=function() {
+    this.setHsvComponentSaturation(clamp(0, this.getHsvComponentSaturation(), 90));
+    this.setHsvComponentValue(clamp(128, this.getHsvComponentValue(), 255));
+    return this;
+  },
   this.getOpacity=function() {
     return(this.opacity);
   };

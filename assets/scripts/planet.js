@@ -106,6 +106,9 @@ var Planet=Fiber.extend(function() {
       if(density > 0.2)
         this.atmosphere.colors.push([0.0, this.color.getCssValue()]);
 
+      this.image = null;
+      this.cache = {};
+
       return this;
     },
 
@@ -207,6 +210,7 @@ var Planet=Fiber.extend(function() {
       };
       
       this.cache = {};
+      this.image = null;
 
     },
 

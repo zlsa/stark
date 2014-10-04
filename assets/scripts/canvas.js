@@ -86,13 +86,10 @@ function canvas_box_text(cc, options) {
   var size    = options.size || 14;
   var padding = [2, Math.ceil((size * 0.5) + 1)];
   var label   = options.label;
-  var color   = new Color(options.color || "#fff");
+  var color   = new Color(options.color || "#fff").adjustAsBackground();
   var pos     = [Math.round(options.position[0]), Math.round(options.position[1])];
   
   var width   = cc.measureText(label).width;
-
-  color.setHsvComponentSaturation(clamp(0, color.getHsvComponentSaturation(), 90));
-  color.setHsvComponentValue(clamp(128, color.getHsvComponentValue(), 255));
 
   cc.save();
   cc.fillStyle = color.getCssValue();
@@ -179,7 +176,7 @@ function canvas_draw_stats(cc, options) {
   prop.foo += 1;
   var rows       = options.rows;
   var distance   = options.distance;
-  var color      = options.color;
+  var color      = options.color.adjustAsBackground();
   var padding    = [40, 60];
 
   var pan_km     = [pixels_to_km(prop.ui.pan[0]), pixels_to_km(prop.ui.pan[1])];
@@ -236,7 +233,7 @@ function canvas_draw_stats(cc, options) {
         cc.font = "bold 14px " + prop.canvas.font;
         cc.save();
         cc.fillStyle = color.getCssValue();
-        cc.fillRect(xoffset + col_padding, (i * 18) - offset - 1, xoffset - 4, 2);
+        cc.fillRect(xoffset + col_padding - 2, (i * 18) - offset - 1, xoffset - 4, 2);
         cc.restore();
       } else {
         cc.globalAlpha *= 0.8;
