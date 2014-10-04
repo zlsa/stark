@@ -47,46 +47,55 @@ var Planet=Fiber.extend(function() {
       
       this.content = {};
 
+      this.cache = {};
+
       this.parse(options);
 
     },
 
-    generate: function(system, number, total) {
-      this.name   = "P" + (number + 1);
+    generate: function(number, total) {
+      if(!total) total = 3;
 
-      this.distance = Math.max(((number * 200000 * random(0.5, 1.5)) + random(0, 5000)) / total, system.star.radius * random(10, 20));
+      var ch = "abcdefghijklmnopqrstuvwxyz";
+
+      this.name = ch[this.system.planets.indexOf(this)];
+
+      this.distance = Math.max(((number * 200000 * random(0.5, 1.5)) + random(0, 5000)) / total, this.system.star.radius * random(10, 20));
+
+      if(number < 0) this.distance *= 0.05;
 
       this.radius = random(80, 200);
+
+      if(number < 0) this.radius *= 0.5;
 
       this.start_offset = random(0, Math.PI * 2);
       this.offset       = this.start_offset;
 
-      this.period = this.distance * 0.03;
+      this.period = this.distance * 0.05;
 
-      if(Math.random() > crange(AU, this.distance, AU*3, 0.99, 0.6)) this.radius += random(0, 200);
+      if(number >= 0) {
+        if(Math.random() > crange(AU, this.distance, AU*3, 0.99, 0.6)) this.radius += random(0, 200);
+      }
       this.radius *= crange(10000, this.distance, AU*5, 0.8, 2);
 
-      this.mass  = crange(80, this.radius, 600, 10, 300) * random(0.8, 1.2);
+      this.mass  = crange(30, this.radius, 600, 6, 300) * random(0.8, 1.2);
 
       var chance_of_gas = crange(150, this.radius, 250, 0, 1);
+      if(number >= 0) chance_of_gas = 0;
 
       this.type = "rocky";
       if(Math.random() < chance_of_gas) this.type = "gas";
 
-      var color = new Color();
-
-      color.setHsvComponentHue(Math.random() * 320);
-      color.setHsvComponentSaturation(random(64, 128) + (Math.random() > 0.8?random(0, 128):0));
-      color.setHsvComponentValue(random(128, 220));
-
-      this.color = color;
+      this.color.setHsvComponentHue(Math.random() * 320);
+      this.color.setHsvComponentSaturation(random(64, 128) + (Math.random() > 0.8?random(0, 128):0));
+      this.color.setHsvComponentValue(random(180, 255));
 
       var density = Math.random() * crange(AU*0.5, Math.abs((AU * 1.5) - this.distance), AU*1.5, 1, 0.2) * 2;
       
-      if(this.type == "gas") density = Math.max(1.2, density);
+      if(this.type == "gas") density = Math.max(1.0, density);
 
       this.atmosphere = {
-        thickness: random(0.5, 2) * density,
+        thickness: random(2, 7) * density,
         density:   density,
         colors: []
       };
@@ -96,7 +105,7 @@ var Planet=Fiber.extend(function() {
       }
       
       if(density > 0.2)
-        this.atmosphere.colors.push([0.0, color.getCssValue()]);
+        this.atmosphere.colors.push([0.0, this.color.getCssValue()]);
 
       return this;
     },
@@ -178,12 +187,27 @@ var Planet=Fiber.extend(function() {
 
       if(data.planets) {
         for(var i=0;i<data.planets.length;i++) {
-          var p = data.planets[i];
-          p.parent = this;
-          p.system = this.system;
-          this.planets[i] = new Planet(p);
+          //        if(data.planets[i].offset) {
+          //          data.planets[i].offset = radians(data.planets[i].offset);
+          //        }
+          if(this.planets.length > i) {
+            this.planets[i].parse(data.planets[i]);
+          } else {
+            var p = data.planets[i];
+            p.system = this.system;
+            p.parent = this;
+            var planet = new Planet(p);
+            this.planets.push(planet);
+          }
         }
       }
+      
+      this.canvas = {
+        planet: null,
+        atmosphere: null
+      };
+      
+      this.cache = {};
 
     },
 
@@ -234,6 +258,7 @@ var Planet=Fiber.extend(function() {
     /************************ STATS ************************/
 
     getType: function() {
+      if(this.cache.type) return this.cache.type;
       var type = this.type;
 
       if(this.type == "gas") {
@@ -255,6 +280,8 @@ var Planet=Fiber.extend(function() {
         }
       }
 
+      this.cache.type = type;
+
       return type;
     },
 
@@ -263,14 +290,17 @@ var Planet=Fiber.extend(function() {
       return false;
     },
     getESI: function() {
-      var score = 0;
+      if(this.cache.esi) return this.cache.esi;
+      var esi = 0;
 
-      score  = crange(20.0, Math.abs(20.0 - this.getTemperature()),   300.0, 0.5, 0);
-      score += crange( 0.6, Math.abs( 1.1 - this.atmosphere.density),   2.0, 0.5, 0);
+      esi  = crange(20.0, Math.abs(20.0 - this.getTemperature()),   300.0, 0.5, 0);
+      esi += crange( 0.6, Math.abs( 1.1 - this.atmosphere.density),   2.0, 0.5, 0);
 
-      return score;
+      this.cache.esi = esi;
+      return esi;
     },
     getPClass: function() {
+      if(this.cache.pclass) return this.cache.pclass;
       var pclass = "";
       var temperature = this.getTemperature();
       var mass        = this.mass;
@@ -289,28 +319,42 @@ var Planet=Fiber.extend(function() {
       else if(mass < 200 ) pclass += "neptunian";
       else                 pclass += "jovian";
 
+      this.cache.pclass = pclass;
       return pclass;
     },
     getPopulation: function() {
+      if(this.cache.population) return this.cache.population;
+
       if(this.type == "gas") return 0;
       var can_support = crange(0.9, this.getESI(), 1.0, 0, 40000);
-      can_support    += crange(0.4, this.getESI(), 1.0, 0, 10);
+      can_support    += crange(0.4, this.getESI(), 1.0, 0, 3);
 
       var area = Math.PI * 4 * (this.radius * this.radius);
 
       var population = can_support * area;
 
+      this.cache.population = population;
+
       return population;
     },
     getDistance: function() {
+      if(this.cache.distance) return this.cache.distance;
+
+      var distance;
       if(this.parent) {
-        return this.parent.getDistance();
+        distance = this.parent.getDistance();
       } else {
-        return this.distance;
+        distance = this.distance;
       }
+
+      this.cache.distance = distance;
+      return distance;
     },
     getTemperature: function() {
+      if(this.cache.temperature) return this.cache.temperature;
       var distance    = this.getDistance();
+
+      prop.foo = this;
 
       var temperature = (this.system.star.temperature * 2000) / (distance * distance * 0.0002);
 
@@ -320,6 +364,8 @@ var Planet=Fiber.extend(function() {
       temperature *= crange(3, this.atmosphere.density, 9, 1.0, 3);
       
       temperature -= crange(0, temperature, 10, 200, 0);
+      
+      this.cache.temperature = temperature;
 
       return temperature;
     },
@@ -430,52 +476,67 @@ var Planet=Fiber.extend(function() {
     renderRockyPlanet: function(cc, size, scale) {
       var center = size/2;
 
-      var s = crange(10, this.radius, 1000, 0.4, 3) * scale;
+      var s = crange(10, this.radius, 1000, 0.8, 5) * scale;
 
       var height = 1;
 
       cc.save();
 
-      cc.arc(center, center, kilometers(this.radius * scale) + 0.5, 0, Math.PI * 2);
+      cc.beginPath();
       cc.fillStyle = this.color.getCssValue();
+      cc.arc(center, center, kilometers(this.radius * scale) + 0.5, 0, Math.PI * 2);
       cc.fill();
 
       cc.clip();
 
-      var tilesize = 10;
+      var feature_number = Math.floor(this.radius * this.radius * 0.003 * random(0.7, 1.3));
 
-      var feature_number = this.radius * this.radius * 0.025 * random(0.7, 1.3);
+      function grad(crater, size) {
+        var g = cc.createRadialGradient(0, 0, 0, 0, 0, size/2);
 
-      for(var i=0;i<feature_number;i++) {
-        var c = new Color(this.color);
+        if(crater) {
+          g.addColorStop(0,   "rgba(0, 0, 0, 0.0)");
+          g.addColorStop(0.7, "rgba(0, 0, 0, 0.5)");
+          g.addColorStop(1,   "rgba(0, 0, 0, 0.0)");
+        } else {
+          g.addColorStop(0,   "rgba(0, 0, 0, 0.5)");
+          g.addColorStop(1,   "rgba(0, 0, 0, 0.0)");
+        }
+
+        return g;
+      }
+
+      var ps = 16;
+      var crater_fill   = grad(true, ps);
+      var mountain_fill = grad(false, ps);
+
+      var crater_number = feature_number * (this.environment.craters / 3);
+
+      cc.fillStyle = crater_fill;
+      for(var i=0;i<crater_number;i++) {
         var x = random(0, size);
         var y = random(0, size);
+        var feature_size = random(0.3, 8) * s;
+        cc.save();
+        cc.translate(x, y);
+        cc.scale(feature_size, feature_size);
+        cc.globalAlpha = random(0.2, 0.4);
+        cc.fillRect(-ps/2, -ps/2, ps, ps);
+        cc.restore();
 
-        var change = random(0.7, 1.1);
-        var crater = (random(0, 3)) < this.environment.craters && change < 1;
-        
-        var feature_size = random(kilometers(4) * s, kilometers(30) * s);
+      }
 
-        if(crater) feature_size *= 1.2;
-
-        c.setHsvComponentValue(c.getHsvComponentValue() * change);
-
-        if(crater) {
-          cc.fillStyle = cc.createRadialGradient(x, y + feature_size * 0.5, 0, x, y, feature_size * 2);
-        } else {
-          cc.fillStyle = cc.createRadialGradient(x, y, 0, x, y, feature_size * 2);
-        }
-
-        if(crater) {
-          cc.fillStyle.addColorStop(0,   c.setOpacity(0).getCssValue());
-          cc.fillStyle.addColorStop(0.7, c.setOpacity(1).getCssValue());
-          cc.fillStyle.addColorStop(1,   c.setOpacity(0).getCssValue());
-        } else {
-          cc.fillStyle.addColorStop(0, c.getCssValue());
-          cc.fillStyle.addColorStop(1, c.setOpacity(0).getCssValue());
-        }
-
-        cc.fillRect(x - feature_size * 2, y - feature_size * 2, feature_size * 4, feature_size * 4);
+      cc.fillStyle = mountain_fill;
+      for(var i=0;i<feature_number - crater_number;i++) {
+        var x = random(0, size);
+        var y = random(0, size);
+        var feature_size = random(0.3, 8) * s;
+        cc.save();
+        cc.translate(x, y);
+        cc.scale(feature_size, feature_size);
+        cc.globalAlpha = random(0.2, 0.4);
+        cc.fillRect(-ps/2, -ps/2, ps, ps);
+        cc.restore();
 
       }
 
@@ -552,6 +613,8 @@ var Planet=Fiber.extend(function() {
         var position = crange(0, color[0], 1, radius, 1);
         cc.fillStyle.addColorStop(position, new Color(color[1]).setOpacity(opacity).getCssValue());
       }
+
+      cc.globalAlpha = clamp(0, this.atmosphere.density, 1);
 
       cc.arc(center, center, center, 0, Math.PI * 2);
       cc.fill();

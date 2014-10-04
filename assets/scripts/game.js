@@ -77,7 +77,6 @@ var Game = Fiber.extend(function() {
       this.system.generateStarfield();
 
       var first_planet = this.system.planets[0].name;
-      console.log(first_planet);
 
       for(var i=0;i<this.ships.auto.length;i++) {
         this.ships.auto[i].teleport(this.system, first_planet);
@@ -169,12 +168,10 @@ var Game = Fiber.extend(function() {
 
       this.mode     = data.mode;
 
-      this.system   = new System(data.system);
+      this.system.parse(data.system);
       this.system.render();
 
-      this.ships    = {};
-
-      this.ships.player = new Ship(data.ships.player);
+      this.ships.player.parse(data.ships.player);
 
       this.ships.auto = [];
       for(var i=0;i<data.ships.auto.length;i++) {

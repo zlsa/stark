@@ -35,8 +35,9 @@ var System=Fiber.extend(function() {
       for(var i=0;i<planet_number;i++) {
         var planet = new Planet({
           system: this
-        }).generate(this, i, planet_number);
+        });
         this.planets.push(planet);
+        planet.generate(i, planet_number);
       }
 
       return this;
@@ -50,8 +51,7 @@ var System=Fiber.extend(function() {
       }
       
       if(data.star) {
-        data.star.system = this;
-        this.star = new Star(data.star);
+        this.star.parse(data.star);
       }
 
       if(data.planets) {
@@ -59,10 +59,14 @@ var System=Fiber.extend(function() {
           //        if(data.planets[i].offset) {
           //          data.planets[i].offset = radians(data.planets[i].offset);
           //        }
-          var p = data.planets[i];
-          p.system = this;
-          var planet = new Planet(p);
-          this.planets[i] = planet;
+          if(this.planets.length > i) {
+            this.planets[i].parse(data.planets[i]);
+          } else {
+            var p = data.planets[i];
+            p.system = this;
+            var planet = new Planet(p);
+            this.planets.push(planet);
+          }
         }
       }
 

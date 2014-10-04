@@ -206,10 +206,10 @@ function to_number(d, truncate) {
     return to_comma(n, truncate);
   };
   var threshold = 1.2;
-  if(d < threshold * thousand * 10) {
+  if(d < threshold * thousand * million) {
     return to_comma(Math.round(d), truncate);
-  } else if(d < threshold * million) {
-    return r(d / thousand, 2) + " thousand";
+//  } else if(d < threshold * million) {
+//    return r(d / thousand, 2) + " thousand";
   } else if(d < threshold * billion) {
     return r(d / million, 2) + " million";
   } else if(d < threshold * trillion) {
@@ -230,7 +230,7 @@ function to_number(d, truncate) {
 function to_comma(number, truncate) {
   if(!truncate) truncate = true;
   var num = Math.abs(number);
-  var n = Math.floor(Math.round(num));
+  var n = Math.floor(num);
 
   var buf = [];
 
@@ -323,5 +323,16 @@ function weed_list(l, constraint) {
     if(constraint(l[i])) weeded.push(l[i]);
   }
   return weeded;
+}
+
+function start_time() {
+  return time();
+}
+
+function end_time(t, message) {
+  var tm = time();
+  var elapsed = (tm - t).toFixed(3);
+  console.log(elapsed + " seconds elapsed: " + message);
+  return tm;
 }
 

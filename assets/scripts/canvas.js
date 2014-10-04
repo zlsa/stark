@@ -326,7 +326,7 @@ function canvas_draw_planet_stats(cc, system, planet) {
   rows.push(["orbit size",    to_distance(planet.getDistance())]);
   rows.push(["orbit period",  Math.round(planet.period / 60) + " minutes"]);
   rows.push(["mass",          to_number(planet.mass * 1000000000000000000) + " tons"]);
-  rows.push(["radius",        to_distance(Math.round(planet.radius * 30))]);
+  rows.push(["radius",        to_distance(Math.round(planet.radius * 50))]);
 
   canvas_draw_stats(cc, {
     distance: distance_to_viewport,

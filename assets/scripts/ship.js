@@ -324,7 +324,7 @@ var Ship = Fiber.extend(function() {
         this.position[1] = 0;
         this.velocity[0] = 0;
         this.velocity[1] = 0;
-        return;
+        return false;
       }
 
       for(var i=0;i<planet.length;i++) {
@@ -333,10 +333,10 @@ var Ship = Fiber.extend(function() {
           return false;
         }
       }
+      
+      if(p.star) return false;
 
       var position = p.getPosition(true);
-
-      console.log(position, p);
 
       this.position[0] = position[0];
       this.position[1] = position[1];
