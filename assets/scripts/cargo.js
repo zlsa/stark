@@ -66,6 +66,8 @@ var FuelTank = Expendable.extend(function(base) {
 
       base.init.call(this, options);
 
+      this.type = "xenon";
+
       this.max_rate = {
         output: 0,
         input:  0
@@ -77,8 +79,8 @@ var FuelTank = Expendable.extend(function(base) {
       };
 
       this.lowpass = {
-        output: new Lowpass(0.9),
-        input:  new Lowpass(0.9),
+        output: new Lowpass(0.1),
+        input:  new Lowpass(0.1),
       };
 
     },
@@ -91,18 +93,25 @@ var FuelTank = Expendable.extend(function(base) {
 
     },
     isEmpty: function() {
-      return (this.getAmount() < 0.01);
+      return (this.getFraction() < 0.0001);
+    },
+    isFull: function() {
+      return (this.getFraction() > 0.9999);
     },
     updateFuel: function() {
-      this.rate.output = clamp(0, this.rate.output, this.max_rate.output);
+      this.rate.output = clamp(0, this.rate.output, this.max_rate.output) * prop.cargo.fuels[this.type].loss;
       this.rate.input  = clamp(0, this.rate.input,  this.max_rate.input);
+
+      if(this.isFull())  this.rate.input  = 0;
+      if(this.isEmpty()) this.rate.output = 0;
+
       this.flow = -this.rate.output + this.rate.input;
 
       this.lowpass.output.target = this.rate.output;
       this.lowpass.input.target  = this.rate.input;
 
-      this.lowpass.output.tick();
-      this.lowpass.input.tick();
+      this.lowpass.output.tick(game_delta());
+      this.lowpass.input.tick(game_delta());
     },
     update: function() {
       this.updateFuel();
@@ -197,12 +206,19 @@ function cargo_init_pre() {
   prop.cargo = {};
 
   prop.cargo.fuels = {
+    "argon": {
+      weight:  0.03,
+      loss: 2,
+      element: "Ar"
+    },
     "xenon": {
       weight:  0.05,
+      loss: 1,
       element: "Xe"
     },
     "hydrogen": {
       weight: 0.015,
+      loss: 1,
       element: "H"
     }
   };

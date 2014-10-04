@@ -318,8 +318,13 @@ function canvas_draw_planet_stats(cc, system, planet) {
   rows.push(["temperature",   to_number(planet.getTemperature(), true) + " °C"]);
 
   rows.push(["fuels",         null]);
-  rows.push(["xenon fuel",    planet.canRefuel("xenon")]);
-  rows.push(["hydrogen fuel", planet.canRefuel("hydrogen")]);
+
+  var types = ["impulse", "jump"];
+
+  for(var i=0;i<types.length;i++) {
+    var type = prop.game.ships.player.model.fuel[types[i]].type;
+    rows.push([type + " fuel",    planet.canRefuel(type)]);
+  }
 
   rows.push(["stats",         null]);
   rows.push(["pressure",      planet.atmosphere.density.toFixed(2) + " atm"]);
@@ -629,8 +634,6 @@ function canvas_draw_fuel_hud(cc, ship, type) {
 
   cc.strokeStyle = cc.fillStyle;
 
-  refueling      = crange(0.95, fraction, 1, refueling, 0);
-
   var flow       = refueling;
 //  flow          -= (ship.fuel[type].lowpass.output.value / ship.fuel[type].max_rate.output) * 0.5;
 
@@ -639,7 +642,7 @@ function canvas_draw_fuel_hud(cc, ship, type) {
     thickness:  6,
     stops:      true,
     secondary:  flow,
-    rate:       ship.fuel[type].lowpass.input.value,
+    rate:       ship.fuel[type].lowpass.input.value * 0.5,
 
     label:      label,
     

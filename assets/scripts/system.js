@@ -74,13 +74,14 @@ var System=Fiber.extend(function() {
 
     /* misc stuff */
 
-    closestPlanet: function(position, touching) {
+    closestPlanet: function(position, touching, factor) {
       if(!touching) touching = false;
+      if(!factor)   factor = 1;
       var closest_planet = null;
       var closest        = Infinity;
 
       for(var i=0;i<this.planets.length;i++) {
-        var p = this.planets[i].closestPlanet(position, touching);
+        var p = this.planets[i].closestPlanet(position, touching, factor);
         if(p[1] < closest) {
           closest_planet = p[0];
           closest        = p[1];

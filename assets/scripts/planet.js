@@ -250,7 +250,9 @@ var Planet=Fiber.extend(function() {
     /************************ TRADING ************************/
 
     canRefuel: function(fuel_type) {
-      if(this.getPopulation() > 500000) return true;
+      if(this.getPopulation() > 200000 && fuel_type == "argon") return true;
+      if(this.getPopulation() > 500000 && fuel_type == "xenon") return true;
+      if(this.getPopulation() > 750000 && fuel_type == "hydrogen") return true;
       return false;
     },
 
@@ -432,19 +434,20 @@ var Planet=Fiber.extend(function() {
       return force;
     },
 
-    closestPlanet: function(position, touching) {
+    closestPlanet: function(position, touching, factor) {
       if(!touching) touching = false;
+      if(!factor)   factor = 1;
       var closest_planet = null;
       var closest        = Infinity;
 
       var distance = distance2d(position, this.getPosition(true));
-      if((touching && distance < this.radius) || !touching) {
+      if((touching && distance < this.radius * factor) || !touching) {
         closest_planet = this;
         closest        = distance;
       }
 
       for(var i=0;i<this.planets.length;i++) {
-        var p = this.planets[i].closestPlanet(position, touching);
+        var p = this.planets[i].closestPlanet(position, touching, factor);
 
         if(p[1] < closest) {
           closest_planet = p[0];

@@ -16,11 +16,11 @@
 
   "fuel": {
     "impulse": {
-      "type":       "xenon",
+      "type":       "argon",
       "capacity":   30,
       "max_rate":   {
         "output":   0.3,
-        "input":    1
+        "input":    1.5
       }
     },
     "jump": {

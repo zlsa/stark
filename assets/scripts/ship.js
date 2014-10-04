@@ -197,6 +197,7 @@ var Ship = Fiber.extend(function() {
         var types = ["impulse", "jump"];
         for(var i=0;i<types.length;i++) {
           var type = types[i];
+          this.fuel[type].type     = this.model.fuel[type].type;
           this.fuel[type].max_rate = this.model.fuel[type].max_rate;
           this.fuel[type].weight   = prop.cargo.fuels[this.model.fuel[type].type].weight;
           this.fuel[type].capacity = this.model.fuel[type].capacity;
@@ -210,17 +211,25 @@ var Ship = Fiber.extend(function() {
       }
 
     },
+    
+    getSpeed: function(relative) {
+      if(relative) {
+        var velocity = system_get().velocityAt(this.position);
+        return distance2d(this.velocity, velocity);
+      }
+      return distance2d(this.velocity);
+    },
 
     updateFuel: function() {
       var fuel_rate_out = this.controls[1] * this.model.fuel.impulse.max_rate.output;
       this.fuel.impulse.rate.output = fuel_rate_out;
 
-      var closest_planet = system_get().closestPlanet(this.position, true);
+      var closest_planet = system_get().closestPlanet(this.position, true, 0.5);
 
       var types = ["impulse", "jump"];
       for(var i=0;i<types.length;i++) {
         var type = types[i];
-        if(closest_planet && closest_planet.canRefuel(this.model.fuel[type].type)) {
+        if(closest_planet && closest_planet.canRefuel(this.model.fuel[type].type) && this.getSpeed(true) < 10) {
           this.fuel[type].rate.input = this.model.fuel[type].max_rate.input;
         } else {
           this.fuel[type].rate.input = 0;
