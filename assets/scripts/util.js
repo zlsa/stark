@@ -177,14 +177,14 @@ function to_distance(d) {
     if(p == 0) n = Math.round(p);
     else       n = d.toFixed(p);
 
-    return to_comma(n);
+    return to_comma(n, false);
   };
   if(d < 50) {
     return r(d / 1000, 2) + " m";
   } else if(d > AU * 0.3) {
     return r(d / AU, 2) + " au";
   } else {
-    return to_comma(Math.round(d)) + " km";
+    return to_comma(Math.round(d), true) + " km";
   }
 }
 
@@ -207,7 +207,7 @@ function to_number(d, truncate) {
   };
   var threshold = 1.2;
   if(d < threshold * thousand * million) {
-    return to_comma(Math.round(d), truncate);
+    return to_comma(Math.round(d), true);
 //  } else if(d < threshold * million) {
 //    return r(d / thousand, 2) + " thousand";
   } else if(d < threshold * billion) {
@@ -228,7 +228,6 @@ function to_number(d, truncate) {
 }
 
 function to_comma(number, truncate) {
-  if(!truncate) truncate = true;
   var num = Math.abs(number);
   var n = Math.floor(num);
 
@@ -250,7 +249,7 @@ function to_comma(number, truncate) {
 
   buf = buf.join(",");
 
-  if(Math.abs(num - n) == 0 && truncate)
+  if(truncate)
     return prefix + buf;
 
   return prefix + buf + "." + fractional.substr(fractional.indexOf(".") + 1);
@@ -292,7 +291,7 @@ var Lowpass=function(mix) {
   this.mix = mix;
 
   this.tick=function() {
-    var mix=this.mix;
+    var mix = this.mix;
     this.value = (this.target * (1-mix)) + (this.value * mix);
   };
 };
@@ -336,3 +335,7 @@ function end_time(t, message) {
   return tm;
 }
 
+function sign(n) {
+  if(n < 0) return -1;
+  return 1;
+}

@@ -70,10 +70,22 @@ var Game = Fiber.extend(function() {
         this.pause();
       }
     },
+
+    generate: function() {
+      this.system.generate();
+
+      this.system.update();
+
+      var first_planet = this.system.planets[0].name;
+
+      for(var i=0;i<this.ships.auto.length;i++) {
+        this.ships.auto[i].teleport(this.system, first_planet);
+      }
+      this.ships.player.teleport(this.system, first_planet);
+    },
     
     complete: function() {
       this.system = this.systems[0];
-      this.system.render();
       this.system.generateStarfield();
 
       var first_planet = this.system.planets[0].name;

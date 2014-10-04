@@ -81,7 +81,6 @@ var Planet=Fiber.extend(function() {
       this.mass  = crange(30, this.radius, 600, 6, 300) * random(0.8, 1.2);
 
       var chance_of_gas = crange(150, this.radius, 250, 0, 1);
-      if(number >= 0) chance_of_gas = 0;
 
       this.type = "rocky";
       if(Math.random() < chance_of_gas) this.type = "gas";
@@ -489,7 +488,7 @@ var Planet=Fiber.extend(function() {
 
       cc.clip();
 
-      var feature_number = Math.floor(this.radius * this.radius * 0.003 * random(0.7, 1.3));
+      var feature_number = Math.floor(this.radius * this.radius * 0.006 * random(0.7, 1.3));
 
       function grad(crater, size) {
         var g = cc.createRadialGradient(0, 0, 0, 0, 0, size/2);
@@ -516,7 +515,7 @@ var Planet=Fiber.extend(function() {
       for(var i=0;i<crater_number;i++) {
         var x = random(0, size);
         var y = random(0, size);
-        var feature_size = random(0.3, 8) * s;
+        var feature_size = random(0.3, 7) * s;
         cc.save();
         cc.translate(x, y);
         cc.scale(feature_size, feature_size);
@@ -530,7 +529,7 @@ var Planet=Fiber.extend(function() {
       for(var i=0;i<feature_number - crater_number;i++) {
         var x = random(0, size);
         var y = random(0, size);
-        var feature_size = random(0.3, 8) * s;
+        var feature_size = random(1, 4) * s;
         cc.save();
         cc.translate(x, y);
         cc.scale(feature_size, feature_size);
@@ -614,7 +613,7 @@ var Planet=Fiber.extend(function() {
         cc.fillStyle.addColorStop(position, new Color(color[1]).setOpacity(opacity).getCssValue());
       }
 
-      cc.globalAlpha = clamp(0, this.atmosphere.density, 1);
+      cc.globalAlpha = crange(0, this.atmosphere.density, 0.9, 0.5, 1);
 
       cc.arc(center, center, center, 0, Math.PI * 2);
       cc.fill();

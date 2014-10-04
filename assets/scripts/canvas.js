@@ -517,11 +517,13 @@ function canvas_draw_ring_gauge(cc, options) {
   var thickness  = options.thickness || 3;
   var radius     = options.radius || 30;
   var fade       = options.fade  || 1;
-  var spill      = options.spill || 0;
+  var spill      = 0;
   var stops      = options.stops || false;
-  var stop_width = options.stop_width || 1;
+  var stop_width = 1;
   var max        = radians(options.max || 360);
   var start      = radians(options.start) || (Math.PI - (max * 0.5));
+  var secondary  = options.secondary;
+  var rate       = options.rate || 1;
 
   cc.lineWidth = thickness;
   cc.lineEnd   = "butt";
@@ -538,18 +540,33 @@ function canvas_draw_ring_gauge(cc, options) {
   cc.arc(0, 0, radius - 0.5, 0, max);
   cc.stroke();
 
-  if(options.secondary) {
-    var t = mod(game_time(), 1);
-    var r = crange(0, t, 1, -10, 0);
-    var w = crange(0, t, 1, thickness, 0);
+  if(secondary) {
+    var rings = 3;
+    var full  = 1;
+    var part  = crange(0, rate, 1, 0, 0.2);
 
-    cc.globalAlpha *= scrange(0, t, 1.0, 0, 1) * crange(0, options.secondary, 0.5, 0, 1);
-    
-    cc.lineWidth = w * options.secondary;
+    for(var i=0;i<rings;i++) {
+      var t = (((game_time()) - (full / rings * i)) % full) / full;
+      if(secondary < 0) {
+        t = 1-t;
+      }
+      var r = crange(0, t, 1, -16, 0);
+      var w = crange(0, t, 1, Math.ceil(thickness * 0.5), Math.ceil(thickness * 0.2));
+      var offset = 0;//crange(0, t, 1, -0.05, 0);
 
-    cc.beginPath();
-    cc.arc(0, 0, radius - thickness - 2 + r, 0, amount * max);
-    cc.stroke();
+      cc.save();
+      cc.globalAlpha *= scrange(0, t, 0.8, 0, 1) * crange(0, Math.abs(secondary), 0.5, 0, 1);
+      
+      cc.lineWidth = w * Math.abs(secondary);
+
+      cc.beginPath();
+      if(amount < part)
+        cc.arc(0, 0, radius - thickness - 1 + r, (offset) * max, (offset + amount) * max);
+      else
+        cc.arc(0, 0, radius - thickness - 1 + r, (amount - part + offset) * max, (offset + amount) * max);
+      cc.stroke();
+      cc.restore();
+    }
   }
   
   cc.restore();
@@ -598,7 +615,7 @@ function canvas_draw_fuel_hud(cc, ship, type) {
   var warning    = scrange(0.15, fraction, 0.20, 1, 0);
   var blink      = scrange(0.01, fraction, 0.02, 1, 0);
 
-  var refueling  = ship.fuel[type].rate.input > 0.001;
+  var refueling  = ship.fuel[type].lowpass.input.value / ship.fuel[type].max_rate.input;
 
   var fuel_type  = ship.model.fuel[type].type;
   var label      = prop.cargo.fuels[fuel_type].element;
@@ -606,17 +623,23 @@ function canvas_draw_fuel_hud(cc, ship, type) {
   var alpha      = crange(-1, Math.sin(game_time() * 11), 1, 1 - (0.8 * blink), 1);
 
   cc.globalAlpha = alpha;
+  
+  var color = new Color("#ddd").blend(new Color("#f42"), warning);
+  cc.fillStyle   = color.blend(new Color("#6f6"), refueling).getCssValue();
 
-  cc.fillStyle   = new Color("#ddd").blend(new Color("#f42"), warning).getCssValue();
   cc.strokeStyle = cc.fillStyle;
+
+  refueling      = crange(0.95, fraction, 1, refueling, 0);
+
+  var flow       = refueling;
+//  flow          -= (ship.fuel[type].lowpass.output.value / ship.fuel[type].max_rate.output) * 0.5;
 
   canvas_draw_ring_gauge(cc, {
     radius:     radius,
     thickness:  6,
     stops:      true,
-    stop_width: 1,
-    spill:      0,
-    secondary:  ship.fuel[type].lowpass.input.value / ship.fuel[type].max_rate.input,
+    secondary:  flow,
+    rate:       ship.fuel[type].lowpass.input.value,
 
     label:      label,
     

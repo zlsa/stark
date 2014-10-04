@@ -77,6 +77,8 @@ function input_command_run(value) {
     prop.game.speedup = parseFloat(data);
   } else if(cmd == "save") {
     storage.set("savegame", prop.game.save());
+  } else if(cmd == "gen") {
+    prop.game.generate();
   } else if(cmd == "restore") {
     prop.game.restore(storage.get("savegame"));
   }
