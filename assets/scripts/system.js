@@ -12,13 +12,15 @@ var System=Fiber.extend(function() {
 
       this.planets = [];
 
-      if(options.url) {
-        this.load(options.url);
-      } else {
-        this.parse(options);
-      }
+      this.cache = {};
 
       this.starfield = [];
+
+      this.parse(options);
+
+      if(options.url) {
+        this.load(options.url);
+      }
 
     },
 
@@ -41,6 +43,8 @@ var System=Fiber.extend(function() {
         this.planets.push(planet);
         planet.generate(i, planet_number);
       }
+
+      this.updatePlanetInfo();
 
       return this;
     },
@@ -72,9 +76,48 @@ var System=Fiber.extend(function() {
         }
       }
 
+      this.updatePlanetInfo();
+
     },
 
     /* misc stuff */
+
+    getPlanetNumber: function() {
+      return this.cache.planet_number;
+    },
+
+    getPopulation: function() {
+      return this.cache.population;
+    },
+    getPopulationString: function() {
+      var pop = this.getPopulation();
+      if(pop > 10000)
+        pop = "about " + to_number(pop);
+      else if(pop > 1000)
+        pop = "< 10000, ±8%";
+      else if(pop > 500)
+        pop = "< 1000, ±3%";
+      else
+        pop = "0";
+
+      return pop;
+    },
+
+    updatePlanetInfo: function() {
+      // planet number
+      var number = 0;
+      for(var i=0;i<this.planets.length;i++) {
+        number += this.planets[i].getPlanetNumber();
+      }
+      this.cache.planet_number = number;
+
+      // planet population
+      number = 0;
+      for(var i=0;i<this.planets.length;i++) {
+        number += this.planets[i].getPopulation(true);
+      }
+      this.cache.population = number;
+    },
 
     closestPlanet: function(position, touching, factor) {
       if(!touching) touching = false;

@@ -339,3 +339,15 @@ function sign(n) {
   if(n < 0) return -1;
   return 1;
 }
+
+function to_percent(n) {
+  return Math.round(n * 100) + "%";
+}
+
+function to_ship_weight(n) {
+  return to_number(n * 1000);
+}
+
+function to_system_weight(n) {
+  return to_number(n * 1000000000000000000);
+}

@@ -29,6 +29,8 @@ function input_init_pre() {
     down:    40,
     enter:   13,
     escape:  27,
+    lbracket: 219,
+    rbracket: 221,
   };
 }
 
@@ -101,6 +103,10 @@ function input_keydown(keycode) {
     $("#debug").addClass("hidden");
     $("#debug-command").blur();
     return true;
+  } else if(keycode == prop.input.keysym.lbracket) {
+    prop.ui.stats -= 1;
+  } else if(keycode == prop.input.keysym.rbracket) {
+    prop.ui.stats += 1;
   }
   return false;
   // called with the users' key-repeat settings

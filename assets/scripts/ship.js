@@ -8,7 +8,6 @@ var ShipModel = Fiber.extend(function() {
 
       this.name         = "";
       this.manufacturer = "";
-      this.name         = "";
 
       this.cargo = {
         capacity: 30
@@ -131,6 +130,7 @@ var Ship = Fiber.extend(function() {
 
       // 'player' or 'auto'
       this.type     = "player";
+      this.name     = "";
 
       // ... basic stuff
       this.position = [0, 0];
@@ -209,9 +209,21 @@ var Ship = Fiber.extend(function() {
         }
 
       }
+      
+      this.generateName();
 
     },
     
+    generateName: function() {
+      var s = choose("aaaabbbcdeeeeffgggghjjkkllmmnnnpppqrsstttuuvvvvwxy").toUpperCase();
+      s += "-";
+      for(var i=0;i<4;i++) {
+        s += randint(0, 10);
+      }
+      this.name = s;
+//      if(this.type == "player")
+    },
+
     getSpeed: function(relative) {
       if(relative) {
         var velocity = system_get().velocityAt(this.position);
@@ -242,6 +254,13 @@ var Ship = Fiber.extend(function() {
     },
     updateMass: function() {
       this.mass = this.model.mass;
+
+      var types = ["impulse", "jump"];
+      for(var i=0;i<types.length;i++) {
+        var type = types[i];
+        this.mass += this.fuel[type].getWeight();
+      }
+
       this.angular_mass = this.model.angular_mass;
     },
     updateAssist: function() {

@@ -214,6 +214,13 @@ var Planet=Fiber.extend(function() {
 
     },
 
+    getPlanetNumber: function() {
+      var number = 1;
+      for(var i=0;i<this.planets.length;i++) {
+        number += this.planets[i].getPlanetNumber();
+      }
+      return number;
+    },
     // CHILDREN
     getChild: function(name) {
       name = name.toLowerCase();
@@ -327,21 +334,50 @@ var Planet=Fiber.extend(function() {
       this.cache.pclass = pclass;
       return pclass;
     },
-    getPopulation: function() {
-      if(this.cache.population) return this.cache.population;
+    getPopulation: function(recursive) {
+      var number = 0;
 
-      if(this.type == "gas") return 0;
-      var can_support = crange(0.9, this.getESI(), 1.0, 0, 40000);
-      can_support    += crange(0.4, this.getESI(), 1.0, 0, 3);
+      if(recursive) {
+        for(var i=0;i<this.planets.length;i++) {
+          number += this.planets[i].getPopulation(true);
+        }
+      }
 
-      var area = Math.PI * 4 * (this.radius * this.radius);
+      if(this.cache.population) {
+        number += this.cache.population;
+      } else {
+        if(this.type == "gas") {
+          number = 0;
+        } else {
+          var can_support = crange(0.9, this.getESI(), 1.0, 0, 40000);
+          can_support    += crange(0.4, this.getESI(), 1.0, 0, 3);
 
-      var population = can_support * area;
+          var area = Math.PI * 4 * (this.radius * this.radius);
 
-      this.cache.population = population;
+          var population = can_support * area;
 
-      return population;
+          this.cache.population = population;
+
+          number += population;
+        }
+      }
+
+      return number;
     },
+    getPopulationString: function() {
+      var pop = this.getPopulation();
+      if(pop > 10000)
+        pop = to_number(pop) + ", ±5%";
+      else if(pop > 1000)
+        pop = "< 10000, ±8%";
+      else if(pop > 500)
+        pop = "< 1000, ±3%";
+      else
+        pop = "0";
+
+      return pop;
+    },
+
     getDistance: function() {
       if(this.cache.distance) return this.cache.distance;
 

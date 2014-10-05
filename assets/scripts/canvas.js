@@ -192,7 +192,7 @@ function canvas_draw_stats(cc, options) {
 
   cc.translate(-(prop.canvas.size[0] * 0.5) + padding[0] - ((1 - alpha) * 40), -(prop.canvas.size[1] * 0.5) + padding[0]);
 
-  cc.globalAlpha = alpha;
+  cc.globalAlpha *= alpha;
 
   for(var i=0;i<rows.length;i++) {
     rows[i][0] = rows[i][0].toUpperCase();
@@ -257,7 +257,7 @@ function canvas_draw_stats(cc, options) {
       }
     }
 
-    if(i == 0) {
+    if(i == 0 && text) {
       canvas_box_text(cc, {
         label:    text,
         position: [xoffset + col_padding + temp_offset, (i * 18) - offset],
@@ -278,9 +278,11 @@ function canvas_draw_stats(cc, options) {
 function canvas_draw_planet_stats(cc, system, planet) {
   var p = planet.getPosition(true);
 
+  var total = 0;
+
   if(planet.planets) {
     for(var i=0;i<planet.planets.length;i++) {
-      canvas_draw_planet_stats(cc, system, planet.planets[i]);
+      total += canvas_draw_planet_stats(cc, system, planet.planets[i]);
     }
   }
 
@@ -292,26 +294,19 @@ function canvas_draw_planet_stats(cc, system, planet) {
 
   var alpha = scrange(small_ring * 0.1, distance_to_viewport, large_ring * 0.3, 1, 0);
 
-  if(alpha < 0.01) return;
+  total += alpha;
+  if(alpha < 0.01) return total;
 
   var rows = [];
 
-  rows.push(["name",          planet.name]);
+  rows.push(["planet name",   planet.name]);
   
   rows.push(["about",         null]);
 
   rows.push(["type",          capitalize(planet.getType())]);
   rows.push(["class",         planet.getPClass()]);
   rows.push(["esi",           planet.getESI().toFixed(2)]);
-  var pop = planet.getPopulation();
-  if(pop > 10000)
-    rows.push(["population",  to_number(pop) + ", ±5%"]);
-  else if(pop > 1000)
-    rows.push(["population",  "< 10000, ±8%"]);
-  else if(pop > 500)
-    rows.push(["population",  "< 1000, ±3%"]);
-  else
-    rows.push(["population",  "0"]);
+  rows.push(["population",    planet.getPopulationString()]);
   rows.push(["temperature",   to_number(planet.getTemperature(), true) + " °C"]);
 
   rows.push(["fuels",         null]);
@@ -327,7 +322,7 @@ function canvas_draw_planet_stats(cc, system, planet) {
   rows.push(["pressure",      planet.atmosphere.density.toFixed(2) + " atm"]);
   rows.push(["orbit size",    to_distance(planet.getDistance())]);
   rows.push(["orbit period",  Math.round(planet.period / 60) + " minutes"]);
-  rows.push(["mass",          to_number(planet.mass * 1000000000000000000) + " tons"]);
+  rows.push(["mass",          to_system_weight(planet.mass) + " tons"]);
   rows.push(["radius",        to_distance(Math.round(planet.radius * 50))]);
 
   canvas_draw_stats(cc, {
@@ -335,6 +330,74 @@ function canvas_draw_planet_stats(cc, system, planet) {
     rows:     rows,
 
     color:    planet.color
+  });
+
+  return total;
+}
+
+function canvas_draw_system_stats(cc, system) {
+
+  var star = system.star;
+
+  canvas_draw_stats(cc, {
+    distance: 0,
+    rows:     [
+      ["system name",       system.name],
+
+      ["about",             null],
+      ["planets",           system.getPlanetNumber()],
+      ["population",        system.getPopulationString()],
+
+      ["star",              null],
+      ["mass",              to_system_weight(star.mass) + " tons"],
+      ["radius",            to_distance(star.radius)],
+      ["temperature",       to_number(star.temperature)],
+    ],
+
+    color:    new Color().setColorTemperatureValue(system.star.temperature)
+  });
+}
+
+function canvas_draw_ship_stats(cc, ship) {
+  var p = ship.position;
+
+  var pan_km     = [pixels_to_km(prop.ui.pan[0]), pixels_to_km(prop.ui.pan[1])];
+  
+  var small_ring = pixels_to_km(Math.min(prop.canvas.size[0], prop.canvas.size[1]) / 2 - 20);
+  var large_ring = pixels_to_km(Math.max(prop.canvas.size[0], prop.canvas.size[1]) / 2 + 20);
+  var distance_to_viewport = distance2d([-p[0], p[1]], pan_km);
+
+  var alpha = scrange(small_ring * 0.1, distance_to_viewport, large_ring * 0.3, 1, 0);
+
+  if(alpha < 0.01) return;
+
+  var rows = [];
+
+  rows.push(["ship name",     ship.name]);
+  
+  rows.push(["about",         null]);
+
+  rows.push(["model",         ship.model.name]);
+  rows.push(["manufacturer",  capitalize(ship.model.manufacturer)]);
+
+  rows.push(["fuels",         null]);
+
+  var types = ["impulse", "jump"];
+
+  for(var i=0;i<types.length;i++) {
+    var type = ship.model.fuel[types[i]].type;
+    rows.push([types[i] + " fuel", capitalize(type)]);
+  }
+
+  rows.push(["stats",         null]);
+  rows.push(["mass",          to_ship_weight(ship.mass) + " tons"]);
+  rows.push(["dry mass",      to_ship_weight(ship.model.mass) + " tons"]);
+
+  canvas_draw_stats(cc, {
+    distance: distance_to_viewport,
+    rows:     rows,
+
+    color:    new Color("#fff")
   });
 
 }
@@ -694,7 +757,7 @@ function canvas_draw_system(cc) {
 
 function canvas_draw_hud(cc) {
   var system = system_get();
-
+  
   for(var i=0;i<system.planets.length;i++) {
     canvas_draw_planet_pointer(cc, system, system.planets[i]);
   }
@@ -703,8 +766,47 @@ function canvas_draw_hud(cc) {
     canvas_draw_ship_pointer(cc, prop.game.ships.auto[i]);
   }
 
-  for(var i=0;i<system.planets.length;i++) {
-    canvas_draw_planet_stats(cc, system, system.planets[i]);
+  var amount = 0;
+
+  amount = ui_stats_amount("planet");
+  if(Math.abs(amount) < 0.95) {
+    cc.save();
+    cc.globalAlpha *= 1 - Math.abs(amount);
+    cc.translate(-70 * amount, 0);
+    var total = 0;
+    for(var i=0;i<system.planets.length;i++) {
+      total +=  canvas_draw_planet_stats(cc, system, system.planets[i]);
+    }
+    if(total < 0.9) {
+      cc.globalAlpha *= crange(0, total, 0.9, 1, 0);
+      canvas_draw_stats(cc, {
+        distance: 0,
+        rows:     [
+          ["no nearby planets", null],
+        ],
+
+        color:    new Color().setColorTemperatureValue(system.star.temperature)
+      });
+    }
+    cc.restore();
+  }
+
+  amount = ui_stats_amount("ship");
+  if(Math.abs(amount) < 0.95) {
+    cc.save();
+    cc.globalAlpha *= 1 - Math.abs(amount);
+    cc.translate(-70 * amount, 0);
+    canvas_draw_ship_stats(cc, prop.game.ships.player);
+    cc.restore();
+  }
+
+  amount = ui_stats_amount("system");
+  if(Math.abs(amount) < 0.95) {
+    cc.save();
+    cc.globalAlpha *= 1 - Math.abs(amount);
+    cc.translate(-70 * amount, 0);
+    canvas_draw_system_stats(cc, system);
+    cc.restore();
   }
 
   canvas_draw_planet_pointer(cc, system, system.star);

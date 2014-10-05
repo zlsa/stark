@@ -120,6 +120,17 @@ var FuelTank = Expendable.extend(function(base) {
   };
 });
 
+var JumpReserve = Fiber.extend(function() {
+  return {
+    init: function(options) {
+      if(!options) options={};
+
+      this.amount   = 0;
+      this.capacity = 0;
+
+    }
+  };
+});
 
 /* CARGO */
 
@@ -207,17 +218,17 @@ function cargo_init_pre() {
 
   prop.cargo.fuels = {
     "argon": {
-      weight:  0.03,
+      weight:  0.003,
       loss: 2,
       element: "Ar"
     },
     "xenon": {
-      weight:  0.05,
+      weight:  0.005,
       loss: 1,
       element: "Xe"
     },
     "hydrogen": {
-      weight: 0.015,
+      weight: 0.0015,
       loss: 1,
       element: "H"
     }
