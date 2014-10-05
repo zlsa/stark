@@ -142,7 +142,7 @@ var System=Fiber.extend(function() {
           closest        = p[1];
         }
       }
-      return closest_planet;
+      return [closest_planet, closest];
     },
     generateStarfield: function() {
       var density = 160; // px per star

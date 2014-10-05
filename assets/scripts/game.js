@@ -32,8 +32,7 @@ var Game = Fiber.extend(function() {
 
       this.mode = "fly";
 
-      this.systems = prop.system.systems
-      this.generate();
+      this.systems = prop.system.systems;
 
       this.system  = null;
 
@@ -75,12 +74,7 @@ var Game = Fiber.extend(function() {
     },
 
     generate: function() {
-
-      this.system = new System().generate();
-
-      this.systems.push(this.system);
-
-      this.teleport();
+      this.systems.push(new System().generate());
     },
 
     getSystem: function(name) {
@@ -95,8 +89,10 @@ var Game = Fiber.extend(function() {
     jump: function(name) {
       var s = this.getSystem(name);
       if(s) {
-        this.system = s;
-        return true;
+        if(this.ships.player.jump(s)) {
+          this.system = s;
+          return true;
+        }
       }
       return false;
     },
@@ -116,7 +112,7 @@ var Game = Fiber.extend(function() {
           prop.game.ships.auto[i].teleport(prop.game.system, first_planet);
         }
         prop.game.ships.player.teleport(prop.game.system, first_planet);
-      }, 100);
+      }, 0);
     },
 
     update: function() {

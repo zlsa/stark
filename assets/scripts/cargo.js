@@ -5,6 +5,7 @@ var Expendable = Fiber.extend(function() {
       if(!options) options={};
       
       this.amount     = 0;
+      this.amount_lowpass = new Lowpass(0.1);
       this.capacity   = 0;
 
       this.can_hold   = {};
@@ -39,19 +40,25 @@ var Expendable = Fiber.extend(function() {
     set: function(fraction) {
       this.amount = this.capacity * fraction;
     },
+    remove: function(amount) {
+      this.amount -= amount;
+    },
     getAmount: function() {
-      return this.amount;
+      return clamp(0, this.amount_lowpass.value, this.capacity);
     },
     getFraction: function() {
-      return this.amount / this.capacity;
+      return this.getAmount() / this.capacity;
     },
     getWeight: function() {
-      return this.amount * this.weight;
+      return this.getAmount() * this.weight;
     },
     updateFlow: function() {
       this.amount += this.flow * game_delta();
 
       this.amount = clamp(0, this.amount, this.capacity);
+
+      this.amount_lowpass.target = this.amount;
+      this.amount_lowpass.tick(game_delta());
     },
     update: function() {
       this.updateFlow();
@@ -242,7 +249,7 @@ function cargo_init_pre() {
       weight: 0.0015,
       element: "H",
 
-      burn_rate: 0.01,
+      burn_rate: 0.5,
       rate: {
         input: 0.6
       }

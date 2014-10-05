@@ -278,14 +278,6 @@ function canvas_draw_stats(cc, options) {
 function canvas_draw_planet_stats(cc, system, planet) {
   var p = planet.getPosition(true);
 
-  var total = 0;
-
-  if(planet.planets) {
-    for(var i=0;i<planet.planets.length;i++) {
-      total += canvas_draw_planet_stats(cc, system, planet.planets[i]);
-    }
-  }
-
   var pan_km     = [pixels_to_km(prop.ui.pan[0]), pixels_to_km(prop.ui.pan[1])];
   
   var small_ring = pixels_to_km(Math.min(prop.canvas.size[0], prop.canvas.size[1]) / 2 - 20);
@@ -294,8 +286,7 @@ function canvas_draw_planet_stats(cc, system, planet) {
 
   var alpha = scrange(small_ring * 0.1, distance_to_viewport, large_ring * 0.3, 1, 0);
 
-  total += alpha;
-  if(alpha < 0.01) return total;
+  if(alpha < 0.01) return 0;
 
   var rows = [];
 
@@ -332,7 +323,7 @@ function canvas_draw_planet_stats(cc, system, planet) {
     color:    planet.color
   });
 
-  return total;
+  return alpha;
 }
 
 function canvas_draw_system_stats(cc, system) {
@@ -414,6 +405,7 @@ function canvas_draw_debug_stats(cc, ship) {
   for(var i=0;i<prop.game.systems.length;i++) {
     var system = prop.game.systems[i];
     rows.push([system.name, null]);
+    rows.push(["planets",    system.getPlanetNumber()]);
     rows.push(["population", system.getPopulationString()]);
   }
 
@@ -794,15 +786,15 @@ function canvas_draw_hud(cc) {
 
   amount = ui_stats_amount("planet");
   if(Math.abs(amount) < 0.95) {
+    var pan_km  = [pixels_to_km(prop.ui.pan[0]), pixels_to_km(prop.ui.pan[1])];
+    var closest = system.closestPlanet(pan_km);
+    
     cc.save();
     cc.globalAlpha *= 1 - Math.abs(amount);
     cc.translate(-70 * amount, 0);
-    var total = 0;
-    for(var i=0;i<system.planets.length;i++) {
-      total +=  canvas_draw_planet_stats(cc, system, system.planets[i]);
-    }
-    if(total < 0.9) {
-      cc.globalAlpha *= crange(0, total, 0.9, 1, 0);
+    var planet_amount = canvas_draw_planet_stats(cc, system, system.planets[i]);
+    if(planet_amount < 0.7) {
+      cc.globalAlpha *= crange(0, planet_amount, 0.7, 1, 0);
       canvas_draw_stats(cc, {
         distance: 0,
         rows:     [

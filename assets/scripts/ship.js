@@ -244,7 +244,7 @@ var Ship = Fiber.extend(function() {
       var fuel_rate_out = this.thrust * prop.cargo.fuels[fuel_type].burn_rate;
       this.fuel.impulse.rate.output = fuel_rate_out;
 
-      var closest_planet = system_get().closestPlanet(this.position, true, 0.5);
+      var closest_planet = system_get().closestPlanet(this.position, true, 0.5)[0];
 
       var types = ["impulse", "jump"];
       for(var i=0;i<types.length;i++) {
@@ -382,6 +382,43 @@ var Ship = Fiber.extend(function() {
       this.velocity[0] = velocity[0];
       this.velocity[1] = velocity[1];
 
+    },
+
+    jump: function(system) {
+      var distance = random(5*AU, 15*AU);
+      var angle    = random(0, Math.PI * 2);
+      
+      var speed    = random(1000, 3000);
+
+      var position = [];
+      position[0] = Math.sin(angle) * distance;
+      position[1] = Math.cos(angle) * distance;
+      
+      var velocity = [];
+      velocity[0] = -Math.sin(angle) * speed + random(-500, 500);
+      velocity[1] = -Math.cos(angle) * speed + random(-500, 500);
+
+      var current_force = system_get().star.mass;
+      var jump_force    =       system.star.mass;
+
+      console.log(Math.abs(current_force - jump_force) + " difference in force");
+
+      var fuel_type = this.model.fuel.jump.type;
+      var fuel_used = trange(0, Math.abs(current_force - jump_force), 2000, 10, 15) * prop.cargo.fuels[fuel_type].burn_rate;
+
+      var can_jump = true;
+      
+      if(this.fuel.jump.getAmount() * 0.7 < fuel_used) can_jump = false;
+      
+      if(can_jump) {
+        this.position = position;
+        this.velocity = velocity;
+        this.fuel.jump.remove(fuel_used);
+        this.angle = random(0, Math.PI);
+        return true;
+      }
+
+      return false;
     },
 
     near: function() {
