@@ -364,7 +364,7 @@ function canvas_draw_ship_stats(cc, ship) {
 
   var rows = [];
 
-  rows.push(["ship name",     ship.name]);
+  rows.push(["ship id",       ship.name]);
   
   rows.push(["about",         null]);
 
