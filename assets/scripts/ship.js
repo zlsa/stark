@@ -410,7 +410,7 @@ var Ship = Fiber.extend(function() {
       console.log(Math.abs(current_force - jump_force) + " difference in force");
 
       var fuel_type = this.model.fuel.jump.type;
-      var fuel_used = trange(1000, Math.abs(current_force - jump_force), 20000, 10, 30) * prop.cargo.fuels[fuel_type].burn_rate;
+      var fuel_used = trange(1000, Math.abs(current_force - jump_force), 60000, 10, 30) * prop.cargo.fuels[fuel_type].burn_rate;
 
       var can_jump = true;
       

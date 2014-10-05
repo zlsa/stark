@@ -7,7 +7,7 @@ function ui_init_pre() {
 
   prop.ui.stats_types = ["system", "planet", "ship", "debug"];
   prop.ui.stats = prop.ui.stats_types.indexOf("planet");
-  prop.ui.stats_lowpass = new Lowpass(20);
+  prop.ui.stats_lowpass = new Lowpass(0.5);
   prop.ui.stats_lowpass.target = prop.ui.stats;
   prop.ui.stats_lowpass.value  = prop.ui.stats;
 }
@@ -58,6 +58,6 @@ function ui_update_post() {
   prop.ui.stats = clamp(0, prop.ui.stats, prop.ui.stats_types.length - 1);
 
   prop.ui.stats_lowpass.target = prop.ui.stats;
-  prop.ui.stats_lowpass.tick(game_delta() * 20);
+  prop.ui.stats_lowpass.tick();
 }
 

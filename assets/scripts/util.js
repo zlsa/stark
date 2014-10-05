@@ -288,10 +288,10 @@ var Lowpass=function(mix) {
   this.target = 0;
   this.value = 0;
 
-  this.mix = mix / 30;
+  this.mix = mix;
 
-  this.tick=function(d) {
-    var mix = 1 - ((1-this.mix) * d);
+  this.tick=function() {
+    var mix = this.mix;
     this.value = (this.target * (1-mix)) + (this.value * mix);
   };
 };

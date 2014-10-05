@@ -274,7 +274,7 @@ function game_complete() {
 
   setInterval(function() {
     prop.game.save();
-  }, 1000 * 10);
+  }, 1000 * 3);
 
 }
 

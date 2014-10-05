@@ -5,7 +5,7 @@ var Expendable = Fiber.extend(function() {
       if(!options) options={};
       
       this.amount     = 0;
-      this.amount_lowpass = new Lowpass(0.1);
+      this.amount_lowpass = new Lowpass(0.5);
       this.capacity   = 0;
 
       this.can_hold   = {};
@@ -58,7 +58,7 @@ var Expendable = Fiber.extend(function() {
       this.amount = clamp(0, this.amount, this.capacity);
 
       this.amount_lowpass.target = this.amount;
-      this.amount_lowpass.tick(game_delta() * 10);
+      this.amount_lowpass.tick();
     },
     update: function() {
       this.updateFlow();
@@ -85,8 +85,8 @@ var FuelTank = Expendable.extend(function(base) {
       };
 
       this.lowpass = {
-        output: new Lowpass(0.1),
-        input:  new Lowpass(0.1),
+        output: new Lowpass(0.8),
+        input:  new Lowpass(0.8),
       };
 
     },
@@ -116,8 +116,8 @@ var FuelTank = Expendable.extend(function(base) {
       this.lowpass.output.target = this.rate.output;
       this.lowpass.input.target  = this.rate.input;
 
-      this.lowpass.output.tick(game_delta());
-      this.lowpass.input.tick(game_delta());
+      this.lowpass.output.tick();
+      this.lowpass.input.tick();
     },
     update: function() {
       this.updateFuel();
