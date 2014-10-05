@@ -58,7 +58,7 @@ var Expendable = Fiber.extend(function() {
       this.amount = clamp(0, this.amount, this.capacity);
 
       this.amount_lowpass.target = this.amount;
-      this.amount_lowpass.tick(game_delta());
+      this.amount_lowpass.tick(game_delta() * 10);
     },
     update: function() {
       this.updateFlow();
@@ -249,7 +249,7 @@ function cargo_init_pre() {
       weight: 0.0015,
       element: "H",
 
-      burn_rate: 0.5,
+      burn_rate: 0.9,
       rate: {
         input: 0.6
       }

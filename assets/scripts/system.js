@@ -241,7 +241,7 @@ var System=Fiber.extend(function() {
     save: function() {
       var data = {};
 
-      log("system save", LOG_DEBUG);
+      log("system save", LOG_FLOOD);
 
       data.name  = this.name;
 

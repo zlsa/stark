@@ -49,7 +49,11 @@ function input_done() {
   $("#debug-command").keydown(function(e) {
     if(e.which == prop.input.keysym.enter) {
       input_command_run($(this).val());
+    } else if(e.which == prop.input.keysym.escape || e.which == prop.input.keysym.tab) {
+      ui_hide_debug_input();
     }
+    e.stopPropagation();
+    e.stopImmediatePropagation();
   });
 
 }

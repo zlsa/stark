@@ -119,7 +119,7 @@ var Star=Fiber.extend(function() {
     },
 
     save: function() {
-      log("star save", LOG_DEBUG);
+      log("star save", LOG_FLOOD);
 
       var data = {};
 

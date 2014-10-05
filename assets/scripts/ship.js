@@ -131,6 +131,8 @@ var Ship = Fiber.extend(function() {
       this.type     = "player";
       this.name     = "";
 
+      this.system   = null;
+
       // ... basic stuff
       this.position = [0, 0];
       this.velocity = [140, 0];
@@ -194,6 +196,10 @@ var Ship = Fiber.extend(function() {
         this.angular_velocity = data.angular_velocity;
       }
 
+      if(data.system) {
+        this.system = data.system;
+      }
+
       if(data.model) {
         this.model = prop.ship.models[data.model];
 
@@ -233,7 +239,7 @@ var Ship = Fiber.extend(function() {
 
     getSpeed: function(relative) {
       if(relative) {
-        var velocity = system_get().velocityAt(this.position);
+        var velocity = this.system.velocityAt(this.position);
         return distance2d(this.velocity, velocity);
       }
       return distance2d(this.velocity);
@@ -244,7 +250,7 @@ var Ship = Fiber.extend(function() {
       var fuel_rate_out = this.thrust * prop.cargo.fuels[fuel_type].burn_rate;
       this.fuel.impulse.rate.output = fuel_rate_out;
 
-      var closest_planet = system_get().closestPlanet(this.position, true, 0.5)[0];
+      var closest_planet = this.system.closestPlanet(this.position, true, 0.5)[0];
 
       var types = ["impulse", "jump"];
       for(var i=0;i<types.length;i++) {
@@ -279,7 +285,7 @@ var Ship = Fiber.extend(function() {
         this.controls[0] = angle_difference(this.controls[0], this.angular_velocity * 0.4) * 3;
       }
       if(this.assist.gravity) {
-        var force = system_get().gravityAt(this.position, this.mass);
+        var force = this.system.gravityAt(this.position, this.mass);
         var angle = angle_difference(-this.angle, Math.atan2(-force[0], force[1]));
         this.controls[0] = (angle - this.angular_velocity) * 50;
       }
@@ -313,14 +319,14 @@ var Ship = Fiber.extend(function() {
       if(Math.abs(this.angular_velocity) < 0.01) this.angular_velocity = 0;
     },
     updateGravity: function() {
-      var force = system_get().gravityAt(this.position, this.mass);
+      var force = this.system.gravityAt(this.position, this.mass);
       this.velocity[0] -= force[0] / this.mass * game_delta();
       this.velocity[1] -= force[1] / this.mass * game_delta();
     },
     updateDamping: function() {
-      var damping = system_get().dampingAt(this.position);
+      var damping = this.system.dampingAt(this.position);
 
-      var velocity = system_get().velocityAt(this.position);
+      var velocity = this.system.velocityAt(this.position);
 
       this.velocity[0] -= velocity[0];
       this.velocity[1] -= velocity[1];
@@ -348,7 +354,7 @@ var Ship = Fiber.extend(function() {
     teleport: function(system, planet) {
       if(!planet) {
         planet = system;
-        system = system_get();
+        system = this.system;
       }
 
       if(typeof planet == typeof "") planet = [planet];
@@ -388,7 +394,7 @@ var Ship = Fiber.extend(function() {
       var distance = random(5*AU, 15*AU);
       var angle    = random(0, Math.PI * 2);
       
-      var speed    = random(1000, 3000);
+      var speed    = random(1000, 5000);
 
       var position = [];
       position[0] = Math.sin(angle) * distance;
@@ -398,13 +404,13 @@ var Ship = Fiber.extend(function() {
       velocity[0] = -Math.sin(angle) * speed + random(-500, 500);
       velocity[1] = -Math.cos(angle) * speed + random(-500, 500);
 
-      var current_force = system_get().star.mass;
-      var jump_force    =       system.star.mass;
+      var current_force = distance2d(this.system.gravityAt(this.position, this.mass)) * 1000000;
+      var jump_force    = distance2d(     system.gravityAt(     position, this.mass)) * 1000000;
 
       console.log(Math.abs(current_force - jump_force) + " difference in force");
 
       var fuel_type = this.model.fuel.jump.type;
-      var fuel_used = trange(0, Math.abs(current_force - jump_force), 2000, 10, 15) * prop.cargo.fuels[fuel_type].burn_rate;
+      var fuel_used = trange(1000, Math.abs(current_force - jump_force), 20000, 10, 30) * prop.cargo.fuels[fuel_type].burn_rate;
 
       var can_jump = true;
       
@@ -414,7 +420,8 @@ var Ship = Fiber.extend(function() {
         this.position = position;
         this.velocity = velocity;
         this.fuel.jump.remove(fuel_used);
-        this.angle = random(0, Math.PI);
+        this.angle    = Math.PI + angle + random(-0.2, 0.2);
+        this.system   = system;
         return true;
       }
 

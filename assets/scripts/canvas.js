@@ -173,7 +173,6 @@ function canvas_draw_planet(cc, system, planet) {
 }
 
 function canvas_draw_stats(cc, options) {
-  prop.foo += 1;
   var rows       = options.rows;
   var distance   = options.distance;
   var color      = options.color.adjustAsBackground();
@@ -779,20 +778,25 @@ function canvas_draw_hud(cc) {
   }
 
   for(var i=0;i<prop.game.ships.auto.length;i++) {
-    canvas_draw_ship_pointer(cc, prop.game.ships.auto[i]);
+    if(prop.game.ships.auto[i].system == system) {
+      canvas_draw_ship_pointer(cc, prop.game.ships.auto[i]);
+    }
   }
 
   var amount = 0;
 
   amount = ui_stats_amount("planet");
   if(Math.abs(amount) < 0.95) {
-    var pan_km  = [pixels_to_km(prop.ui.pan[0]), pixels_to_km(prop.ui.pan[1])];
+    var pan_km  = [-pixels_to_km(prop.ui.pan[0]), pixels_to_km(prop.ui.pan[1])];
     var closest = system.closestPlanet(pan_km);
+
+    prop.foo = closest;
+    prop.d2d = pan_km;
     
     cc.save();
     cc.globalAlpha *= 1 - Math.abs(amount);
     cc.translate(-70 * amount, 0);
-    var planet_amount = canvas_draw_planet_stats(cc, system, system.planets[i]);
+    var planet_amount = canvas_draw_planet_stats(cc, system, closest[0]);
     if(planet_amount < 0.7) {
       cc.globalAlpha *= crange(0, planet_amount, 0.7, 1, 0);
       canvas_draw_stats(cc, {
@@ -884,7 +888,6 @@ function canvas_update_post() {
 
   cc.save();
 
-  prop.foo = 0;
   cc.translate(prop.canvas.size[0] / 2, prop.canvas.size[1] / 2);
   canvas_draw_hud(cc);
   cc.restore();

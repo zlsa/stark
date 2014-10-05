@@ -40,13 +40,15 @@ var Game = Fiber.extend(function() {
 
       this.ships.auto = [];
 
+      this.log   = [];
+
       // this.ships.auto.push(new Ship({
       //   type:  "auto",
       //   model: "x220"
       // }));
 
       this.ships.player = new Ship({
-        model: "x220"
+        model: "x220",
       });
 
       Math.seedrandom("stark");
@@ -99,6 +101,7 @@ var Game = Fiber.extend(function() {
     
     complete: function() {
       this.system = this.systems[0];
+      this.ships.player.system = this.system;
 
       this.teleport();
       
@@ -266,8 +269,8 @@ function game_complete() {
 
   prop.game.complete();
 
-  if(storage.has("savegame"))
-    prop.game.restore(storage.get("savegame"));
+//  if(storage.has("savegame"))
+//    prop.game.restore(storage.get("savegame"));
 
   setInterval(function() {
     prop.game.save();

@@ -345,7 +345,7 @@ function to_percent(n) {
 }
 
 var SHIP_MASS   = 1000;
-var SYSTEM_MASS = 1000000000000000000;
+var SYSTEM_MASS = 1000000000000000000000000;
 
 function to_ship_mass(n) {
   return to_number(n * SHIP_MASS);

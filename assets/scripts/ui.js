@@ -39,6 +39,7 @@ function ui_hide_debug_input() {
   $("#debug").addClass("hidden");
   $("#debug-command").val("");
   $("#debug-command").blur();
+  $(window).focus();
 }
 
 function ui_toggle_debug_input() {
