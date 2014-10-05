@@ -170,6 +170,7 @@ var Game = Fiber.extend(function() {
       data.mode     = this.mode;
 
       data.systems  = [];
+
       for(var i=0;i<this.systems.length;i++) {
         data.systems.push(this.systems[i].save());
       }
@@ -268,7 +269,9 @@ function game_complete() {
   if(storage.has("savegame"))
     prop.game.restore(storage.get("savegame"));
 
-  setInterval(prop.game.save, 1000 * 10);
+  setInterval(function() {
+    prop.game.save();
+  }, 1000 * 10);
 
 }
 

@@ -185,6 +185,8 @@ var Planet=Fiber.extend(function() {
             this.image = data;
           }
         });
+      } else {
+        this.image = null;
       }
 
       if(data.planets) {
@@ -212,7 +214,6 @@ var Planet=Fiber.extend(function() {
       };
       
       this.cache = {};
-      this.image = null;
 
     },
 
