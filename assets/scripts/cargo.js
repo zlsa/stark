@@ -232,9 +232,9 @@ function cargo_init_pre() {
       weight:  0.005,
       element: "Xe",
 
-      burn_rate: 0.01,
+      burn_rate: 0.1,
       rate: {
-        input: 1
+        input: 1.5
       }
     },
 
@@ -244,7 +244,7 @@ function cargo_init_pre() {
 
       burn_rate: 0.01,
       rate: {
-        input: 2
+        input: 0.6
       }
     }
   };

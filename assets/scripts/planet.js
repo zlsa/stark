@@ -188,7 +188,8 @@ var Planet=Fiber.extend(function() {
       }
 
       if(data.planets) {
-        for(var i=0;i<data.planets.length;i++) {
+        var i;
+        for(i=0;i<data.planets.length;i++) {
           //        if(data.planets[i].offset) {
           //          data.planets[i].offset = radians(data.planets[i].offset);
           //        }
@@ -202,6 +203,7 @@ var Planet=Fiber.extend(function() {
             this.planets.push(planet);
           }
         }
+        this.planets.splice(i);
       }
       
       this.canvas = {
@@ -367,11 +369,11 @@ var Planet=Fiber.extend(function() {
     getPopulationString: function() {
       var pop = this.getPopulation();
       if(pop > 10000)
-        pop = to_number(pop) + ", ±5%";
+        pop = to_number(pop) + " ±5%";
       else if(pop > 1000)
-        pop = "< 10000, ±8%";
+        pop = "< 10000 ±8%";
       else if(pop > 500)
-        pop = "< 1000, ±3%";
+        pop = "< 1000 ±3%";
       else
         pop = "0";
 
@@ -534,15 +536,16 @@ var Planet=Fiber.extend(function() {
       var feature_number = Math.floor(this.radius * this.radius * 0.006 * random(0.7, 1.3));
 
       function grad(crater, size) {
-        var g = cc.createRadialGradient(0, 0, 0, 0, 0, size/2);
 
+        var g = cc.createRadialGradient(0, -size/4, 0, 0, 0, size/2);
+        
         if(crater) {
-          g.addColorStop(0,   "rgba(0, 0, 0, 0.0)");
-          g.addColorStop(0.7, "rgba(0, 0, 0, 0.5)");
-          g.addColorStop(1,   "rgba(0, 0, 0, 0.0)");
+          g.addColorStop(0,   "rgba(128, 128, 128, 0.0)");
+          g.addColorStop(0.7, "rgba(128, 128, 128, 0.5)");
+          g.addColorStop(1,   "rgba(128, 128, 128, 0.0)");
         } else {
-          g.addColorStop(0,   "rgba(0, 0, 0, 0.5)");
-          g.addColorStop(1,   "rgba(0, 0, 0, 0.0)");
+          g.addColorStop(0,   "rgba(128, 128, 128, 0.5)");
+          g.addColorStop(1,   "rgba(128, 128, 128, 0.0)");
         }
 
         return g;
@@ -572,10 +575,12 @@ var Planet=Fiber.extend(function() {
       for(var i=0;i<feature_number - crater_number;i++) {
         var x = random(0, size);
         var y = random(0, size);
-        var feature_size = random(1, 4) * s;
+        var feature_size = random(1, 6) * s;
         cc.save();
         cc.translate(x, y);
         cc.scale(feature_size, feature_size);
+        if(Math.random() > 0.5) cc.globalCompositeOperation = "lighter";
+        else                    cc.globalCompositeOperation = "darker";
         cc.globalAlpha = random(0.2, 0.4);
         cc.fillRect(-ps/2, -ps/2, ps, ps);
         cc.restore();

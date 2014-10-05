@@ -33,7 +33,8 @@ var Game = Fiber.extend(function() {
       this.mode = "fly";
 
       this.systems = prop.system.systems
-      this.systems.push(system_generate());
+      this.generate();
+
       this.system  = null;
 
       this.ships = {};
@@ -74,9 +75,30 @@ var Game = Fiber.extend(function() {
     },
 
     generate: function() {
-      this.system.generate();
+
+      this.system = new System().generate();
+
+      this.systems.push(this.system);
 
       this.teleport();
+    },
+
+    getSystem: function(name) {
+      for(var i=0;i<this.systems.length;i++) {
+        if(this.systems[i].name.toLowerCase() == name.toLowerCase()) {
+          return this.systems[i];
+        }
+      }
+      return false;
+    },
+
+    jump: function(name) {
+      var s = this.getSystem(name);
+      if(s) {
+        this.system = s;
+        return true;
+      }
+      return false;
     },
     
     complete: function() {
@@ -151,7 +173,12 @@ var Game = Fiber.extend(function() {
 
       data.mode     = this.mode;
 
-      data.system   = this.system.save();
+      data.systems  = [];
+      for(var i=0;i<this.systems.length;i++) {
+        data.systems.push(this.systems[i].save());
+      }
+
+      data.system   = this.system.name.toLowerCase();
 
       data.ships    = {};
 
@@ -167,7 +194,7 @@ var Game = Fiber.extend(function() {
     },
 
     restore: function(data) {
-      
+
       Math.seedrandom("stark");
       
       this.paused   = data.paused;
@@ -179,7 +206,12 @@ var Game = Fiber.extend(function() {
 
       this.mode     = data.mode;
 
-      this.system.parse(data.system);
+      this.systems  = [];
+      for(var i=0;i<data.systems.length;i++) {
+        this.systems.push(new System(data.systems[i]));
+      }
+
+      this.system = this.getSystem(data.system);
       this.system.render();
 
       this.ships.player.parse(data.ships.player);

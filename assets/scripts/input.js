@@ -43,6 +43,7 @@ function input_done() {
 
   $(window).keyup(function(e) {
     prop.input.keys[e.which]=false;
+    console.log(e.which);
   });
 
   $("#debug-command").keydown(function(e) {
@@ -69,6 +70,10 @@ function input_command_run(value) {
     } else {
       prop.game.ships.player.teleport(planet);
     }
+  } else if(cmd == "jump") {
+    prop.game.jump(data);
+  } else if(cmd == "rename") {
+    prop.game.ships.player.rename(data);
   } else if(cmd == "ifuel") {
     var amount = parseFloat(data);
     prop.game.ships.player.fuel.impulse.set(amount);
@@ -85,23 +90,15 @@ function input_command_run(value) {
     prop.game.restore(storage.get("savegame"));
   }
 
-  $("#debug").addClass("hidden");
-  $("#debug-command").val("");
-  $("#debug-command").blur();
+  ui_hide_debug_input();
 }
 
 function input_keydown(keycode) {
   if(keycode == prop.input.keysym.tab) {
-    $("#debug").toggleClass("hidden");
-    if(!$("#debug").hasClass("hidden")) {
-      $("#debug-command").focus();
-    } else {
-      $("#debug-command").blur();
-    }
+    ui_toggle_debug_input();
     return true;
-  } else if(keycode == prop.input.keysym.esc) {
-    $("#debug").addClass("hidden");
-    $("#debug-command").blur();
+  } else if(keycode == prop.input.keysym.escape) {
+    ui_hide_debug_input();
     return true;
   } else if(keycode == prop.input.keysym.lbracket) {
     prop.ui.stats -= 1;

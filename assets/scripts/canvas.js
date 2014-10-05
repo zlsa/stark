@@ -402,6 +402,30 @@ function canvas_draw_ship_stats(cc, ship) {
 
 }
 
+function canvas_draw_debug_stats(cc, ship) {
+
+  var rows = [];
+
+  rows.push(["debug info",    null]);
+  
+  rows.push(["fps",           to_number(prop.time.fps)]);
+  rows.push(["frame spacing", Math.round(delta() * 1000) + "ms"]);
+
+  for(var i=0;i<prop.game.systems.length;i++) {
+    var system = prop.game.systems[i];
+    rows.push([system.name, null]);
+    rows.push(["population", system.getPopulationString()]);
+  }
+
+  canvas_draw_stats(cc, {
+    distance: 1,
+    rows:     rows,
+
+    color:    new Color("#f4f")
+  });
+
+}
+
 /************ POINTERS *************/
 
 function canvas_draw_pointer(cc, options) {
@@ -791,6 +815,15 @@ function canvas_draw_hud(cc) {
     cc.restore();
   }
 
+  amount = ui_stats_amount("system");
+  if(Math.abs(amount) < 0.95) {
+    cc.save();
+    cc.globalAlpha *= 1 - Math.abs(amount);
+    cc.translate(-70 * amount, 0);
+    canvas_draw_system_stats(cc, system);
+    cc.restore();
+  }
+
   amount = ui_stats_amount("ship");
   if(Math.abs(amount) < 0.95) {
     cc.save();
@@ -800,12 +833,12 @@ function canvas_draw_hud(cc) {
     cc.restore();
   }
 
-  amount = ui_stats_amount("system");
+  amount = ui_stats_amount("debug");
   if(Math.abs(amount) < 0.95) {
     cc.save();
     cc.globalAlpha *= 1 - Math.abs(amount);
     cc.translate(-70 * amount, 0);
-    canvas_draw_system_stats(cc, system);
+    canvas_draw_debug_stats(cc);
     cc.restore();
   }
 

@@ -27,7 +27,12 @@ var System=Fiber.extend(function() {
     generate: function() {
       Math.seedrandom(time());
 
-      this.name = "Untitled System 42";
+      var s = choose("aaaabbbcdeeeeffgggghjjkkllmmnnnpppqrsstttuuvvvvwxy").toUpperCase();
+      s += "-";
+      for(var i=0;i<2;i++) {
+        s += randint(0, 9);
+      }
+      this.name = s;
 
       this.star = new Star({
         system: this
@@ -52,7 +57,6 @@ var System=Fiber.extend(function() {
     },
 
     parse: function(data) {
-      console.log(data);
 
       if(data.name) {
         this.name = data.name;
@@ -63,7 +67,8 @@ var System=Fiber.extend(function() {
       }
 
       if(data.planets) {
-        for(var i=0;i<data.planets.length;i++) {
+        var i;
+        for(i=0;i<data.planets.length;i++) {
           //        if(data.planets[i].offset) {
           //          data.planets[i].offset = radians(data.planets[i].offset);
           //        }
@@ -76,6 +81,7 @@ var System=Fiber.extend(function() {
             this.planets.push(planet);
           }
         }
+        this.planets.splice(i);
       }
 
       this.updatePlanetInfo();
@@ -139,13 +145,13 @@ var System=Fiber.extend(function() {
       return closest_planet;
     },
     generateStarfield: function() {
-      var density = 70; // px per star
+      var density = 160; // px per star
 
       var number = (prop.canvas.size[0] * prop.canvas.size[1]) / density / density;
 
       console.log(number);
 
-      var rng = new Math.seedrandom("starfield");
+      var rng = new Math.seedrandom(time());
 
       this.starfield = [];
 

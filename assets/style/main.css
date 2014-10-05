@@ -10,7 +10,7 @@ html,body {
 html {
   background-color: #111;
   font-size: 14px;
-  font-family: "Exo 2", sans-serif;
+  font-family: "Roboto Condensed", sans-serif;
   font-weight: 700;
 }
 
@@ -20,16 +20,17 @@ html {
   top: 0;
   right: 0;
   padding: 5px 20px;
+
+  transition: opacity 0.2s ease;
+  pointer-events: auto;
 }
 
 #debug.hidden {
-  display: none;
+  opacity: 0;
+  pointer-events: none;
 }
 
 #debug-command {
-  border-bottom: 2px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
-
   color: #fff;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
 

@@ -174,6 +174,10 @@ var Ship = Fiber.extend(function() {
         this.type = data.type;
       }
 
+      if(data.name) {
+        this.name = data.name;
+      }
+
       if(data.position) {
         this.position = data.position;
       }
@@ -209,15 +213,19 @@ var Ship = Fiber.extend(function() {
 
       }
       
-      this.generateName();
+      if(!this.name) this.generateName();
 
+    },
+    
+    rename: function(name) {
+      this.name = name.toUpperCase();
     },
     
     generateName: function() {
       var s = choose("aaaabbbcdeeeeffgggghjjkkllmmnnnpppqrsstttuuvvvvwxy").toUpperCase();
       s += "-";
       for(var i=0;i<4;i++) {
-        s += randint(0, 10);
+        s += randint(0, 9);
       }
       this.name = s;
 //      if(this.type == "player")
@@ -384,6 +392,8 @@ var Ship = Fiber.extend(function() {
       log("ship save", LOG_FLOOD);
 
       var data = {};
+
+      data.name     = this.name;
 
       data.model    = this.model.id;
 
