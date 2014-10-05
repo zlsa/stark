@@ -206,7 +206,7 @@ function to_number(d, truncate) {
     return to_comma(n, truncate);
   };
   var threshold = 1.2;
-  if(d < threshold * thousand * million) {
+  if(d < threshold * million) {
     return to_comma(Math.round(d), true);
 //  } else if(d < threshold * million) {
 //    return r(d / thousand, 2) + " thousand";
@@ -344,10 +344,13 @@ function to_percent(n) {
   return Math.round(n * 100) + "%";
 }
 
-function to_ship_weight(n) {
-  return to_number(n * 1000);
+var SHIP_MASS   = 1000;
+var SYSTEM_MASS = 1000000000000000000;
+
+function to_ship_mass(n) {
+  return to_number(n * SHIP_MASS);
 }
 
-function to_system_weight(n) {
-  return to_number(n * 1000000000000000000);
+function to_system_mass(n) {
+  return to_number(n * SYSTEM_MASS);
 }

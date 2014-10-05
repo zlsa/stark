@@ -3,6 +3,7 @@ function canvas_init_pre() {
   prop.canvas={};
 
   prop.canvas.font      = "'Exo 2', sans-serif";
+  prop.canvas.font      = "'Roboto Condensed', sans-serif";
   prop.canvas.mono_font = "monoOne, monospace";
 
   prop.canvas.enabled = true;
@@ -22,13 +23,12 @@ function canvas_init() {
 }
 
 function canvas_render_star() {
-  return;
-  var size = 8;
+  var size = 4;
   prop.canvas.star = canvas_new(size, size);
 
   prop.canvas.star.fillStyle = prop.canvas.star.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
   prop.canvas.star.fillStyle.addColorStop(0, "#fff");
-  prop.canvas.star.fillStyle.addColorStop(0.5, "#fff");
+  prop.canvas.star.fillStyle.addColorStop(0.2, "#fff");
   prop.canvas.star.fillStyle.addColorStop(1, "rgba(255, 255, 255, 0)");
   
   prop.canvas.star.fillRect(0, 0, size, size);
@@ -84,7 +84,7 @@ function canvas_outline_text(cc, text, position, border) {
 function canvas_box_text(cc, options) {
 
   var size    = options.size || 14;
-  var padding = [2, Math.ceil((size * 0.5) + 1)];
+  var padding = [2, Math.ceil((size * 0.5) + 2)];
   var label   = options.label;
   var color   = new Color(options.color || "#fff").adjustAsBackground();
   var pos     = [Math.round(options.position[0]), Math.round(options.position[1])];
@@ -321,8 +321,8 @@ function canvas_draw_planet_stats(cc, system, planet) {
   rows.push(["stats",         null]);
   rows.push(["pressure",      planet.atmosphere.density.toFixed(2) + " atm"]);
   rows.push(["orbit size",    to_distance(planet.getDistance())]);
-  rows.push(["orbit period",  Math.round(planet.period / 60) + " minutes"]);
-  rows.push(["mass",          to_system_weight(planet.mass) + " tons"]);
+  rows.push(["orbit period",  Math.round(planet.period / prop.game.time_scale) + " minutes"]);
+  rows.push(["mass",          to_system_mass(planet.mass) + " tons"]);
   rows.push(["radius",        to_distance(Math.round(planet.radius * 50))]);
 
   canvas_draw_stats(cc, {
@@ -349,9 +349,9 @@ function canvas_draw_system_stats(cc, system) {
       ["population",        system.getPopulationString()],
 
       ["star",              null],
-      ["mass",              to_system_weight(star.mass) + " tons"],
+      ["mass",              to_system_mass(star.mass) + " tons"],
       ["radius",            to_distance(star.radius)],
-      ["temperature",       to_number(star.temperature)],
+      ["temperature",       to_number(star.temperature) + " °K"],
     ],
 
     color:    new Color().setColorTemperatureValue(system.star.temperature)
@@ -390,8 +390,8 @@ function canvas_draw_ship_stats(cc, ship) {
   }
 
   rows.push(["stats",         null]);
-  rows.push(["mass",          to_ship_weight(ship.mass) + " tons"]);
-  rows.push(["dry mass",      to_ship_weight(ship.model.mass) + " tons"]);
+  rows.push(["mass",          to_ship_mass(ship.mass) + " tons"]);
+  rows.push(["dry mass",      to_ship_mass(ship.model.mass) + " tons"]);
 
   canvas_draw_stats(cc, {
     distance: distance_to_viewport,
@@ -716,24 +716,24 @@ function canvas_draw_fuel_hud(cc, ship, type) {
 /************ STARFIELD **************/
 
 function canvas_draw_starfield(cc) {
-  return;
   var system = system_get();
 
   for(var i=0;i<system.starfield.length;i++) {
     var star = system.starfield[i];
 
-    var depth = crange(0, star[1], 1, 0.5, 0.1);
+    var depth = crange(0, star[1], 1, 0.1, 0.02);
+    var s    = prop.canvas.star_size;
+    var size = crange(0, star[1], 1, s, 2);
 
     var pos = [
       mod(star[0][0] + (prop.ui.pan[0] * depth), prop.canvas.size[0]),
       mod(star[0][1] + (prop.ui.pan[1] * depth), prop.canvas.size[1])
     ];
 
-//    cc.arc(pos[0], pos[1], crange(0, star[1], 1, 2, 0.5), 0, Math.PI*2);
-//    cc.rect(pos[0], pos[1], crange(0, star[1], 1, 2, 0.5), crange(0, star[1], 1, 2, 0.5));
-    var s    = prop.canvas.star_size;
-    var size = crange(0, star[1], 1, s, 1);
+    //    cc.arc(pos[0], pos[1], crange(0, star[1], 1, 2, 0.5), 0, Math.PI*2);
+    //    cc.rect(pos[0], pos[1], crange(0, star[1], 1, 2, 0.5), crange(0, star[1], 1, 2, 0.5));
     cc.drawImage(prop.canvas.star.canvas, pos[0] - s, pos[1] - s, size, size);
+
   }
 
 }

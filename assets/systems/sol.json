@@ -21,7 +21,7 @@
       "radius":     40,
       "offset":     270,
       "mass":       10,
-      "period":     120
+      "period":     1200
     },
 
     {
@@ -32,7 +32,7 @@
       "radius":     130,
       "offset":     180,
       "mass":       65,
-      "period":     450,
+      "period":     4500,
       "atmosphere": {
         "thickness": 5,
         "density":   5.0,
@@ -52,7 +52,7 @@
           "radius":     50,
           "offset":     90,
           "mass":       16,
-          "period":     200
+          "period":     2000
         }
 
       ]
@@ -66,7 +66,7 @@
       "radius":     150,
       "offset":     135,
       "mass":       59,
-      "period":     800,
+      "period":     8000,
       "atmosphere": {
         "thickness": 6,
         "density":   1,
@@ -87,7 +87,7 @@
           "radius":     50,
           "offset":     0,
           "mass":       8,
-          "period":     240
+          "period":     2400
         }
 
       ]
@@ -101,7 +101,7 @@
       "radius":     120,
       "offset":     10,
       "mass":       30,
-      "period":     1200,
+      "period":     12000,
       "atmosphere": {
         "thickness": 2,
         "density":   0.6,
@@ -111,20 +111,6 @@
         ]
       },
       "planets": [
-
-        {
-          "name":      "Pota",
-          "color":      "#887",
-          "type":       "rocky",
-          "environment": {
-            "craters":    1
-          },
-          "distance":   440,
-          "radius":     25,
-          "offset":    -45,
-          "mass":       7,
-          "period":     100
-        },
 
         {
           "name":      "Deimos",
@@ -137,7 +123,7 @@
           "radius":     35,
           "offset":     225,
           "mass":       7,
-          "period":     120
+          "period":     1200
         }
 
       ]
@@ -151,7 +137,7 @@
       "radius":     350,
       "offset":     90,
       "mass":       300,
-      "period":     2000,
+      "period":     20000,
       "atmosphere": {
         "thickness": 20,
         "density":   2,
@@ -172,7 +158,7 @@
           "radius":     50,
           "offset":     20,
           "mass":       8,
-          "period":     90,
+          "period":     900,
           "atmosphere": {
             "thickness": 3,
             "density":   1,
@@ -197,7 +183,7 @@
       "radius":     30,
       "offset":     45,
       "mass":       5,
-      "period":     2400
+      "period":     24000
     }
   ]
 }

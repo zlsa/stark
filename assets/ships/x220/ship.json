@@ -6,7 +6,7 @@
   "angular_mass": 0.5,
 
   "power": {
-    "thrust": 8,
+    "thrust": 4,
     "angle":  6
   },
 
@@ -17,19 +17,11 @@
   "fuel": {
     "impulse": {
       "type":       "argon",
-      "capacity":   30,
-      "max_rate":   {
-        "output":   0.3,
-        "input":    1.5
-      }
+      "capacity":   30
     },
     "jump": {
       "type":       "hydrogen",
-      "capacity":   50,
-      "max_rate":   {
-        "output":   0.05,
-        "input":    0.5
-      }
+      "capacity":   50
     }
   },
 

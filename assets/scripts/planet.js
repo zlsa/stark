@@ -452,7 +452,7 @@ var Planet=Fiber.extend(function() {
     gravityAt: function(position, mass) {
       var pp        = this.getPosition(true);
 
-      var radius    = Math.max(this.radius, 40);
+      var radius    = Math.max(this.radius, 60);
 
       var distance  = distance2d([0, 0], [distance2d(pp, position), radius]);
       var pull      = (this.mass * mass * 100000) / (distance * distance);
@@ -585,6 +585,7 @@ var Planet=Fiber.extend(function() {
       cc.restore();
 
       cc.arc(center, center, kilometers(this.radius * scale) + 1, 0, Math.PI * 2);
+      cc.globalAlpha = 1;
       cc.fillStyle = cc.createRadialGradient(center, center, 0, center, center, center);
       cc.fillStyle.addColorStop(0.0, "rgba(0, 0, 0, 0.10)");
       cc.fillStyle.addColorStop(0.5, "rgba(0, 0, 0, 0.32)");

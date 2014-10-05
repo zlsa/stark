@@ -23,6 +23,8 @@ var Game = Fiber.extend(function() {
 
       this.speedup = 1;
 
+      this.time_scale = 60;
+
       this.time  = 0;
       this.delta = 0;
 
@@ -74,32 +76,29 @@ var Game = Fiber.extend(function() {
     generate: function() {
       this.system.generate();
 
-      this.system.update();
-
-      var first_planet = this.system.planets[0].name;
-
-      for(var i=0;i<this.ships.auto.length;i++) {
-        this.ships.auto[i].teleport(this.system, first_planet);
-      }
-      this.ships.player.teleport(this.system, first_planet);
+      this.teleport();
     },
     
     complete: function() {
       this.system = this.systems[0];
-      this.system.generateStarfield();
 
-      var first_planet = this.system.planets[0].name;
-
-      for(var i=0;i<this.ships.auto.length;i++) {
-        this.ships.auto[i].teleport(this.system, first_planet);
-      }
-      this.ships.player.teleport(this.system, first_planet);
-
+      this.teleport();
+      
       this.paused = false;
     },
 
+    teleport: function() {
+      setTimeout(function() {
+        var first_planet = prop.game.system.planets[0].name;
+        for(var i=0;i<prop.game.ships.auto.length;i++) {
+          prop.game.ships.auto[i].teleport(prop.game.system, first_planet);
+        }
+        prop.game.ships.player.teleport(prop.game.system, first_planet);
+      }, 100);
+    },
+
     update: function() {
-      this.delta=Math.min(delta()*this.speedup, 1);
+      this.delta = delta() * this.speedup;
 
       if(this.isPaused()) {
         this.delta=0;

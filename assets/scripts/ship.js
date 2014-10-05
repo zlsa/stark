@@ -17,17 +17,15 @@ var ShipModel = Fiber.extend(function() {
         impulse: {
           type:       "xenon",
           capacity:   30,
-          max_rate:   {
-            output:   1,
-            input:    1
+          rate: {
+            input: 2
           }
         },
         jump: {
           type:       "hydrogen",
           capacity:   50,
-          max_rate:   {
-            output:   1,
-            input:    1
+          rate: {
+            input: 2
           }
         }
       };
@@ -77,9 +75,10 @@ var ShipModel = Fiber.extend(function() {
         for(var i=0;i<types.length;i++) {
           var type = types[i];
           if(data.fuel[type]) {
-            if(data.fuel[type].type)       this.fuel[type].type       = data.fuel[type].type;
+            var fuel_type = data.fuel[type].type;
+            if(data.fuel[type].type)       this.fuel[type].type       = fuel_type;
             if(data.fuel[type].capacity)   this.fuel[type].capacity   = data.fuel[type].capacity;
-            if(data.fuel[type].max_rate)   this.fuel[type].max_rate   = data.fuel[type].max_rate;
+            this.fuel[type].rate.input                                = prop.cargo.fuels[fuel_type].rate.input;
           }
         }
       }
@@ -198,7 +197,7 @@ var Ship = Fiber.extend(function() {
         for(var i=0;i<types.length;i++) {
           var type = types[i];
           this.fuel[type].type     = this.model.fuel[type].type;
-          this.fuel[type].max_rate = this.model.fuel[type].max_rate;
+          this.fuel[type].max_rate = this.model.fuel[type].rate;
           this.fuel[type].weight   = prop.cargo.fuels[this.model.fuel[type].type].weight;
           this.fuel[type].capacity = this.model.fuel[type].capacity;
 
@@ -233,7 +232,8 @@ var Ship = Fiber.extend(function() {
     },
 
     updateFuel: function() {
-      var fuel_rate_out = this.controls[1] * this.model.fuel.impulse.max_rate.output;
+      var fuel_type     = this.model.fuel.impulse.type;
+      var fuel_rate_out = this.thrust * prop.cargo.fuels[fuel_type].burn_rate;
       this.fuel.impulse.rate.output = fuel_rate_out;
 
       var closest_planet = system_get().closestPlanet(this.position, true, 0.5);
@@ -242,7 +242,7 @@ var Ship = Fiber.extend(function() {
       for(var i=0;i<types.length;i++) {
         var type = types[i];
         if(closest_planet && closest_planet.canRefuel(this.model.fuel[type].type) && this.getSpeed(true) < 10) {
-          this.fuel[type].rate.input = this.model.fuel[type].max_rate.input;
+          this.fuel[type].rate.input = this.model.fuel[type].rate.input;
         } else {
           this.fuel[type].rate.input = 0;
         }
@@ -282,14 +282,14 @@ var Ship = Fiber.extend(function() {
       this.controls[1] = 0.0;
     },
     updateThrust: function() {
-      this.controls[0] = clamp(-3, this.controls[0], 3);
+      this.controls[0] = clamp(-1, this.controls[0], 1);
       this.controls[1] = clamp( 0, this.controls[1], 1);
 
-      this.thrust = this.model.power.thrust * this.controls[1] * 10;
-      this.force[0] = Math.sin(this.angle) * this.thrust;
-      this.force[1] = Math.cos(this.angle) * this.thrust;
+      this.thrust = this.model.power.thrust * this.controls[1];
+      this.force[0] = Math.sin(this.angle) * this.thrust * 20;
+      this.force[1] = Math.cos(this.angle) * this.thrust * 20;
 
-      this.angular_force = this.model.power.angle * this.controls[0];
+      this.angular_force = this.model.power.angle * this.controls[0] * 3;
     },
     updatePhysics: function() {
       this.velocity[0] += (this.force[0] / this.mass) * game_delta();

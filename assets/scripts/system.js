@@ -46,6 +46,8 @@ var System=Fiber.extend(function() {
 
       this.updatePlanetInfo();
 
+      this.generateStarfield();
+
       return this;
     },
 
@@ -77,6 +79,8 @@ var System=Fiber.extend(function() {
       }
 
       this.updatePlanetInfo();
+
+      this.generateStarfield();
 
     },
 
@@ -135,8 +139,7 @@ var System=Fiber.extend(function() {
       return closest_planet;
     },
     generateStarfield: function() {
-      return;
-      var density = 120; // px per star
+      var density = 70; // px per star
 
       var number = (prop.canvas.size[0] * prop.canvas.size[1]) / density / density;
 

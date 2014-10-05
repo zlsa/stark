@@ -69,7 +69,6 @@ var FuelTank = Expendable.extend(function(base) {
       this.type = "xenon";
 
       this.max_rate = {
-        output: 0,
         input:  0
       };
 
@@ -99,7 +98,7 @@ var FuelTank = Expendable.extend(function(base) {
       return (this.getFraction() > 0.9999);
     },
     updateFuel: function() {
-      this.rate.output = clamp(0, this.rate.output, this.max_rate.output) * prop.cargo.fuels[this.type].loss;
+//      this.rate.output = clamp(0, this.rate.output, this.max_rate.output);
       this.rate.input  = clamp(0, this.rate.input,  this.max_rate.input);
 
       if(this.isFull())  this.rate.input  = 0;
@@ -216,21 +215,37 @@ var Cargo = Fiber.extend(function() {
 function cargo_init_pre() {
   prop.cargo = {};
 
+  
+
   prop.cargo.fuels = {
     "argon": {
       weight:  0.003,
-      loss: 2,
-      element: "Ar"
+      element: "Ar",
+
+      burn_rate: 0.1,
+      rate: {
+        input: 2
+      }
     },
+
     "xenon": {
       weight:  0.005,
-      loss: 1,
-      element: "Xe"
+      element: "Xe",
+
+      burn_rate: 0.01,
+      rate: {
+        input: 1
+      }
     },
+
     "hydrogen": {
       weight: 0.0015,
-      loss: 1,
-      element: "H"
+      element: "H",
+
+      burn_rate: 0.01,
+      rate: {
+        input: 2
+      }
     }
   };
 }
